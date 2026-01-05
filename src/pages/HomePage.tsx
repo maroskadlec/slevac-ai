@@ -92,7 +92,7 @@ function HomePage() {
               </h2>
               
               <p className="text-gray-600 mb-6">
-                16 variant animací floating button → modal. Od klasických po best practice interaction design patterns.
+                16 variant animací floating button → modal. Cursor vymyslel sám pouze podle textového kontextu.
               </p>
               
               <div className="flex items-center text-blue-500 font-semibold group-hover:translate-x-2 transition-transform">
@@ -144,7 +144,7 @@ function HomePage() {
               </h2>
               
               <p className="text-gray-600 mb-6">
-                Integrace s Figma pomocí Model Context Protocol. Přímá synchronizace designu s implementací.
+                Integrace s Figma pomocí Model Context Protocol. Cursor natáhl Figma projekt, ale byl nutný manuální zásah a ladění.
               </p>
               
               <div className="flex items-center text-purple-500 font-semibold group-hover:translate-x-2 transition-transform">
