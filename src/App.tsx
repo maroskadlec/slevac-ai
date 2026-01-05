@@ -4,8 +4,10 @@ import CursorIdeas from './pages/CursorIdeas'
 import FigmaMCP from './pages/FigmaMCP'
 
 function App() {
+  const basename = import.meta.env.PROD ? '/slevac-ai' : ''
+  
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/cursor-ideas" element={<CursorIdeas />} />
