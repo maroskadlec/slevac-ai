@@ -282,7 +282,7 @@ function CursorIdeas() {
       {/* Back button - vlevo nahoře nad selectorem */}
       <motion.button
         onClick={() => navigate('/')}
-        className="absolute top-6 left-6 z-[60] flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all text-gray-700 hover:text-gray-900 border border-gray-100"
+        className="absolute top-6 left-6 z-[60] flex items-center gap-2 px-4 py-2 bg-white rounded-xl transition-all text-gray-700 hover:text-gray-900 border border-gray-100"
         whileHover={{ x: -2, scale: 1.02 }}
         whileTap={{ scale: 0.95 }}
         initial={{ opacity: 0, x: -20 }}
@@ -293,9 +293,21 @@ function CursorIdeas() {
         <span className="text-sm font-medium">Zpět</span>
       </motion.button>
       
+      {/* Help text */}
+      <motion.div
+        className="absolute top-6 right-6 z-50 bg-blue-50 text-blue-700 px-4 py-3 rounded-xl border border-blue-200 max-w-xs"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+      >
+        <p className="text-sm font-medium">
+          💡 Vyber si variantu a klikni na floating button v pravém dolním rohu.
+        </p>
+      </motion.div>
+      
       {/* Selector variant - levý horní roh */}
       <div className="absolute top-20 left-6 z-50 max-h-[calc(90vh-80px)] overflow-y-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 border border-gray-100">
           <p className="text-sm font-semibold text-gray-700 mb-2">Základní varianty:</p>
           <div className="flex flex-col gap-2 mb-4">
             <button

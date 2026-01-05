@@ -35,12 +35,27 @@ function FigmaMCP() {
         <div className="w-[140px]" />
       </div>
 
+      {/* Help text */}
+      <div className="px-6 pb-4 text-center">
+        <motion.div
+          className="inline-flex bg-purple-50 text-purple-700 px-4 py-3 rounded-xl border border-purple-200"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <p className="text-sm font-medium">
+            💡 Checkuj pana Lupičku, pulzuje, mrká a otevírá modál, pokud na něj klikneš.
+          </p>
+        </motion.div>
+      </div>
+
       {/* Tab Switcher */}
       <div className="px-6 pb-6 text-center">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex bg-white rounded-2xl shadow-lg p-1 gap-1"
+          transition={{ delay: 0.3 }}
+          className="inline-flex bg-white rounded-2xl border border-gray-100 p-1 gap-1"
         >
           <motion.button
             onClick={() => setViewMode('desktop')}
