@@ -68,7 +68,7 @@ function FigmaMCP() {
             whileTap={{ scale: 0.98 }}
           >
             <Monitor className="w-5 h-5" />
-            <span>Desktop</span>
+            <span>Desktop 1000</span>
           </motion.button>
           
           <motion.button
