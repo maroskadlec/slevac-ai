@@ -67,13 +67,13 @@ function HomePage() {
               damping: 20,
               delay: 0.2
             }}
-            className="inline-block mb-6"
+            className="inline-block mb-0"
           >
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl overflow-hidden">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center overflow-hidden">
               <motion.img
                 src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
                 alt="Mrkatko"
-                className="w-10 h-10 object-cover"
+                className="w-20 h-20 object-cover mt-6 ml-[10px]"
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 1 }}
                 transition={{
@@ -84,11 +84,11 @@ function HomePage() {
             </div>
           </motion.div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
-            Slevomat AI
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            Opening Lupičky na Sleváči
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Interakční design playground s pokročilými animacemi a integrací s Figma
+            Interakční playground s animacemi pro otevření / zavření pana Lupičky.
           </p>
         </motion.div>
 
