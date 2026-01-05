@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Send Button">
+<circle id="Ellipse 1" cx="16" cy="16" r="16" fill="var(--fill-0, #0072BF)"/>
+<path id="Vector" d="M11.5538 16.9054L16.0637 15.7916L12.8854 19.315C12.6877 19.5342 12.6512 19.8631 12.7958 20.1238L14.7574 23.6603C15.0002 24.0981 15.599 24.1163 15.8658 23.694L23.0909 12.2565C23.3868 11.7881 23.044 11.1678 22.5077 11.2013L9.41399 12.0195C8.9305 12.0497 8.64618 12.6005 8.88769 13.0391L10.8386 16.5821C10.9823 16.8432 11.2732 16.9747 11.5538 16.9054Z" fill="var(--fill-0, white)"/>
+</g>
+</svg>
