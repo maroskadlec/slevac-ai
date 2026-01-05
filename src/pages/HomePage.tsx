@@ -121,7 +121,7 @@ function HomePage() {
               </h2>
               
               <p className="text-gray-600 mb-6">
-                16 variant animací floating button → modal. Cursor vymýšlel podle textového kontextu.
+                Cursor sám vymyslel 16 variant animací floating button → modal podle textového kontextu.
               </p>
               
               <div className="flex items-center text-blue-500 font-semibold group-hover:translate-x-2 transition-transform">
@@ -173,7 +173,7 @@ function HomePage() {
               </h2>
               
               <p className="text-gray-600 mb-6">
-                Integrace s Figma pomocí MCP. Cursor natáhl Figma zdroje, ale byl nutný manuální zásah a ladění.
+                Integrace s Figma pomocí MCP a manuálním laděním v Cursoru.
               </p>
               
               <div className="flex items-center text-purple-500 font-semibold group-hover:translate-x-2 transition-transform">
