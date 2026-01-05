@@ -1,9 +1,28 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Sparkles, Figma } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+const mrkatkoImg = "http://localhost:3845/assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png"
+const mrkatkoImgBlink = "http://localhost:3845/assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png"
 
 function HomePage() {
   const navigate = useNavigate()
+  const [isBlinking, setIsBlinking] = useState(false)
+
+  useEffect(() => {
+    const blinkCycle = () => {
+      setTimeout(() => {
+        setIsBlinking(true)
+        setTimeout(() => {
+          setIsBlinking(false)
+        }, 200)
+      }, 2000)
+    }
+    blinkCycle()
+    const interval = setInterval(blinkCycle, 2400)
+    return () => clearInterval(interval)
+  }, [])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -50,8 +69,18 @@ function HomePage() {
             }}
             className="inline-block mb-6"
           >
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
-              <Sparkles className="w-10 h-10 text-white" strokeWidth={2} />
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl overflow-hidden">
+              <motion.img
+                src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                alt="Mrkatko"
+                className="w-10 h-10 object-cover"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  duration: 0.1,
+                  ease: "easeIn"
+                }}
+              />
             </div>
           </motion.div>
           
