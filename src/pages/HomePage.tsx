@@ -84,7 +84,7 @@ function HomePage() {
             </div>
           </motion.div>
           
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-5xl font-heading font-bold text-gray-900 mb-4">
             Opening Lupičky na Sleváči
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -116,7 +116,7 @@ function HomePage() {
                 <Sparkles className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
               
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl font-heading font-bold text-gray-900 mb-3">
                 Cursor Ideas
               </h2>
               
@@ -168,7 +168,7 @@ function HomePage() {
                 <Figma className="w-7 h-7 text-white" strokeWidth={2.5} />
               </div>
               
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl font-heading font-bold text-gray-900 mb-3">
                 Figma MCP
               </h2>
               

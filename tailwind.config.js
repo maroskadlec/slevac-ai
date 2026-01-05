@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'heading': ['"DM Sans"', 'sans-serif'],
+      },
       animation: {
         'float-up': 'float-up 0.3s ease-out',
       },

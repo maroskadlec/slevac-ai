@@ -137,7 +137,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                 <div className="flex-1 flex flex-col gap-[12px] items-center pt-[24px] px-[12px]">
                   <div className="flex flex-col gap-[12px] items-start w-[297px]">
                     <div className="flex flex-col justify-center w-full text-center">
-                      <p className="text-[18px] leading-[24px] font-bold text-black">
+                      <p className="text-[18px] leading-[24px] font-heading font-bold text-black">
                         Co je pro vás u nabídky nejdůležitější?
                       </p>
                     </div>

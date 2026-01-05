@@ -29,7 +29,7 @@ function FigmaMCP() {
         </motion.button>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-gray-900">Figma MCP Prototype</h1>
+        <h1 className="text-2xl font-heading font-bold text-gray-900">Figma MCP Prototype</h1>
 
         {/* Spacer */}
         <div className="w-[140px]" />

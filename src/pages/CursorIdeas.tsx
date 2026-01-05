@@ -717,7 +717,7 @@ function CursorIdeas() {
                       <Hand className="w-8 h-8 text-blue-500" />
                     </motion.div>
                     <motion.h2 
-                      className="text-2xl font-bold text-gray-800 mb-2"
+                      className="text-2xl font-heading font-bold text-gray-800 mb-2"
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={
@@ -821,7 +821,7 @@ function CursorIdeas() {
                   <Hand className="w-8 h-8 text-blue-500" />
                 </motion.div>
                 <motion.h2 
-                  className="text-2xl font-bold text-gray-800 mb-2"
+                  className="text-2xl font-heading font-bold text-gray-800 mb-2"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
