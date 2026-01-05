@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Sparkles, Figma } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const mrkatkoImg = "/assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png"
-const mrkatkoImgBlink = "/assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png"
+const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
+const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
 
 function HomePage() {
   const navigate = useNavigate()

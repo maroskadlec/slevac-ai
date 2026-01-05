@@ -2,11 +2,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const mrkatkoImg = "/assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png"
-const mrkatkoImgBlink = "/assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png"
-const sendButtonImg = "/assets/b566da7dcba8c9f0656e922633217fc36ee35512.svg"
-const voiceButtonBg = "/assets/f39427466b7ce9cea4505bd4b8ac65b6e3d74bf3.svg"
-const voiceIcon = "/assets/037840fe097f349417e8ae86808dddf316d4ac75.svg"
+const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
+const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
+const sendButtonImg = `${import.meta.env.BASE_URL}assets/b566da7dcba8c9f0656e922633217fc36ee35512.svg`
+const voiceButtonBg = `${import.meta.env.BASE_URL}assets/f39427466b7ce9cea4505bd4b8ac65b6e3d74bf3.svg`
+const voiceIcon = `${import.meta.env.BASE_URL}assets/037840fe097f349417e8ae86808dddf316d4ac75.svg`
 
 interface MobileProps {
   isOpen: boolean

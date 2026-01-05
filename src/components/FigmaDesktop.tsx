@@ -1,12 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 
-const mrkatkoImg = "/assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png"
-const mrkatkoImgBlink = "/assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png"
-const closeIconImg = "/assets/c1b749a8143858489d026131cbf1d1804e6e2af0.svg"
-const sendButtonImg = "/assets/7c097206977c16b3e9fcff249f8fd9c86fbd5568.svg"
-const voiceButtonBg = "/assets/74ad77275199479aea4bf86e7ce94c22d3306a24.svg"
-const voiceIcon = "/assets/037840fe097f349417e8ae86808dddf316d4ac75.svg"
+const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
+const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
+const closeIconImg = `${import.meta.env.BASE_URL}assets/c1b749a8143858489d026131cbf1d1804e6e2af0.svg`
+const sendButtonImg = `${import.meta.env.BASE_URL}assets/7c097206977c16b3e9fcff249f8fd9c86fbd5568.svg`
+const voiceButtonBg = `${import.meta.env.BASE_URL}assets/74ad77275199479aea4bf86e7ce94c22d3306a24.svg`
+const voiceIcon = `${import.meta.env.BASE_URL}assets/037840fe097f349417e8ae86808dddf316d4ac75.svg`
 
 interface DesktopProps {
   isOpen: boolean
