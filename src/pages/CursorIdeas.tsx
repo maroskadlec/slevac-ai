@@ -770,7 +770,7 @@ function CursorIdeas() {
       <AnimatePresence>
         {isOpen && !useSharedElement && (
           <motion.div
-            variants={modalVariants[animationVariant]}
+            variants={modalVariants[animationVariant as keyof typeof modalVariants] || modalVariants['spring-scale']}
             initial="initial"
             animate="animate"
             exit="exit"
