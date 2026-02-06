@@ -94,11 +94,6 @@ export default function DealCarousel({ deals, compact = false }: DealCarouselPro
               </p>
               {/* Rating */}
               <div className="flex items-center gap-[3px]">
-                {deal.ratingLabel && (
-                  <span className={`text-[#e8a400] font-semibold ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
-                    {deal.ratingLabel}
-                  </span>
-                )}
                 <Star className={`text-[#FCD34D] fill-[#FCD34D] ${compact ? 'w-[9px] h-[9px]' : 'w-[10px] h-[10px]'}`} />
                 <span className={`text-[#666] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
                   {deal.rating.toFixed(1).replace('.', ',')} / 5
