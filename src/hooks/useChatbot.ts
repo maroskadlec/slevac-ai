@@ -109,92 +109,116 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     return { text: 'Rádo se stalo! 😊 Pokud budeš potřebovat cokoliv dalšího, jsem tu pro tebe.' }
   }
 
-  // --- Specific location: Krkonoše → show deals ---
+  // Determine if we have enough context to show deals
+  // Early conversation = user sent fewer than 2 messages before this one
+  const isEarlyConversation = prevUserMessages.length < 2
+  const hasLocationContext = allUserText.match(/\b(krkonos|beskydy|sumav|lipno|jeseniky|cesky raj|vysocin|praha|brno|spindl|harrachov|pec|snezk)/)
+  const hasTypeContext = allUserText.match(/\b(wellness|relax|masaz|spa|hotel|ubytovan|dovolen|restaurac|jidlo|romanticke|rodina|deti|sport|aktivit)/)
+
+  // --- Specific location: Krkonoše ---
   if (msg.match(/\b(krkonos|spindl|harrachov|pec|snezk)/)) {
+    if (isEarlyConversation && !hasTypeContext) {
+      return { text: 'Krkonoše jsou skvělá volba! 🏔️ Abych ti našel to pravé – hledáš spíš wellness a relax, aktivní dovolenou, nebo rodinný pobyt?' }
+    }
     return {
       text: 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe. Který se ti líbí nejvíc?',
       deals: pickRandomDeals(5),
     }
   }
 
-  // --- Specific location: Beskydy, Šumava, other mountains → show deals ---
+  // --- Specific location: Beskydy, Šumava, other mountains ---
   if (msg.match(/\b(beskydy|sumav|lipno|jeseniky|cesky raj|vysocin)/)) {
+    if (isEarlyConversation && !hasTypeContext) {
+      return { text: 'Výborný tip na lokalitu! Co tam chceš hlavně dělat – relaxovat ve wellness, vyrazit na výlety, nebo si užít pobyt s rodinou?' }
+    }
     return {
       text: 'Skvělá volba! Našel jsem pro tebe nabídky v této oblasti. Podívej se, co jsem vybral:',
       deals: pickRandomDeals(5),
     }
   }
 
-  // --- Wellness with enough context → show deals ---
+  // --- Wellness ---
   if (msg.match(/\b(wellness|relax|masaz|spa|bazen|saun|virivk)/)) {
-    if (allUserText.match(/\b(krkonos|beskydy|sumav|praha|brno|lipno|jeseniky)/) || prevUserMessages.length >= 2) {
-      return {
-        text: 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe.',
-        deals: pickRandomDeals(5),
-      }
+    if (isEarlyConversation && !hasLocationContext) {
+      return { text: 'Wellness zní skvěle! 🧖 Máš představu o lokalitě? Třeba Krkonoše, Beskydy, Šumava – nebo ti to je jedno a hledáš prostě nejlepší nabídku?' }
     }
-    return { text: 'Moc rád. Vidím do celé nabídky Slevomatu a pomůžu ti vybrat nejvhodnější zážitek podle preferencí. Uvažuješ o nějaké konkrétní lokalitě?' }
+    return {
+      text: 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe.',
+      deals: pickRandomDeals(5),
+    }
   }
 
-  // --- Restaurant with enough context → show deals ---
+  // --- Restaurant ---
   if (msg.match(/\b(jidlo|restaurac|jist|obed|vecere|snidane|kuchyn|gastr|menu|degustac)/)) {
-    if (prevUserMessages.length >= 1 || msg.length > 20) {
-      return {
-        text: 'Tady jsou moje top doporučení. Všechny mají skvělé hodnocení a nabízí nezapomenutelný zážitek:',
-        deals: pickRandomDeals(5),
-      }
+    if (isEarlyConversation && msg.length < 25) {
+      return { text: 'Skvělá volba! Máme úžasné nabídky restaurací. Hledáš spíš degustační menu, zážitkovou večeři, nebo něco jiného? A v jakém městě?' }
     }
-    return { text: 'Skvělá volba! Máme úžasné nabídky restaurací. Hledáš spíš degustační menu, zážitkovou večeři, nebo něco jiného?' }
+    return {
+      text: 'Tady jsou moje top doporučení. Všechny mají skvělé hodnocení a nabízí nezapomenutelný zážitek:',
+      deals: pickRandomDeals(5),
+    }
   }
 
-  // --- Travel/Hotel → context determines ---
+  // --- Travel/Hotel ---
   if (msg.match(/\b(hotel|ubytovan|dovolen|cestovan|vylet|pobyt|chata|chalup)/)) {
-    if (allUserText.match(/\b(krkonos|beskydy|sumav|lipno|jeseniky|cesky raj)/) || prevUserMessages.length >= 2) {
-      return {
-        text: 'Tady jsou nabídky pobytů, které jsem pro tebe vybral. Všechny mají výborné hodnocení:',
-        deals: pickRandomDeals(5),
-      }
+    if (isEarlyConversation && !hasLocationContext) {
+      return { text: 'Cestování je moje specialita! Máme nabídky od horských chat po luxusní resorty. Kam by ses chtěl/a podívat a co je pro tebe důležité – wellness, příroda, sport?' }
     }
-    return { text: 'Cestování je moje specialita! Máme nabídky od horských chat po luxusní resorty. Kam by ses chtěl/a podívat?' }
+    return {
+      text: 'Tady jsou nabídky pobytů, které jsem pro tebe vybral. Všechny mají výborné hodnocení:',
+      deals: pickRandomDeals(5),
+    }
   }
 
-  // --- Price focused → show deals ---
+  // --- Price focused ---
   if (msg.match(/\b(cena|levn|slev|akce|vyhod|peniz|korun|kc|czk|lacin)/)) {
-    if (prevUserMessages.length >= 1) {
-      return {
-        text: 'Tady jsou nejlepší nabídky s výborným poměrem cena/výkon. Všechny pod super cenou:',
-        deals: pickRandomDeals(5),
-      }
+    if (isEarlyConversation) {
+      return { text: 'Rozumím, hledáš nejlepší poměr cena/výkon! Momentálně máme akce až -60% na vybrané pobyty. O jaký typ zážitku máš zájem a kam by ses chtěl/a podívat?' }
     }
-    return { text: 'Rozumím, hledáš nejlepší poměr cena/výkon! Momentálně máme akce až -60% na vybrané pobyty. O jaký typ zážitku máš zájem?' }
+    return {
+      text: 'Tady jsou nejlepší nabídky s výborným poměrem cena/výkon. Všechny pod super cenou:',
+      deals: pickRandomDeals(5),
+    }
   }
 
-  // --- Romantic → show deals ---
+  // --- Romantic ---
   if (msg.match(/\b(romanticke|partner|dvou|valentyn|vyrocí|ve dvou)/)) {
+    if (isEarlyConversation && !hasLocationContext) {
+      return { text: 'Romantika pro dva – to zní krásně! 💑 Máš představu kam? A láká tě spíš wellness, večeře při svíčkách, nebo obojí?' }
+    }
     return {
       text: 'Romantický pobyt pro dva? Mám pro tebe skvělé tipy – privátní wellness, večeře při svíčkách a krásné prostředí:',
       deals: pickRandomDeals(5),
     }
   }
 
-  // --- Family → show deals ---
+  // --- Family ---
   if (msg.match(/\b(rodina|deti|dite|rodinny|rodinn)/)) {
+    if (isEarlyConversation && !hasLocationContext) {
+      return { text: 'Rodinný pobyt je super nápad! 👨‍👩‍👧‍👦 Kam byste chtěli vyrazit? A jak staré jsou děti – ať najdu něco, co bude bavit celou rodinu.' }
+    }
     return {
       text: 'Pro rodiny s dětmi mám super tipy! Aquaparky, animační programy a pobyty, kde si užijí malí i velcí:',
       deals: pickRandomDeals(5),
     }
   }
 
-  // --- Sports → show deals ---
+  // --- Sports ---
   if (msg.match(/\b(sport|aktivit|kolo|lyzov|bruslen|turistik|golf|cykl)/)) {
+    if (isEarlyConversation && !hasLocationContext) {
+      return { text: 'Aktivní dovolená – to je moje! 🚴 Jaký sport tě zajímá a kam by ses chtěl/a podívat?' }
+    }
     return {
       text: 'Sportovní nabídky jsou super! Tady je pár tipů, co jsem pro tebe našel:',
       deals: pickRandomDeals(5),
     }
   }
 
-  // --- Views / nature → show deals ---
+  // --- Views / nature ---
   if (msg.match(/\b(vyhled|prirod|hory|more|krajin|les)/)) {
+    if (isEarlyConversation && !hasLocationContext) {
+      return { text: 'Příroda a krásné výhledy – toho máme hodně! 🌿 Preferuješ hory, vodní plochy, nebo ti je to jedno? A hledáš spíš relax nebo aktivní program?' }
+    }
     return {
       text: 'Krásné výhledy a příroda – to je přesně to, co máme. Podívej se na tyto nabídky:',
       deals: pickRandomDeals(5),
