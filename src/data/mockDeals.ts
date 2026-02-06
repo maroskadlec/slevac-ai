@@ -13,11 +13,13 @@ export interface DealCard {
   distance: string
 }
 
+const BASE = import.meta.env.BASE_URL
+
 // All 11 real deals – chatbot randomly picks 5 for each recommendation
 export const allDeals: DealCard[] = [
   {
     id: 'd1',
-    image: '', // placeholder – real image coming later
+    image: `${BASE}assets/deals/d1.jpg`,
     title: 'Pobyt ve Špindlerově Mlýně s polopenzí a wellness',
     price: 2290,
     rating: 4.4,
@@ -28,7 +30,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd2',
-    image: '',
+    image: `${BASE}assets/deals/d2.jpg`,
     title: 'Relax ve Špindlu: jídlo, bazén a neomezený wellness',
     price: 3980,
     originalPrice: 4200,
@@ -42,7 +44,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd3',
-    image: '',
+    image: `${BASE}assets/deals/d3.jpg`,
     title: 'Pobyt ve Vrchlabí: možnost wellness i romantické večeře',
     price: 2540,
     originalPrice: 2978,
@@ -56,7 +58,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd4',
-    image: '',
+    image: `${BASE}assets/deals/d4.jpg`,
     title: 'Pobyt ve Špindlerově Mlýně s polopenzí i wellness',
     price: 6580,
     rating: 4.7,
@@ -68,7 +70,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd5',
-    image: '',
+    image: `${BASE}assets/deals/d5.jpg`,
     title: 'Horský hotel u Pece pod Sněžkou s jídlem a wellness',
     price: 1899,
     originalPrice: 2900,
@@ -82,7 +84,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd6',
-    image: '',
+    image: `${BASE}assets/deals/d6.jpg`,
     title: 'Pobyt ve Špindlu s polopenzí a neomezeným wellness',
     price: 5990,
     originalPrice: 6660,
@@ -95,7 +97,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd7',
-    image: '',
+    image: `${BASE}assets/deals/d7.jpg`,
     title: 'Wellness pobyt v Peci pod Sněžkou s polopenzí',
     price: 3290,
     rating: 4.7,
@@ -107,7 +109,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd8',
-    image: '',
+    image: `${BASE}assets/deals/d8.jpg`,
     title: 'Resort Špindl pod Medvědínem: jídlo i aquapark',
     price: 2600,
     rating: 4.6,
@@ -118,7 +120,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd9',
-    image: '',
+    image: `${BASE}assets/deals/d9.jpg`,
     title: 'Pobyt ve Špindlu až pro 5 osob: jídlo i wellness',
     price: 1790,
     rating: 4.6,
@@ -130,7 +132,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd10',
-    image: '',
+    image: `${BASE}assets/deals/d10.jpg`,
     title: 'Pobyt v Krkonoších: jídlo i neomezený wellness',
     price: 2290,
     originalPrice: 2744,
@@ -143,7 +145,7 @@ export const allDeals: DealCard[] = [
   },
   {
     id: 'd11',
-    image: '',
+    image: `${BASE}assets/deals/d11.jpg`,
     title: 'Harrachov: apartmán s vlastní vířivkou i saunou, jídlo',
     price: 8190,
     originalPrice: 8506,
