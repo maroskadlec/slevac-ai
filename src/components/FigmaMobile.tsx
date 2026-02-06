@@ -1,13 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X, Info, Mic, Send } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useChatbot } from '../hooks/useChatbot'
 
 const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
 const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
-const sendButtonImg = `${import.meta.env.BASE_URL}assets/b566da7dcba8c9f0656e922633217fc36ee35512.svg`
-const voiceButtonBg = `${import.meta.env.BASE_URL}assets/f39427466b7ce9cea4505bd4b8ac65b6e3d74bf3.svg`
-const voiceIcon = `${import.meta.env.BASE_URL}assets/037840fe097f349417e8ae86808dddf316d4ac75.svg`
 
 interface MobileProps {
   isOpen: boolean
@@ -21,18 +18,14 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
 
   useEffect(() => {
     if (!isOpen) {
-      // Floating button pulse animation cycle with 250ms intervals
       const animationCycle = () => {
-        setButtonState('state3')        // at 0ms
-        setTimeout(() => setButtonState('state4'), 250)   // at 250ms
-        setTimeout(() => setButtonState('state5'), 500)   // at 500ms
-        setTimeout(() => setButtonState('default'), 750)  // at 750ms
+        setButtonState('state3')
+        setTimeout(() => setButtonState('state4'), 250)
+        setTimeout(() => setButtonState('state5'), 500)
+        setTimeout(() => setButtonState('default'), 750)
       }
-
-      // Start after 2s, repeat every 1000ms (full cycle duration)
       const initialTimeout = setTimeout(animationCycle, 2000)
       const interval = setInterval(animationCycle, 1000)
-
       return () => {
         clearTimeout(initialTimeout)
         clearInterval(interval)
@@ -40,25 +33,17 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
     }
   }, [isOpen])
 
-  // Mrkatko blink animation
   useEffect(() => {
     const blinkCycle = () => {
-      // Wait 2000ms, then blink
       setTimeout(() => {
         setIsBlinking(true)
-        // Stay blinking for 200ms, then return to default
         setTimeout(() => {
           setIsBlinking(false)
         }, 200)
       }, 2000)
     }
-
-    // Start initial blink cycle
     blinkCycle()
-    
-    // Repeat every 2400ms (2000ms default + 100ms transition + 200ms blink + 100ms transition)
     const interval = setInterval(blinkCycle, 2400)
-
     return () => clearInterval(interval)
   }, [])
 
@@ -91,15 +76,37 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 stiffness: 300,
                 damping: 30
               }}
-              className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-20 flex flex-col gap-[10px] p-[8px] h-[480px]"
+              className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-20 flex flex-col h-[480px]"
             >
-              {/* Header */}
-              <div className="bg-white h-[30px] overflow-hidden rounded-tl-[8px] rounded-tr-[8px] relative">
-                <div className="absolute bg-[#e4e4e7] h-[3px] w-[32px] rounded-[22px] top-[6px] left-1/2 transform -translate-x-1/2" />
+              {/* Drag Handle */}
+              <div className="flex justify-center pt-[6px] pb-[2px] flex-shrink-0">
+                <div className="bg-[#e4e4e7] h-[3px] w-[32px] rounded-[22px]" />
+              </div>
+
+              {/* Header Bar */}
+              <div className="flex items-center px-[10px] py-[6px] gap-[6px] flex-shrink-0">
+                {/* Mrkatko small circle */}
+                <div className="w-[24px] h-[24px] bg-[#006eb9] rounded-full overflow-hidden flex-shrink-0 relative">
+                  <motion.img 
+                    alt="Mrkatko" 
+                    className="absolute w-[167%] h-[175%] max-w-none left-[-22%] top-[-6%]"
+                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.1, ease: "easeIn" }}
+                  />
+                </div>
                 
+                {/* Disclaimer */}
+                <div className="flex items-center gap-[3px] flex-1 min-w-0">
+                  <p className="text-[10px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
+                  <Info className="w-[10px] h-[10px] text-[#8e8e93] flex-shrink-0" />
+                </div>
+                
+                {/* Close button */}
                 <motion.button
                   onClick={onToggle}
-                  className="absolute right-[-6px] top-[-9px] w-[48px] h-[48px] cursor-pointer flex items-center justify-center"
+                  className="w-[24px] h-[24px] flex items-center justify-center cursor-pointer"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -107,73 +114,75 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 </motion.button>
               </div>
 
-              {/* Chat Content */}
-              <div className="flex-1 flex flex-col w-full min-h-0">
-                {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto px-[8px] py-[6px] flex flex-col gap-[6px] scrollbar-thin">
-                  {chat.messages.map((msg) => (
-                    <motion.div
-                      key={msg.id}
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.2 }}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[85%] px-[10px] py-[6px] rounded-[12px] text-[13px] leading-[18px] whitespace-pre-line ${
-                          msg.sender === 'user'
-                            ? 'bg-[#006eb9] text-white rounded-br-[4px]'
-                            : 'bg-[#f1f3f5] text-black rounded-bl-[4px]'
-                        }`}
-                      >
-                        {msg.text}
+              {/* Scrollable Chat Area */}
+              <div className="flex-1 overflow-y-auto px-[12px] pb-[6px] flex flex-col gap-[10px] min-h-0">
+                {/* Welcome Title */}
+                <h2 className="text-[18px] leading-[24px] font-heading font-bold text-black pt-[2px] pb-[2px]">
+                  Ahoj, pomůžu najít nabídky, které ti sednou
+                </h2>
+                
+                {/* Messages */}
+                {chat.messages.map((msg) => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className={msg.sender === 'user' ? 'flex justify-end' : ''}
+                  >
+                    {msg.sender === 'user' ? (
+                      <div className="bg-[#f0f0f3] rounded-[14px] rounded-br-[4px] px-[12px] py-[6px] max-w-[85%]">
+                        <p className="text-[13px] leading-[18px] text-black">{msg.text}</p>
                       </div>
-                    </motion.div>
-                  ))}
-                  {chat.isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex justify-start"
-                    >
-                      <div className="bg-[#f1f3f5] px-[12px] py-[8px] rounded-[12px] rounded-bl-[4px] flex gap-[4px] items-center">
-                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} className="w-[5px] h-[5px] bg-gray-400 rounded-full" />
-                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} className="w-[5px] h-[5px] bg-gray-400 rounded-full" />
-                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} className="w-[5px] h-[5px] bg-gray-400 rounded-full" />
-                      </div>
-                    </motion.div>
-                  )}
-                  <div ref={chat.messagesEndRef} />
-                </div>
-
-                {/* Input Footer */}
-                <div className="flex flex-col items-center justify-end w-full px-[2px] pb-[4px]">
-                  <div className="flex gap-[4px] items-center w-full">
-                    <input
-                      type="text"
-                      value={chat.inputValue}
-                      onChange={(e) => chat.setInputValue(e.target.value)}
-                      onKeyDown={chat.handleKeyDown}
-                      placeholder="Popište mi svou představu .."
-                      className="flex-1 bg-[#f1f3f5] px-[12px] py-[6px] rounded-[8px] text-[14px] leading-[22px] text-black placeholder-[#6b6b70] font-medium outline-none border-none focus:ring-2 focus:ring-[#006eb9]/30"
-                    />
-                    
-                    {/* Send Button */}
-                    <button
-                      onClick={chat.sendMessage}
-                      className="w-[32px] h-[32px] cursor-pointer flex-shrink-0 hover:opacity-80 transition-opacity"
-                    >
-                      <img src={sendButtonImg} alt="Odeslat" className="w-full h-full" />
-                    </button>
-                    
-                    {/* Voice Button */}
-                    <div className="relative w-[32px] h-[32px] flex-shrink-0">
-                      <img src={voiceButtonBg} alt="" className="w-full h-full" />
-                      <div className="absolute top-[6.4px] left-[6.4px] w-[19.2px] h-[19.2px] bg-[#17181b] rounded-full flex items-center justify-center">
-                        <img src={voiceIcon} alt="" className="w-[11.789px] h-[16px]" />
-                      </div>
+                    ) : (
+                      <p className="text-[13px] leading-[19px] text-[#1a1a1a] whitespace-pre-line">{msg.text}</p>
+                    )}
+                  </motion.div>
+                ))}
+                
+                {/* Typing indicator */}
+                {chat.isTyping && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-[5px]"
+                  >
+                    <div className="flex gap-[3px] items-center">
+                      <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} className="w-[4px] h-[4px] bg-[#8e8e93] rounded-full" />
+                      <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} className="w-[4px] h-[4px] bg-[#8e8e93] rounded-full" />
+                      <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} className="w-[4px] h-[4px] bg-[#8e8e93] rounded-full" />
                     </div>
-                  </div>
+                    <span className="text-[12px] text-[#8e8e93]">{chat.typingText}</span>
+                  </motion.div>
+                )}
+                
+                <div ref={chat.messagesEndRef} />
+              </div>
+
+              {/* Input Bar */}
+              <div className="px-[8px] pb-[8px] pt-[4px] flex-shrink-0">
+                <div className="flex gap-[6px] items-center">
+                  <input
+                    type="text"
+                    value={chat.inputValue}
+                    onChange={(e) => chat.setInputValue(e.target.value)}
+                    onKeyDown={chat.handleKeyDown}
+                    placeholder="Popište svou představu..."
+                    className="flex-1 bg-[#f1f3f5] rounded-[18px] px-[14px] py-[8px] text-[13px] leading-[18px] text-black placeholder-[#8e8e93] outline-none border-none focus:ring-2 focus:ring-[#006eb9]/20"
+                  />
+                  
+                  {/* Mic Button */}
+                  <button className="w-[32px] h-[32px] bg-[#17181b] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#2a2a2e] transition-colors cursor-pointer">
+                    <Mic className="w-[14px] h-[14px] text-white" />
+                  </button>
+                  
+                  {/* Send Button */}
+                  <button
+                    onClick={chat.sendMessage}
+                    className="w-[32px] h-[32px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-colors cursor-pointer"
+                  >
+                    <Send className="w-[14px] h-[14px] text-white" />
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -254,4 +263,3 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
     </div>
   )
 }
-
