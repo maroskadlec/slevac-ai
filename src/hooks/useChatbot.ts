@@ -89,6 +89,11 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     return { text: 'Ahoj! 👋 Rád tě vidím. Jak ti mohu dnes pomoci s výběrem nabídky na Sleváči?' }
   }
 
+  // --- Name question ---
+  if (msg.match(/\b(jak se jmenuj|tve jmeno|tvoje jmeno|kdo jsi|jak ti rikaj)/)) {
+    return { text: 'Ve Slevomatu mi říkají Kolečko 😊 A jsem tu, abych ti pomohl najít ten nejlepší zážitek nebo dovolenou!' }
+  }
+
   // --- How did you recommend / on what basis ---
   if (msg.match(/\b(jak jsi.*doporuc|jak jsi.*vyber|jak jsi.*vybir|na zaklade|podle ceho|jak vyber|jak vybir|proc zrovna|jak to vyber|jak to vybir|jak doporuc)/)) {
     return { text: getHowIRecommendResponse() }
