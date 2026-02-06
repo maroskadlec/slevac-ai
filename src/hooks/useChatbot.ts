@@ -308,6 +308,23 @@ export function useChatbot(_isOpen?: boolean) {
     }
   }, [sendMessage])
 
+  const handleFeedback = useCallback((type: 'up' | 'down') => {
+    setIsTyping(true)
+    setTypingText(getTypingText())
+
+    const delay = 600 + Math.random() * 600
+
+    setTimeout(() => {
+      const botMsgId = nextIdRef.current++
+      const text = type === 'up'
+        ? 'Děkuju, to je milé. 😊'
+        : 'To mne mrzí. Pomoz mi pochopit, kde jsem udělal chybku. Školím se a ty mi pomůžeš být příště lepším.'
+      setMessages(prev => [...prev, { id: botMsgId, text, sender: 'bot' }])
+      setIsTyping(false)
+      setTypingText('')
+    }, delay)
+  }, [])
+
   return {
     messages,
     inputValue,
@@ -317,5 +334,6 @@ export function useChatbot(_isOpen?: boolean) {
     messagesEndRef,
     sendMessage,
     handleKeyDown,
+    handleFeedback,
   }
 }

@@ -138,7 +138,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                     ) : (
                       <>
                         <p className="text-[13px] leading-[19px] text-[#1a1a1a] whitespace-pre-line">{msg.text}</p>
-                        {msg.deals && <DealCarousel deals={msg.deals} compact />}
+                        {msg.deals && <DealCarousel deals={msg.deals} compact onFeedback={chat.handleFeedback} />}
                       </>
                     )}
                   </motion.div>
