@@ -18,17 +18,33 @@ export interface ChatMessage {
   deals?: DealCard[]
 }
 
-function getTypingText(userMessage: string): string {
-  const msg = userMessage.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  if (msg.match(/\b(jidlo|restaurac|jist|obed|vecere|snidane|kuchyn|gastr)/)) return 'Hledám restaurace'
-  if (msg.match(/\b(hotel|ubytovan|dovolen|cestovan|vylet|pobyt|chata|chalup)/)) return 'Koumám výlety'
-  if (msg.match(/\b(wellness|relax|masaz|spa|bazen|saun|virivk)/)) return 'Hledám wellness'
-  if (msg.match(/\b(cena|levn|slev|akce|vyhod|peniz|korun)/)) return 'Počítám slevy'
-  if (msg.match(/\b(sport|aktivit|kolo|lyzov|turistik)/)) return 'Hledám aktivity'
-  if (msg.match(/\b(rodina|deti|dite|rodinny)/)) return 'Hledám rodinné nabídky'
-  if (msg.match(/\b(romanticke|partner|dvou)/)) return 'Hledám romantické nabídky'
-  if (msg.match(/\b(krkonos|spindl|harrachov|pec|snezk|beskydy|sumav|lipno|jeseniky)/)) return 'Koumám lokality'
-  return 'Přemýšlím'
+const TYPING_TEXTS = [
+  'Musím to promyslet',
+  'Koumám, co ti nabídnout',
+  'Vybírám z nabídek',
+  'Hledám to nejlepší',
+  'Chvilku, mrknu na to',
+  'Přemýšlím nad možnostmi',
+  'Dávám to dohromady',
+  'Procházím nabídky pro tebe',
+  'Šťourám se v nabídkách',
+  'Moment, ladím detaily',
+  'Hned to bude',
+]
+
+// Tracks which texts have been used in this session to avoid repetition
+const usedTypingTexts: Set<number> = new Set()
+
+function getTypingText(): string {
+  // If all texts have been used, reset
+  if (usedTypingTexts.size >= TYPING_TEXTS.length) {
+    usedTypingTexts.clear()
+  }
+  // Pick a random unused text
+  const available = TYPING_TEXTS.map((_, i) => i).filter(i => !usedTypingTexts.has(i))
+  const idx = available[Math.floor(Math.random() * available.length)]
+  usedTypingTexts.add(idx)
+  return TYPING_TEXTS[idx]
 }
 
 interface BotResponse {
@@ -235,7 +251,7 @@ export function useChatbot(isOpen: boolean) {
     setMessages(newMessages)
     setInputValue('')
     setIsTyping(true)
-    setTypingText(getTypingText(text))
+    setTypingText(getTypingText())
 
     // Longer delay when deals are included (simulating search)
     const response = getBotResponse(text, newMessages)

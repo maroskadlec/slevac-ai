@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, Star, Info, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Heart, Star, ThumbsUp, ThumbsDown } from 'lucide-react'
 import type { DealCard } from '../data/mockDeals'
 
 interface DealCarouselProps {
@@ -39,11 +39,10 @@ export default function DealCarousel({ deals, compact = false }: DealCarouselPro
       className="flex flex-col gap-[6px] w-full"
     >
       {/* Section Header */}
-      <div className="flex items-center gap-[4px]">
-        <p className={`text-[#8e8e93] font-medium ${compact ? 'text-[11px]' : 'text-[12px]'}`}>
-          Nabídky, které by ti mohli sednout
+      <div>
+        <p className={`text-[#8e8e93] font-medium leading-tight ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
+          Vybral jsem z nabídek podle toho, co o nich vím a podle toho, co říkají ostatní zákazníci.
         </p>
-        <Info className={`text-[#b0b0b5] flex-shrink-0 ${compact ? 'w-[10px] h-[10px]' : 'w-[12px] h-[12px]'}`} />
       </div>
 
       {/* Scrollable Cards */}
