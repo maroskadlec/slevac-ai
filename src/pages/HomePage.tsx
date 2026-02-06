@@ -71,12 +71,6 @@ function HomePage() {
           </motion.a>
         </motion.div>
 
-        {/* Footer */}
-        <motion.div variants={itemVariants} className="mt-16">
-          <p className="text-gray-500 text-sm">
-            Vytvořeno v collabu Figma & Cursor & Claude Code
-          </p>
-        </motion.div>
       </motion.div>
     </div>
   )
