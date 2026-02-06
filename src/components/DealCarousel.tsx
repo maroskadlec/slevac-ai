@@ -105,12 +105,11 @@ export default function DealCarousel({ deals, compact = false }: DealCarouselPro
               {/* Provider + Location */}
               <div className={`flex items-center gap-[4px] text-[#8e8e93] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
                 <span className="truncate">{deal.provider}</span>
-                <span className="flex-shrink-0 opacity-50">🏷</span>
+                <span className="flex-shrink-0 opacity-50">·</span>
                 <span className="truncate">{deal.location}</span>
               </div>
               {/* Distance */}
               <div className={`flex items-center gap-[3px] text-[#8e8e93] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
-                <span className="flex-shrink-0 opacity-50">🚗</span>
                 <span>{deal.distance}</span>
               </div>
             </div>
