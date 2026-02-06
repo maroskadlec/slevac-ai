@@ -25,28 +25,11 @@ function FigmaMCP() {
           whileTap={{ scale: 0.95 }}
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="font-medium">Zpět na rozcestník</span>
+          <span className="font-medium">Zpět</span>
         </motion.button>
-
-        {/* Title */}
-        <h1 className="text-2xl font-heading font-bold text-gray-900">Figma MCP Prototype</h1>
 
         {/* Spacer */}
         <div className="w-[140px]" />
-      </div>
-
-      {/* Help text */}
-      <div className="px-6 pb-4 text-center">
-        <motion.div
-          className="inline-flex bg-purple-50 text-purple-700 px-4 py-3 rounded-xl border border-purple-200"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <p className="text-sm font-medium">
-            💡 Checkuj pana Lupičku, pulzuje, mrká a otevírá modál, pokud na něj klikneš.
-          </p>
-        </motion.div>
       </div>
 
       {/* Tab Switcher */}
@@ -129,20 +112,6 @@ function FigmaMCP() {
         </motion.div>
       </div>
 
-      {/* Info Badge */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="p-6"
-      >
-        <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-lg">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-sm font-medium text-gray-700">
-            Interaktivní prototyp z Figma • {viewMode === 'desktop' ? 'Desktop 1000×800' : 'Mobile 320×568'}
-          </span>
-        </div>
-      </motion.div>
     </div>
   )
 }
