@@ -166,19 +166,21 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               {/* Input Bar */}
               <div className="px-[8px] pb-[8px] pt-[4px] flex-shrink-0">
                 <div className="flex gap-[6px] items-center">
-                  <input
-                    type="text"
-                    value={chat.inputValue}
-                    onChange={(e) => chat.setInputValue(e.target.value)}
-                    onKeyDown={chat.handleKeyDown}
-                    placeholder="Popište svou představu..."
-                    className="flex-1 bg-[#f1f3f5] rounded-[18px] px-[14px] py-[8px] text-[13px] leading-[18px] text-black placeholder-[#8e8e93] outline-none border-none focus:ring-2 focus:ring-[#006eb9]/20"
-                  />
-                  
-                  {/* Mic Button */}
-                  <button className="w-[32px] h-[32px] bg-[#17181b] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#2a2a2e] transition-colors cursor-pointer">
-                    <Mic className="w-[14px] h-[14px] text-white" />
-                  </button>
+                  {/* Input with mic inside */}
+                  <div className="flex-1 flex items-center bg-white rounded-[18px] border border-[#d1d5db] px-[3px] py-[2px] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
+                    <input
+                      type="text"
+                      value={chat.inputValue}
+                      onChange={(e) => chat.setInputValue(e.target.value)}
+                      onKeyDown={chat.handleKeyDown}
+                      placeholder="Popište svou představu..."
+                      className="flex-1 bg-transparent px-[10px] py-[5px] text-[13px] leading-[18px] text-black placeholder-[#8e8e93] outline-none border-none"
+                    />
+                    {/* Mic Button inside input */}
+                    <button className="w-[26px] h-[26px] rounded-full border border-[#d1d5db] flex items-center justify-center flex-shrink-0 hover:bg-[#f1f3f5] transition-colors cursor-pointer bg-white">
+                      <Mic className="w-[12px] h-[12px] text-[#6b7280]" />
+                    </button>
+                  </div>
                   
                   {/* Send Button */}
                   <button
