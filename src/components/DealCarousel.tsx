@@ -65,9 +65,21 @@ export default function DealCarousel({ deals, compact = false }: DealCarouselPro
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              {/* Price Badge */}
-              <div className={`absolute bottom-[5px] left-[5px] bg-[#00a84f] text-white font-bold rounded-[4px] ${compact ? 'text-[10px] px-[5px] py-[1px]' : 'text-[11px] px-[6px] py-[2px]'}`}>
-                {formatPrice(deal.price)} Kč
+              {/* Price Badge Area */}
+              <div className={`absolute bottom-[5px] left-[5px] flex items-center gap-[3px]`}>
+                <div className={`bg-[#00a84f] text-white font-bold rounded-[4px] ${compact ? 'text-[10px] px-[5px] py-[1px]' : 'text-[11px] px-[6px] py-[2px]'}`}>
+                  {formatPrice(deal.price)} Kč
+                </div>
+                {deal.originalPrice && (
+                  <span className={`text-white font-medium line-through opacity-90 ${compact ? 'text-[8px]' : 'text-[9px]'}`}>
+                    {formatPrice(deal.originalPrice)} Kč
+                  </span>
+                )}
+                {deal.discount && (
+                  <span className={`bg-[#f0c850] text-[#333] font-bold rounded-[3px] ${compact ? 'text-[8px] px-[3px] py-[0.5px]' : 'text-[9px] px-[4px] py-[1px]'}`}>
+                    –{deal.discount} %
+                  </span>
+                )}
               </div>
               {/* Heart Icon */}
               <button className={`absolute top-[5px] right-[5px] bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors ${compact ? 'w-[20px] h-[20px]' : 'w-[24px] h-[24px]'}`}>
@@ -80,18 +92,32 @@ export default function DealCarousel({ deals, compact = false }: DealCarouselPro
               <p className={`font-bold text-black leading-tight line-clamp-2 ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
                 {deal.title}
               </p>
+              {/* Rating */}
               <div className="flex items-center gap-[3px]">
+                {deal.ratingLabel && (
+                  <span className={`text-[#e8a400] font-semibold ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
+                    {deal.ratingLabel}
+                  </span>
+                )}
                 <Star className={`text-[#FCD34D] fill-[#FCD34D] ${compact ? 'w-[9px] h-[9px]' : 'w-[10px] h-[10px]'}`} />
                 <span className={`text-[#666] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
-                  {deal.rating.toFixed(1).replace('.', ',')} / 5 ({deal.reviewCount} hodnocení)
+                  {deal.rating.toFixed(1).replace('.', ',')} / 5
+                </span>
+                <span className={`text-[#999] ${compact ? 'text-[8px]' : 'text-[9px]'}`}>
+                  ({deal.reviewCount} hodnocení)
                 </span>
               </div>
-              <p className={`text-[#8e8e93] truncate ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
-                {deal.provider}
-              </p>
-              <p className={`text-[#8e8e93] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
-                {deal.distance}
-              </p>
+              {/* Provider + Location */}
+              <div className={`flex items-center gap-[4px] text-[#8e8e93] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
+                <span className="truncate">{deal.provider}</span>
+                <span className="flex-shrink-0 opacity-50">🏷</span>
+                <span className="truncate">{deal.location}</span>
+              </div>
+              {/* Distance */}
+              <div className={`flex items-center gap-[3px] text-[#8e8e93] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
+                <span className="flex-shrink-0 opacity-50">🚗</span>
+                <span>{deal.distance}</span>
+              </div>
             </div>
           </div>
         ))}
