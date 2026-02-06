@@ -23,19 +23,38 @@ const TYPING_TEXTS = [
   'Hned to bude',
 ]
 
+const OFF_TOPIC_RESPONSES = [
+  'Tohle bohužel není moje parketa. Ale cestování a zážitky – tam se vyznám!',
+  'Na tohle ti neporadím, ale zkus se mě zeptat na dovolenou nebo zážitky.',
+  'Tady jsem mimo. Pojďme radši na to, co umím – nabídky cestování a zážitků!',
+  'Ajaj, tohle je nad moje síly. Ale najít ti super zážitek nebo dovolenou? To zvládnu!',
+  'Hmm, tohle není úplně můj obor. Jsem specialista na cestování a zážitky ze Slevomatu.',
+  'Promiň, ale tady ti nepomůžu. Zkus se zeptat na nějaký výlet nebo zážitek!',
+  'Tohle mám zakázané téma 😅 Radši mi řekni, kam chceš vyrazit nebo co chceš zažít.',
+  'Na tohle odpověď nemám. Ale co třeba wellness víkend nebo adrenalinový zážitek?',
+  'Tady ti neporadím. Moje doména jsou slevomatí zážitky a cestování – co tě láká?',
+]
+
 // Tracks which texts have been used in this session to avoid repetition
 const usedTypingTexts: Set<number> = new Set()
+const usedOffTopicTexts: Set<number> = new Set()
+
+function pickUnused(pool: string[], used: Set<number>): string {
+  if (used.size >= pool.length) {
+    used.clear()
+  }
+  const available = pool.map((_, i) => i).filter(i => !used.has(i))
+  const idx = available[Math.floor(Math.random() * available.length)]
+  used.add(idx)
+  return pool[idx]
+}
 
 function getTypingText(): string {
-  // If all texts have been used, reset
-  if (usedTypingTexts.size >= TYPING_TEXTS.length) {
-    usedTypingTexts.clear()
-  }
-  // Pick a random unused text
-  const available = TYPING_TEXTS.map((_, i) => i).filter(i => !usedTypingTexts.has(i))
-  const idx = available[Math.floor(Math.random() * available.length)]
-  usedTypingTexts.add(idx)
-  return TYPING_TEXTS[idx]
+  return pickUnused(TYPING_TEXTS, usedTypingTexts)
+}
+
+function getOffTopicResponse(): string {
+  return pickUnused(OFF_TOPIC_RESPONSES, usedOffTopicTexts)
 }
 
 interface BotResponse {
@@ -185,8 +204,8 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     return { text: 'Můžeš mi říct trochu víc? Rád ti pomohu najít perfektní nabídku na Sleváči!' }
   }
 
-  // --- Default ---
-  return { text: 'Zajímavé! Rád ti s tím pomohu. Zkus se mě zeptat na jídlo, cestování, wellness nebo aktuální slevy – a já ti najdu ty nejlepší nabídky.' }
+  // --- Off-topic: anything not matching travel / experiences ---
+  return { text: getOffTopicResponse() }
 }
 
 export function useChatbot(isOpen: boolean) {
