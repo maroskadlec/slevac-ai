@@ -9,18 +9,26 @@ export interface ChatMessage {
   deals?: DealCard[]
 }
 
-const TYPING_TEXTS = [
-  'Musím to promyslet',
+// Typing texts when chatbot is searching through offers
+const SEARCH_TYPING_TEXTS = [
   'Koumám, co ti nabídnout',
   'Vybírám z nabídek',
   'Hledám to nejlepší',
-  'Chvilku, mrknu na to',
   'Přemýšlím nad možnostmi',
   'Dávám to dohromady',
   'Procházím nabídky pro tebe',
   'Šťourám se v nabídkách',
   'Moment, ladím detaily',
+]
+
+// Typing texts for general conversation / thinking (no search context)
+const THINKING_TYPING_TEXTS = [
+  'Musím to promyslet',
+  'Chvilku, mrknu na to',
   'Hned to bude',
+  'Moment…',
+  'Přemýšlím…',
+  'Dej mi vteřinku',
 ]
 
 const HOW_I_RECOMMEND_RESPONSES = [
@@ -42,7 +50,8 @@ const OFF_TOPIC_RESPONSES = [
 ]
 
 // Tracks which texts have been used in this session to avoid repetition
-const usedTypingTexts: Set<number> = new Set()
+const usedSearchTypingTexts: Set<number> = new Set()
+const usedThinkingTypingTexts: Set<number> = new Set()
 const usedOffTopicTexts: Set<number> = new Set()
 const usedHowIRecommendTexts: Set<number> = new Set()
 
@@ -56,8 +65,12 @@ function pickUnused(pool: string[], used: Set<number>): string {
   return pool[idx]
 }
 
-function getTypingText(): string {
-  return pickUnused(TYPING_TEXTS, usedTypingTexts)
+function getSearchTypingText(): string {
+  return pickUnused(SEARCH_TYPING_TEXTS, usedSearchTypingTexts)
+}
+
+function getThinkingTypingText(): string {
+  return pickUnused(THINKING_TYPING_TEXTS, usedThinkingTypingTexts)
 }
 
 function getOffTopicResponse(): string {
@@ -107,6 +120,20 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
   // --- Thanks (no deals) ---
   if (msg.match(/\b(dekuj|diky|dik|dikes|super|parad|skvel)/)) {
     return { text: 'Rádo se stalo! 😊 Pokud budeš potřebovat cokoliv dalšího, jsem tu pro tebe.' }
+  }
+
+  // --- Post-dislike: user is explaining what was wrong ---
+  const isAfterDislike = lastBotMsg.includes('pomoz mi pochopit') || lastBotMsg.includes('udelal chybku')
+  if (isAfterDislike) {
+    return { text: 'Rozumím, díky za vysvětlení! Beru si to k srdci a příště budu chytřejší. Chceš, abych to zkusil znovu s jinými nabídkami?' }
+  }
+
+  // --- More offers / different offers ---
+  if (msg.match(/\b(vic nabid|dalsi nabid|jeste nec|jine nabid|neco jineho|dalsi moznost|vice moznost|zkus jine|ukaz dalsi|jeste dalsi|nemáš jiné|jinè nabíd)/)) {
+    return {
+      text: 'Jasně, tady je další várka nabídek. Snad tady najdeš, co hledáš:',
+      deals: pickRandomDeals(5),
+    }
   }
 
   // Determine if we have enough context to show deals
@@ -280,11 +307,15 @@ export function useChatbot(_isOpen?: boolean) {
     const newMessages: ChatMessage[] = [...messages, { id: userMsgId, text, sender: 'user' }]
     setMessages(newMessages)
     setInputValue('')
+
+    // Compute response first to pick contextual typing text
+    const response = getBotResponse(text, newMessages)
+    const typingLabel = response.deals ? getSearchTypingText() : getThinkingTypingText()
+
     setIsTyping(true)
-    setTypingText(getTypingText())
+    setTypingText(typingLabel)
 
     // Longer delay when deals are included (simulating search)
-    const response = getBotResponse(text, newMessages)
     const baseDelay = response.deals ? 1200 : 800
     const delay = baseDelay + Math.random() * 800
 
@@ -310,7 +341,7 @@ export function useChatbot(_isOpen?: boolean) {
 
   const handleFeedback = useCallback((type: 'up' | 'down') => {
     setIsTyping(true)
-    setTypingText(getTypingText())
+    setTypingText(getThinkingTypingText())
 
     const delay = 600 + Math.random() * 600
 
