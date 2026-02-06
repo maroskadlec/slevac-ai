@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useChatbot } from '../hooks/useChatbot'
 
 const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
 const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
@@ -16,6 +17,7 @@ interface MobileProps {
 export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
+  const chat = useChatbot(isOpen)
 
   useEffect(() => {
     if (!isOpen) {
@@ -105,60 +107,70 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 </motion.button>
               </div>
 
-              {/* Content */}
-              <div className="flex-1 flex flex-col gap-[10px] w-full">
-                <div className="flex-1 flex flex-col gap-[12px] items-center pt-[24px] px-[12px]">
-                  <div className="flex flex-col gap-[12px] items-start w-[297px]">
-                    <div className="flex flex-col justify-center w-full text-center">
-                      <p className="text-[18px] leading-[24px] font-heading font-bold text-black">
-                        Co je pro vás u nabídky nejdůležitější?
-                      </p>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-[12px] items-start justify-center w-full cursor-pointer">
-                      <button className="bg-white flex gap-[4px] items-center justify-center px-[12px] py-[4px] rounded-[53px] shadow-[0px_2px_5px_0px_rgba(0,0,0,0.12)] hover:shadow-md transition-shadow">
-                        <p className="text-[14px] leading-[22px] font-medium text-black whitespace-nowrap">
-                          🛏 Záleží mi na jídle a službách
-                        </p>
-                      </button>
-                      <button className="bg-white flex gap-[4px] items-center justify-center px-[12px] py-[4px] rounded-[53px] shadow-[0px_2px_5px_0px_rgba(0,0,0,0.12)] hover:shadow-md transition-shadow">
-                        <p className="text-[14px] leading-[22px] font-medium text-black whitespace-nowrap">
-                          🏞 Hezčí výhled
-                        </p>
-                      </button>
-                      <button className="bg-white flex gap-[4px] items-center justify-center px-[12px] py-[4px] rounded-[53px] shadow-[0px_2px_5px_0px_rgba(0,0,0,0.12)] hover:shadow-md transition-shadow">
-                        <p className="text-[14px] leading-[22px] font-medium text-black whitespace-nowrap">
-                          💰 Chci lepší poměr cena/výkon
-                        </p>
-                      </button>
-                    </div>
-                  </div>
+              {/* Chat Content */}
+              <div className="flex-1 flex flex-col w-full min-h-0">
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto px-[8px] py-[6px] flex flex-col gap-[6px] scrollbar-thin">
+                  {chat.messages.map((msg) => (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[85%] px-[10px] py-[6px] rounded-[12px] text-[13px] leading-[18px] whitespace-pre-line ${
+                          msg.sender === 'user'
+                            ? 'bg-[#006eb9] text-white rounded-br-[4px]'
+                            : 'bg-[#f1f3f5] text-black rounded-bl-[4px]'
+                        }`}
+                      >
+                        {msg.text}
+                      </div>
+                    </motion.div>
+                  ))}
+                  {chat.isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-[#f1f3f5] px-[12px] py-[8px] rounded-[12px] rounded-bl-[4px] flex gap-[4px] items-center">
+                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} className="w-[5px] h-[5px] bg-gray-400 rounded-full" />
+                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} className="w-[5px] h-[5px] bg-gray-400 rounded-full" />
+                        <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} className="w-[5px] h-[5px] bg-gray-400 rounded-full" />
+                      </div>
+                    </motion.div>
+                  )}
+                  <div ref={chat.messagesEndRef} />
                 </div>
 
-                {/* Footer */}
-                <div className="flex flex-col items-center justify-end overflow-hidden w-full">
-                  <div className="flex flex-col gap-[8px] items-start py-[4px] px-0 w-full">
-                    <div className="flex gap-[4px] items-center w-full">
-                      {/* Input */}
-                      <div className="flex-1 bg-[#f1f3f5] flex flex-col items-start px-[16px] py-[8px] rounded-[8px]">
-                        <div className="flex gap-[8px] items-center justify-center w-full">
-                          <p className="flex-1 text-[14px] leading-[22px] text-[#6b6b70] font-medium">
-                            Popište mi svou představu ..
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {/* Send Button */}
-                      <div className="w-[32px] h-[32px]">
-                        <img src={sendButtonImg} alt="" className="w-full h-full" />
-                      </div>
-                      
-                      {/* Voice Button */}
-                      <div className="relative w-[32px] h-[32px]">
-                        <img src={voiceButtonBg} alt="" className="w-full h-full" />
-                        <div className="absolute top-[6.4px] left-[6.4px] w-[19.2px] h-[19.2px] bg-[#17181b] rounded-full flex items-center justify-center">
-                          <img src={voiceIcon} alt="" className="w-[11.789px] h-[16px]" />
-                        </div>
+                {/* Input Footer */}
+                <div className="flex flex-col items-center justify-end w-full px-[2px] pb-[4px]">
+                  <div className="flex gap-[4px] items-center w-full">
+                    <input
+                      type="text"
+                      value={chat.inputValue}
+                      onChange={(e) => chat.setInputValue(e.target.value)}
+                      onKeyDown={chat.handleKeyDown}
+                      placeholder="Popište mi svou představu .."
+                      className="flex-1 bg-[#f1f3f5] px-[12px] py-[6px] rounded-[8px] text-[14px] leading-[22px] text-black placeholder-[#6b6b70] font-medium outline-none border-none focus:ring-2 focus:ring-[#006eb9]/30"
+                    />
+                    
+                    {/* Send Button */}
+                    <button
+                      onClick={chat.sendMessage}
+                      className="w-[32px] h-[32px] cursor-pointer flex-shrink-0 hover:opacity-80 transition-opacity"
+                    >
+                      <img src={sendButtonImg} alt="Odeslat" className="w-full h-full" />
+                    </button>
+                    
+                    {/* Voice Button */}
+                    <div className="relative w-[32px] h-[32px] flex-shrink-0">
+                      <img src={voiceButtonBg} alt="" className="w-full h-full" />
+                      <div className="absolute top-[6.4px] left-[6.4px] w-[19.2px] h-[19.2px] bg-[#17181b] rounded-full flex items-center justify-center">
+                        <img src={voiceIcon} alt="" className="w-[11.789px] h-[16px]" />
                       </div>
                     </div>
                   </div>
