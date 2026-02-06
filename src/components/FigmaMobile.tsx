@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Info, Mic, Send } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useChatbot } from '../hooks/useChatbot'
+import DealCarousel from './DealCarousel'
 
 const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
 const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
@@ -128,14 +129,17 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}
-                    className={msg.sender === 'user' ? 'flex justify-end' : ''}
+                    className={`${msg.sender === 'user' ? 'flex justify-end' : 'flex flex-col gap-[8px]'}`}
                   >
                     {msg.sender === 'user' ? (
                       <div className="bg-[#f0f0f3] rounded-[14px] rounded-br-[4px] px-[12px] py-[6px] max-w-[85%]">
                         <p className="text-[13px] leading-[18px] text-black">{msg.text}</p>
                       </div>
                     ) : (
-                      <p className="text-[13px] leading-[19px] text-[#1a1a1a] whitespace-pre-line">{msg.text}</p>
+                      <>
+                        <p className="text-[13px] leading-[19px] text-[#1a1a1a] whitespace-pre-line">{msg.text}</p>
+                        {msg.deals && <DealCarousel deals={msg.deals} compact />}
+                      </>
                     )}
                   </motion.div>
                 ))}

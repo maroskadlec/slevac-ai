@@ -1,9 +1,21 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import type { DealCard } from '../data/mockDeals'
+import {
+  wellnessDeals,
+  krkonoseDeals,
+  restaurantDeals,
+  travelDeals,
+  romanticDeals,
+  familyDeals,
+  sportDeals,
+  cheapDeals,
+} from '../data/mockDeals'
 
 export interface ChatMessage {
   id: number
   text: string
   sender: 'user' | 'bot'
+  deals?: DealCard[]
 }
 
 function getTypingText(userMessage: string): string {
@@ -12,73 +24,187 @@ function getTypingText(userMessage: string): string {
   if (msg.match(/\b(hotel|ubytovan|dovolen|cestovan|vylet|pobyt|chata|chalup)/)) return 'Koumám výlety'
   if (msg.match(/\b(wellness|relax|masaz|spa|bazen|saun|virivk)/)) return 'Hledám wellness'
   if (msg.match(/\b(cena|levn|slev|akce|vyhod|peniz|korun)/)) return 'Počítám slevy'
-  if (msg.match(/\b(sport|aktivit|kolo|lyzov|turistik|bruslen)/)) return 'Hledám aktivity'
+  if (msg.match(/\b(sport|aktivit|kolo|lyzov|turistik)/)) return 'Hledám aktivity'
   if (msg.match(/\b(rodina|deti|dite|rodinny)/)) return 'Hledám rodinné nabídky'
-  if (msg.match(/\b(romanticke|partner|dvou|valentyn)/)) return 'Hledám romantické nabídky'
-  if (msg.match(/\b(vyhled|prirod|hory|more|krajin)/)) return 'Koumám lokality'
+  if (msg.match(/\b(romanticke|partner|dvou)/)) return 'Hledám romantické nabídky'
+  if (msg.match(/\b(krkonos|spindl|harrachov|pec|snezk|beskydy|sumav|lipno|jeseniky)/)) return 'Koumám lokality'
   return 'Přemýšlím'
 }
 
-function getBotResponse(userMessage: string): string {
+interface BotResponse {
+  text: string
+  deals?: DealCard[]
+}
+
+function getBotResponse(userMessage: string, conversationHistory: ChatMessage[]): BotResponse {
   const msg = userMessage.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
+  // Check conversation context - what was the previous topic
+  const prevBotMessages = conversationHistory.filter(m => m.sender === 'bot')
+  const lastBotMsg = prevBotMessages.length > 0
+    ? prevBotMessages[prevBotMessages.length - 1].text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    : ''
+  const prevUserMessages = conversationHistory.filter(m => m.sender === 'user')
+  const allUserText = prevUserMessages.map(m => m.text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')).join(' ')
+
+  // --- Greetings (no deals) ---
   if (msg.match(/\b(ahoj|cau|dobr[ye]|hey|hi|hello|zdar|nazdar)\b/)) {
-    return 'Ahoj! 👋 Rád tě vidím. Jak ti mohu dnes pomoci s výběrem nabídky na Sleváči?'
+    return { text: 'Ahoj! 👋 Rád tě vidím. Jak ti mohu dnes pomoci s výběrem nabídky na Sleváči?' }
   }
 
-  if (msg.match(/\b(jidlo|restaurac|jist|obed|vecere|snidane|kuchyn|gastr)/)) {
-    return 'Moc rád. Vidím do celé nabídky Slevomatu a pomůžu ti vybrat nejvhodnější zážitek podle preferencí. Máš chuť na nějakou konkrétní kuchyni, nebo spíš degustační menu?'
-  }
-
-  if (msg.match(/\b(hotel|ubytovan|dovolen|cestovan|vylet|pobyt|chata|chalup)/)) {
-    return 'Našel jsem pár skvělých pobytů, kde si užiješ relax i zážitky. Ideální víkend ve dvou s polopenzí a jen kousek autem od tebe. Uvažuješ o nějaké konkrétní lokalitě?'
-  }
-
-  if (msg.match(/\b(vyhled|prirod|hory|more|krajin|les)/)) {
-    return 'Krásné výhledy máme v nabídce! Doporučuji horské hotely v Beskydech, Krkonoších nebo wellness u Lipna s výhledem na přehradu. Který se ti líbí nejvíc?'
-  }
-
-  if (msg.match(/\b(cena|levn|slev|akce|vyhod|peniz|korun|kc|czk)/)) {
-    return 'Rozumím, hledáš nejlepší poměr cena/výkon! Momentálně máme akce až -60% na vybrané pobyty. Mám ti doporučit top nabídky pod 2000 Kč?'
-  }
-
-  if (msg.match(/\b(wellness|relax|masaz|spa|bazen|saun|virivk)/)) {
-    return 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe. Který se ti líbí nejvíc?'
-  }
-
-  if (msg.match(/\b(dekuj|diky|dik|dikes|super|parad|skvel)/)) {
-    return 'Rádo se stalo! 😊 Pokud budeš potřebovat cokoliv dalšího, jsem tu pro tebe.'
-  }
-
+  // --- Help (no deals) ---
   if (msg.match(/\b(co umis|pomoc|help|co delas|jak funguj|co jsi)/)) {
-    return 'Jsem tvůj AI asistent pro Sleváč! 🤖 Mohu ti pomoci s:\n• Výběrem restaurací a jídla\n• Hledáním dovolených a pobytů\n• Wellness a relax nabídkami\n• Najít nejlepší slevy a akce\n\nProstě se zeptej!'
+    return { text: 'Jsem tvůj AI asistent pro Sleváč! 🤖 Mohu ti pomoci s:\n• Výběrem restaurací a jídla\n• Hledáním dovolených a pobytů\n• Wellness a relax nabídkami\n• Najít nejlepší slevy a akce\n\nProstě se zeptej!' }
   }
 
-  if (msg.match(/\b(rodina|deti|dite|rodinny)/)) {
-    return 'Pro rodiny s dětmi mám skvělé tipy! Aquaparky, dětské zážitkové parky a rodinné pobyty s all-inclusive. Kolik je dětem?'
+  // --- Thanks (no deals) ---
+  if (msg.match(/\b(dekuj|diky|dik|dikes|super|parad|skvel)/)) {
+    return { text: 'Rádo se stalo! 😊 Pokud budeš potřebovat cokoliv dalšího, jsem tu pro tebe.' }
   }
 
-  if (msg.match(/\b(romanticke|partner|dvou|valentyn|vyrocí)/)) {
-    return 'Romantický pobyt? Mám pro tebe privátní wellness, večeře při svíčkách a víkendové pobyty pro dva. Chceš něco blízko, nebo spíš dál od města?'
-  }
-
-  if (msg.match(/\b(sport|aktivit|kolo|turistik|lyzov|bruslen)/)) {
-    return 'Sportovní nabídky jsou super! Máme lyžařské pobyty, cyklistické výlety i golfové balíčky. Jaký sport tě zajímá?'
-  }
-
+  // --- Specific location: Krkonoše → show deals ---
   if (msg.match(/\b(krkonos|spindl|harrachov|pec|snezk)/)) {
-    return 'Krkonoše jsou skvělá volba! Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe.'
+    return {
+      text: 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe. Který se ti líbí nejvíc?',
+      deals: krkonoseDeals,
+    }
   }
 
-  if (msg.match(/\b(ano|jo|jasne|urcite|rad|bych|chci|chtel)/)) {
-    return 'Připojíme k tomu nějakou aktivitu v okolí?'
+  // --- Specific location: Beskydy, Šumava, other mountains → show travel deals ---
+  if (msg.match(/\b(beskydy|sumav|lipno|jeseniky|cesky raj|vysocin)/)) {
+    return {
+      text: 'Skvělá volba! Našel jsem pro tebe nabídky v této oblasti. Podívej se, co jsem vybral:',
+      deals: travelDeals,
+    }
   }
 
+  // --- Wellness with enough context → show deals ---
+  if (msg.match(/\b(wellness|relax|masaz|spa|bazen|saun|virivk)/)) {
+    // If user already mentioned a location before, show deals
+    if (allUserText.match(/\b(krkonos|beskydy|sumav|praha|brno|lipno|jeseniky)/) || prevUserMessages.length >= 2) {
+      return {
+        text: 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe.',
+        deals: wellnessDeals,
+      }
+    }
+    return { text: 'Moc rád. Vidím do celé nabídky Slevomatu a pomůžu ti vybrat nejvhodnější zážitek podle preferencí. Uvažuješ o nějaké konkrétní lokalitě?' }
+  }
+
+  // --- Restaurant with enough context → show deals ---
+  if (msg.match(/\b(jidlo|restaurac|jist|obed|vecere|snidane|kuchyn|gastr|menu|degustac)/)) {
+    if (prevUserMessages.length >= 1 || msg.length > 20) {
+      return {
+        text: 'Tady jsou moje top doporučení restaurací. Všechny mají skvělé hodnocení a nabízí nezapomenutelný zážitek:',
+        deals: restaurantDeals,
+      }
+    }
+    return { text: 'Skvělá volba! Máme úžasné nabídky restaurací. Hledáš spíš degustační menu, zážitkovou večeři, nebo něco jiného?' }
+  }
+
+  // --- Travel/Hotel → context determines ---
+  if (msg.match(/\b(hotel|ubytovan|dovolen|cestovan|vylet|pobyt|chata|chalup)/)) {
+    if (allUserText.match(/\b(krkonos|beskydy|sumav|lipno|jeseniky|cesky raj)/) || prevUserMessages.length >= 2) {
+      return {
+        text: 'Tady jsou nabídky pobytů, které jsem pro tebe vybral. Všechny mají výborné hodnocení:',
+        deals: travelDeals,
+      }
+    }
+    return { text: 'Cestování je moje specialita! Máme nabídky od horských chat po luxusní resorty. Kam by ses chtěl/a podívat?' }
+  }
+
+  // --- Price focused → show cheap deals ---
+  if (msg.match(/\b(cena|levn|slev|akce|vyhod|peniz|korun|kc|czk|lacin)/)) {
+    if (prevUserMessages.length >= 1) {
+      return {
+        text: 'Tady jsou nejlepší nabídky s výborným poměrem cena/výkon. Všechny pod super cenou:',
+        deals: cheapDeals,
+      }
+    }
+    return { text: 'Rozumím, hledáš nejlepší poměr cena/výkon! Momentálně máme akce až -60% na vybrané pobyty. O jaký typ zážitku máš zájem?' }
+  }
+
+  // --- Romantic → show deals ---
+  if (msg.match(/\b(romanticke|partner|dvou|valentyn|vyrocí|ve dvou)/)) {
+    return {
+      text: 'Romantický pobyt pro dva? Mám pro tebe skvělé tipy – privátní wellness, večeře při svíčkách a krásné prostředí:',
+      deals: romanticDeals,
+    }
+  }
+
+  // --- Family → show deals ---
+  if (msg.match(/\b(rodina|deti|dite|rodinny|rodinn)/)) {
+    return {
+      text: 'Pro rodiny s dětmi mám super tipy! Aquaparky, animační programy a pobyty, kde si užijí malí i velcí:',
+      deals: familyDeals,
+    }
+  }
+
+  // --- Sports → show deals ---
+  if (msg.match(/\b(sport|aktivit|kolo|lyzov|bruslen|turistik|golf|cykl)/)) {
+    return {
+      text: 'Sportovní nabídky jsou super! Tady je pár tipů, co jsem pro tebe našel:',
+      deals: sportDeals,
+    }
+  }
+
+  // --- Views / nature → show travel deals ---
+  if (msg.match(/\b(vyhled|prirod|hory|more|krajin|les)/)) {
+    return {
+      text: 'Krásné výhledy a příroda – to je přesně to, co máme. Podívej se na tyto nabídky:',
+      deals: travelDeals,
+    }
+  }
+
+  // --- Confirmations: "Ano", "Chci" etc. → check context and show relevant deals ---
+  if (msg.match(/\b(ano|jo|jasne|urcite|rad|bych|chci|chtel|chtela|davej|ukazat|zobraz)/)) {
+    // Determine which deals based on conversation history
+    if (allUserText.match(/\b(wellness|relax|masaz|spa)/)) {
+      return {
+        text: 'Tady jsou moje top doporučení wellness pobytů pro tebe:',
+        deals: wellnessDeals,
+      }
+    }
+    if (allUserText.match(/\b(restaurac|jidlo|vecere|obed)/)) {
+      return {
+        text: 'Podívej se na tyto skvělé restaurace:',
+        deals: restaurantDeals,
+      }
+    }
+    if (allUserText.match(/\b(romanticke|partner|dvou)/)) {
+      return {
+        text: 'Tady jsou romantické nabídky, které jsem pro tebe vybral:',
+        deals: romanticDeals,
+      }
+    }
+    if (allUserText.match(/\b(rodina|deti|rodinny)/)) {
+      return {
+        text: 'Rodinné nabídky, které jsem pro tebe našel:',
+        deals: familyDeals,
+      }
+    }
+    if (allUserText.match(/\b(cena|levn|slev)/)) {
+      return {
+        text: 'Nejlepší akce, co jsem našel:',
+        deals: cheapDeals,
+      }
+    }
+    // Default: show general travel deals
+    if (lastBotMsg.includes('aktivit') || lastBotMsg.includes('pripojime')) {
+      return {
+        text: 'Mám pro tebe pár tipů na aktivity a výlety v okolí:',
+        deals: sportDeals,
+      }
+    }
+    return { text: 'Připojíme k tomu nějakou aktivitu v okolí?' }
+  }
+
+  // --- Short messages ---
   if (msg.length < 5) {
-    return 'Můžeš mi říct trochu víc? Rád ti pomohu najít perfektní nabídku na Sleváči!'
+    return { text: 'Můžeš mi říct trochu víc? Rád ti pomohu najít perfektní nabídku na Sleváči!' }
   }
 
-  return 'Zajímavé! Rád ti s tím pomohu. Zkus se mě zeptat konkrétněji – třeba na jídlo, cestování, wellness nebo aktuální slevy na Sleváči.'
+  // --- Default ---
+  return { text: 'Zajímavé! Rád ti s tím pomohu. Zkus se mě zeptat na jídlo, cestování, wellness nebo aktuální slevy – a já ti najdu ty nejlepší nabídky.' }
 }
 
 export function useChatbot(isOpen: boolean) {
@@ -91,7 +217,9 @@ export function useChatbot(isOpen: boolean) {
 
   // Auto-scroll to bottom when messages change
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 50)
   }, [])
 
   useEffect(() => {
@@ -103,21 +231,29 @@ export function useChatbot(isOpen: boolean) {
     if (!text || isTyping) return
 
     const userMsgId = nextIdRef.current++
-    setMessages(prev => [...prev, { id: userMsgId, text, sender: 'user' }])
+    const newMessages: ChatMessage[] = [...messages, { id: userMsgId, text, sender: 'user' }]
+    setMessages(newMessages)
     setInputValue('')
     setIsTyping(true)
     setTypingText(getTypingText(text))
 
-    // Simulate bot typing delay
-    const delay = 800 + Math.random() * 1000
+    // Longer delay when deals are included (simulating search)
+    const response = getBotResponse(text, newMessages)
+    const baseDelay = response.deals ? 1200 : 800
+    const delay = baseDelay + Math.random() * 800
+
     setTimeout(() => {
-      const botResponse = getBotResponse(text)
       const botMsgId = nextIdRef.current++
-      setMessages(prev => [...prev, { id: botMsgId, text: botResponse, sender: 'bot' }])
+      setMessages(prev => [...prev, {
+        id: botMsgId,
+        text: response.text,
+        sender: 'bot',
+        deals: response.deals,
+      }])
       setIsTyping(false)
       setTypingText('')
     }, delay)
-  }, [inputValue, isTyping])
+  }, [inputValue, isTyping, messages])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
