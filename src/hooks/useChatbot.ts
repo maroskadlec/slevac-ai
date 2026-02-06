@@ -224,7 +224,7 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
   return { text: getOffTopicResponse() }
 }
 
-export function useChatbot(isOpen: boolean) {
+export function useChatbot(_isOpen?: boolean) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
