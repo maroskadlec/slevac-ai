@@ -23,6 +23,12 @@ const TYPING_TEXTS = [
   'Hned to bude',
 ]
 
+const HOW_I_RECOMMEND_RESPONSES = [
+  'Prošel jsem nabídky a vybral ty, které mají dobré hodnocení od ostatních zákazníků. Beru v potaz popis, co v nabídce dostaneš, a taky to, jak ji hodnotí lidi, co ji už vyzkoušeli.',
+  'Při výběru jsem se díval na dvě věci – co nabídka obsahuje a jak ji hodnotí ostatní zákazníci. U každé nabídky znám detaily jako lokalitu, co je v ceně, a další důležité info. K tomu přidávám recenze lidí, kteří už nabídku využili. Díky tomu ti můžu doporučit to, co opravdu stojí za to.',
+  'Výběr není náhodný. Každou nabídku znám do detailu – vím, co obsahuje, kde se nachází a za kolik. Navíc se dívám na hodnocení a recenze od zákazníků, kteří už nabídku vyzkoušeli. Takže ti doporučuji jen to, co má ověřenou kvalitu.',
+]
+
 const OFF_TOPIC_RESPONSES = [
   'Tohle bohužel není moje parketa. Ale cestování a zážitky – tam se vyznám!',
   'Na tohle ti neporadím, ale zkus se mě zeptat na dovolenou nebo zážitky.',
@@ -38,6 +44,7 @@ const OFF_TOPIC_RESPONSES = [
 // Tracks which texts have been used in this session to avoid repetition
 const usedTypingTexts: Set<number> = new Set()
 const usedOffTopicTexts: Set<number> = new Set()
+const usedHowIRecommendTexts: Set<number> = new Set()
 
 function pickUnused(pool: string[], used: Set<number>): string {
   if (used.size >= pool.length) {
@@ -55,6 +62,10 @@ function getTypingText(): string {
 
 function getOffTopicResponse(): string {
   return pickUnused(OFF_TOPIC_RESPONSES, usedOffTopicTexts)
+}
+
+function getHowIRecommendResponse(): string {
+  return pickUnused(HOW_I_RECOMMEND_RESPONSES, usedHowIRecommendTexts)
 }
 
 interface BotResponse {
@@ -78,9 +89,14 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     return { text: 'Ahoj! 👋 Rád tě vidím. Jak ti mohu dnes pomoci s výběrem nabídky na Sleváči?' }
   }
 
-  // --- Help (no deals) ---
-  if (msg.match(/\b(co umis|pomoc|help|co delas|jak funguj|co jsi)/)) {
-    return { text: 'Jsem tvůj AI asistent pro Sleváč! 🤖 Mohu ti pomoci s:\n• Výběrem restaurací a jídla\n• Hledáním dovolených a pobytů\n• Wellness a relax nabídkami\n• Najít nejlepší slevy a akce\n\nProstě se zeptej!' }
+  // --- How did you recommend / on what basis ---
+  if (msg.match(/\b(jak jsi.*doporuc|jak jsi.*vyber|jak jsi.*vybir|na zaklade|podle ceho|jak vyber|jak vybir|proc zrovna|jak to vyber|jak to vybir|jak doporuc)/)) {
+    return { text: getHowIRecommendResponse() }
+  }
+
+  // --- Help / capabilities (no deals) ---
+  if (msg.match(/\b(co umis|pomoc|help|co delas|jak funguj|co jsi|co vse|co muzes|co dokazes|co zvlad)/)) {
+    return { text: 'Jsem tu, abych ti usnadnil výběr z nabídek na Slevomatu. Tady je, co pro tebe můžu udělat:\n\n🏖️ Cestování – najdu ti dovolenou podle destinace, termínu nebo rozpočtu\n\n🎁 Zážitky – poradím s výběrem adrenalinových, relaxačních nebo romantických zážitků\n\n⭐ Doporučení – vybírám podle hodnocení a recenzí od ostatních zákazníků\n\nProstě mi řekni, co hledáš, a já ti ukážu to nejlepší!' }
   }
 
   // --- Thanks (no deals) ---
