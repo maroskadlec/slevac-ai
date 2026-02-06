@@ -8,9 +8,12 @@ interface DealCarouselProps {
   compact?: boolean
 }
 
+const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
+
 export default function DealCarousel({ deals, compact = false }: DealCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [feedback, setFeedback] = useState<'none' | 'up' | 'down'>('none')
 
   const cardWidth = compact ? 148 : 164
   const gap = compact ? 6 : 8
@@ -130,19 +133,43 @@ export default function DealCarousel({ deals, compact = false }: DealCarouselPro
       </div>
 
       {/* Feedback Row */}
-      <div className="flex items-center justify-between">
-        <span className={`text-[#8e8e93] ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
-          Vyhovují vám doporučení
-        </span>
-        <div className="flex gap-[8px]">
-          <button className="hover:scale-110 transition-transform">
-            <ThumbsUp className={`text-[#b0b0b5] hover:text-[#006eb9] transition-colors ${compact ? 'w-[13px] h-[13px]' : 'w-[15px] h-[15px]'}`} />
-          </button>
-          <button className="hover:scale-110 transition-transform">
-            <ThumbsDown className={`text-[#b0b0b5] hover:text-red-400 transition-colors ${compact ? 'w-[13px] h-[13px]' : 'w-[15px] h-[15px]'}`} />
-          </button>
+      {feedback === 'up' ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="flex items-center gap-[8px] py-[2px]"
+        >
+          <img
+            src={mrkatkoImg}
+            alt="Kolečko"
+            className={`${compact ? 'w-[28px] h-[28px]' : 'w-[34px] h-[34px]'}`}
+          />
+          <span className={`text-[#006eb9] font-semibold ${compact ? 'text-[13px]' : 'text-[15px]'}`}>
+            Děkuju
+          </span>
+        </motion.div>
+      ) : (
+        <div className="flex items-center justify-between">
+          <span className={`text-[#8e8e93] ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
+            Vyhovují vám doporučení?
+          </span>
+          <div className="flex gap-[8px]">
+            <button
+              onClick={() => setFeedback('up')}
+              className="hover:scale-110 transition-transform cursor-pointer"
+            >
+              <ThumbsUp className={`text-[#b0b0b5] hover:text-[#006eb9] transition-colors ${compact ? 'w-[13px] h-[13px]' : 'w-[15px] h-[15px]'}`} />
+            </button>
+            <button
+              onClick={() => setFeedback('down')}
+              className="hover:scale-110 transition-transform cursor-pointer"
+            >
+              <ThumbsDown className={`text-[#b0b0b5] hover:text-red-400 transition-colors ${compact ? 'w-[13px] h-[13px]' : 'w-[15px] h-[15px]'}`} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   )
 }
