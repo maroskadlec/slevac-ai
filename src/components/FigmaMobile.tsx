@@ -50,7 +50,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
 
   return (
     <div className="relative w-full h-full overflow-visible flex items-center justify-center">
-      <div className="relative w-[320px] h-[568px] bg-[#f5f5f5] rounded-[32px] overflow-hidden border-4 border-gray-900">
+      <div className="relative w-[320px] h-[568px] bg-white rounded-[32px] overflow-hidden border-4 border-gray-900">
         
         {/* ===== SLEVOMAT APP LAYOUT ===== */}
         <div className="h-full overflow-y-auto z-0">
@@ -91,53 +91,23 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             <span className="text-[#666] pb-[6px]">Restaur…</span>
           </div>
 
-          {/* Blue Hero Section */}
-          <div className="relative bg-gradient-to-br from-[#006eb9] to-[#0098e5] px-[14px] pt-[16px] pb-[20px] overflow-hidden">
-            {/* Stars decoration */}
-            <div className="absolute top-0 right-0 w-full h-full pointer-events-none">
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-[3px] h-[3px] bg-white/60 rounded-full"
-                  style={{
-                    top: `${10 + Math.random() * 60}%`,
-                    left: `${30 + Math.random() * 65}%`,
-                  }}
-                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
-                  transition={{ duration: 1.5 + Math.random(), repeat: Infinity, delay: Math.random() * 2 }}
-                />
-              ))}
-            </div>
-            
+          {/* Hero Section */}
+          <div className="relative bg-[#E5F0F7] px-[14px] pt-[16px] pb-[20px] overflow-hidden">
             <div className="flex items-start justify-between">
-              <h2 className="text-white font-bold text-[18px] leading-[22px] max-w-[180px]">
+              <h2 className="text-[#1a1a1a] font-bold text-[18px] leading-[22px] max-w-[180px]">
                 Pomůžu vám najít nabídky, které vám sednou
               </h2>
-              {/* Kolečko character */}
+              {/* Mrkatko avatar */}
               <div className="w-[80px] h-[80px] relative flex-shrink-0">
-                <div className="absolute inset-0 bg-[#e8a020] rounded-full flex items-center justify-center overflow-hidden border-[3px] border-[#d4901a]">
-                  {/* Gear teeth */}
-                  {[...Array(8)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute w-[14px] h-[14px] bg-[#e8a020] border-[2px] border-[#d4901a] rounded-[2px]"
-                      style={{
-                        transform: `rotate(${i * 45}deg) translateY(-36px)`,
-                      }}
-                    />
-                  ))}
-                  {/* Face */}
-                  <div className="relative z-10 flex flex-col items-center">
-                    <div className="flex gap-[10px] mb-[3px]">
-                      <div className="w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center">
-                        <div className="w-[7px] h-[7px] bg-[#333] rounded-full" />
-                      </div>
-                      <div className="w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center">
-                        <div className="w-[7px] h-[7px] bg-[#333] rounded-full" />
-                      </div>
-                    </div>
-                    <div className="w-[18px] h-[8px] border-b-[2px] border-[#333] rounded-b-full" />
-                  </div>
+                <div className="absolute inset-0 bg-[#006eb9] rounded-full flex items-center justify-center overflow-hidden border-[3px] border-white shadow-md">
+                  <motion.img 
+                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                    alt="Mrkatko" 
+                    className="absolute left-[-22%] top-[-6%] w-[167%] h-[175%] max-w-none"
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.1, ease: "easeIn" }}
+                  />
                 </div>
               </div>
             </div>
