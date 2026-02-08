@@ -104,7 +104,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   className="flex items-center gap-[3px] flex-1 min-w-0 cursor-pointer hover:opacity-70 transition-opacity"
                 >
                   <p className="text-[12px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
-                  <Info className="w-[10px] h-[10px] text-[#8e8e93] flex-shrink-0" />
+                  <Info className="w-[13px] h-[13px] text-[#8e8e93] flex-shrink-0" />
                 </button>
                 
                 {/* Close button */}
