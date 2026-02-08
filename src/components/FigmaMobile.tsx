@@ -98,7 +98,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 Pomůžu vám najít nabídky, které vám sednou
               </h2>
               {/* Mrkatko avatar */}
-              <div className="w-[120px] h-[120px] relative flex-shrink-0">
+              <div className="w-[96px] h-[96px] relative flex-shrink-0">
                 <motion.img 
                   src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
                   alt="Mrkatko" 
