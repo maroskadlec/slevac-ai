@@ -99,16 +99,14 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               </h2>
               {/* Mrkatko avatar */}
               <div className="w-[80px] h-[80px] relative flex-shrink-0">
-                <div className="absolute inset-0 bg-[#006eb9] rounded-full flex items-center justify-center overflow-hidden border-[3px] border-white shadow-md">
-                  <motion.img 
-                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
-                    alt="Mrkatko" 
-                    className="absolute left-[-22%] top-[-6%] w-[167%] h-[175%] max-w-none"
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.1, ease: "easeIn" }}
-                  />
-                </div>
+                <motion.img 
+                  src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                  alt="Mrkatko" 
+                  className="w-full h-full object-contain"
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.1, ease: "easeIn" }}
+                />
               </div>
             </div>
 
