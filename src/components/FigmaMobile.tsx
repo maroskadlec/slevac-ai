@@ -74,22 +74,21 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
 
           {/* Hero Section */}
           <div className="relative bg-[#E5F0F7] px-[14px] pt-[16px] pb-[20px] overflow-hidden">
-            <div className="flex items-start justify-between">
-              <h2 className="text-[#1a1a1a] font-bold text-[20px] leading-[24px] max-w-[180px]">
-                Pomůžu vám najít nabídky, které vám sednou
-              </h2>
-              {/* Mrkatko avatar */}
-              <div className="w-[96px] h-[96px] relative flex-shrink-0">
-                <motion.img 
-                  src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
-                  alt="Mrkatko" 
-                  className="w-full h-full object-contain"
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.1, ease: "easeIn" }}
-                />
-              </div>
+            {/* Mrkatko avatar - absolute positioned */}
+            <div className="absolute top-[10px] right-[10px] w-[110px] h-[110px]">
+              <motion.img 
+                src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                alt="Mrkatko" 
+                className="w-full h-full object-contain"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.1, ease: "easeIn" }}
+              />
             </div>
+            
+            <h2 className="text-[#1a1a1a] font-bold text-[20px] leading-[24px] pr-[110px]">
+              Pomůžu vám najít nabídky, které vám sednou
+            </h2>
 
             {/* Search Input */}
             <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[10px] flex items-center border border-solid border-[#CBCCCE]">
