@@ -42,7 +42,7 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
     >
       {/* Section Header */}
       <div>
-        <p className={`text-[#8e8e93] font-medium leading-tight ${compact ? 'text-[12px]' : 'text-[13px]'}`}>
+        <p className={`text-[#8e8e93] leading-tight ${compact ? 'text-[12px]' : 'text-[13px]'}`}>
           Vybral jsem z nabídek podle toho, co o nich vím a podle toho, co říkají ostatní zákazníci.
         </p>
       </div>
