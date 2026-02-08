@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Info, Mic, Send } from 'lucide-react'
+import { X, Info, Mic, Send, Search, Heart, Tag, ShoppingCart } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
@@ -50,7 +50,257 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
 
   return (
     <div className="relative w-full h-full overflow-visible flex items-center justify-center">
-      <div className="relative w-[320px] h-[568px] bg-white rounded-[32px] overflow-hidden border-4 border-gray-900">
+      <div className="relative w-[320px] h-[568px] bg-[#f5f5f5] rounded-[32px] overflow-hidden border-4 border-gray-900">
+        
+        {/* ===== SLEVOMAT APP LAYOUT ===== */}
+        <div className="h-full overflow-y-auto z-0">
+          
+          {/* Top App Bar */}
+          <div className="bg-white px-[10px] py-[8px] flex items-center justify-between">
+            {/* Logo */}
+            <div className="w-[22px] h-[22px] bg-[#0098e5] rounded-full flex items-center justify-center">
+              <div className="w-[12px] h-[12px] border-2 border-white rounded-full" />
+            </div>
+            
+            {/* Right icons */}
+            <div className="flex items-center gap-[10px]">
+              <Search className="w-[16px] h-[16px] text-[#333]" />
+              <div className="relative">
+                <Heart className="w-[16px] h-[16px] text-[#333]" />
+                <span className="absolute -top-[5px] -right-[6px] bg-red-500 text-white text-[7px] font-bold rounded-full w-[12px] h-[12px] flex items-center justify-center">2</span>
+              </div>
+              <div className="relative">
+                <Tag className="w-[16px] h-[16px] text-[#00a84f]" />
+                <span className="absolute -top-[5px] -right-[6px] bg-red-500 text-white text-[7px] font-bold rounded-full w-[12px] h-[12px] flex items-center justify-center">1</span>
+              </div>
+              <div className="w-[22px] h-[22px] rounded-full bg-gradient-to-br from-blue-400 to-blue-600 overflow-hidden">
+                <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white text-[8px] font-bold">M</div>
+              </div>
+              <div className="relative">
+                <ShoppingCart className="w-[16px] h-[16px] text-[#333]" />
+                <span className="absolute -top-[5px] -right-[6px] bg-[#00a84f] text-white text-[7px] font-bold rounded-full w-[12px] h-[12px] flex items-center justify-center">0</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Category Tabs */}
+          <div className="bg-white px-[10px] pb-[8px] flex gap-[12px] overflow-x-auto text-[11px] font-medium whitespace-nowrap border-b border-[#e8e8e8]">
+            <span className="text-[#333] border-b-2 border-[#333] pb-[6px]">Cestování</span>
+            <span className="text-[#666] pb-[6px]">Zážitky a zábava</span>
+            <span className="text-[#666] pb-[6px]">Krása a relax</span>
+            <span className="text-[#666] pb-[6px]">Restaur…</span>
+          </div>
+
+          {/* Blue Hero Section */}
+          <div className="relative bg-gradient-to-br from-[#006eb9] to-[#0098e5] px-[14px] pt-[16px] pb-[20px] overflow-hidden">
+            {/* Stars decoration */}
+            <div className="absolute top-0 right-0 w-full h-full pointer-events-none">
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-[3px] h-[3px] bg-white/60 rounded-full"
+                  style={{
+                    top: `${10 + Math.random() * 60}%`,
+                    left: `${30 + Math.random() * 65}%`,
+                  }}
+                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+                  transition={{ duration: 1.5 + Math.random(), repeat: Infinity, delay: Math.random() * 2 }}
+                />
+              ))}
+            </div>
+            
+            <div className="flex items-start justify-between">
+              <h2 className="text-white font-bold text-[18px] leading-[22px] max-w-[180px]">
+                Pomůžu vám najít nabídky, které vám sednou
+              </h2>
+              {/* Kolečko character */}
+              <div className="w-[80px] h-[80px] relative flex-shrink-0">
+                <div className="absolute inset-0 bg-[#e8a020] rounded-full flex items-center justify-center overflow-hidden border-[3px] border-[#d4901a]">
+                  {/* Gear teeth */}
+                  {[...Array(8)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute w-[14px] h-[14px] bg-[#e8a020] border-[2px] border-[#d4901a] rounded-[2px]"
+                      style={{
+                        transform: `rotate(${i * 45}deg) translateY(-36px)`,
+                      }}
+                    />
+                  ))}
+                  {/* Face */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="flex gap-[10px] mb-[3px]">
+                      <div className="w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center">
+                        <div className="w-[7px] h-[7px] bg-[#333] rounded-full" />
+                      </div>
+                      <div className="w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center">
+                        <div className="w-[7px] h-[7px] bg-[#333] rounded-full" />
+                      </div>
+                    </div>
+                    <div className="w-[18px] h-[8px] border-b-[2px] border-[#333] rounded-b-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Search Input */}
+            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[10px] flex items-center justify-between shadow-sm">
+              <span className="text-[12px] text-[#999]">Popište mi, co chcete zažít ...</span>
+              <Mic className="w-[16px] h-[16px] text-[#333]" />
+            </div>
+          </div>
+
+          {/* Promo Banner */}
+          <div className="mx-[10px] mt-[10px] rounded-[10px] overflow-hidden relative bg-gradient-to-r from-[#1a6fb5] via-[#2a80c0] to-[#1a6fb5] p-[12px] min-h-[90px]">
+            {/* Stars */}
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={`star-${i}`}
+                className="absolute w-[2px] h-[2px] bg-yellow-300/70 rounded-full"
+                style={{
+                  top: `${15 + Math.random() * 70}%`,
+                  left: `${5 + Math.random() * 90}%`,
+                }}
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 1 + Math.random(), repeat: Infinity, delay: Math.random() }}
+              />
+            ))}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white font-bold text-[13px] leading-[16px]">TÝDEN EXTRA SLEV</p>
+                <p className="text-white font-bold text-[13px] leading-[16px]">NA NEJLEPŠÍ POBYTY</p>
+                <div className="mt-[8px] bg-[#00a84f] text-white text-[10px] font-bold px-[10px] py-[4px] rounded-[4px] inline-block">
+                  Chci slevu
+                </div>
+              </div>
+              {/* Small Kolečko */}
+              <div className="w-[55px] h-[55px] relative flex-shrink-0">
+                <div className="absolute inset-0 bg-[#e8a020] rounded-full flex items-center justify-center overflow-hidden border-[2px] border-[#d4901a]">
+                  {[...Array(8)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute w-[9px] h-[9px] bg-[#e8a020] border-[1.5px] border-[#d4901a] rounded-[1px]"
+                      style={{
+                        transform: `rotate(${i * 45}deg) translateY(-25px)`,
+                      }}
+                    />
+                  ))}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="flex gap-[7px] mb-[2px]">
+                      <div className="w-[9px] h-[9px] bg-white rounded-full flex items-center justify-center">
+                        <div className="w-[4px] h-[4px] bg-[#333] rounded-full" />
+                      </div>
+                      <div className="w-[9px] h-[9px] bg-white rounded-full flex items-center justify-center">
+                        <div className="w-[4px] h-[4px] bg-[#333] rounded-full" />
+                      </div>
+                    </div>
+                    <div className="w-[12px] h-[5px] border-b-[1.5px] border-[#333] rounded-b-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Location */}
+          <div className="px-[10px] py-[10px] flex items-center justify-center gap-[4px] text-[11px]">
+            <span className="text-[#333]">Praha a okolí</span>
+            <span className="text-[#333]">·</span>
+            <span className="text-[#00a84f] font-medium">Změnit lokalitu</span>
+          </div>
+
+          {/* Category Cards Grid */}
+          <div className="px-[10px] grid grid-cols-2 gap-[6px]">
+            {/* Card 1 */}
+            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
+              <img src={`${import.meta.env.BASE_URL}assets/deals/d3.jpg`} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
+                <p className="text-white font-bold text-[10px] leading-[13px]">Wellness pobyty<br/>za skvělé ceny</p>
+              </div>
+            </div>
+            {/* Card 2 */}
+            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
+              <img src={`${import.meta.env.BASE_URL}assets/deals/d1.jpg`} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
+                <p className="text-white font-bold text-[10px] leading-[13px]">Kam na jarňáky?</p>
+              </div>
+            </div>
+            {/* Card 3 */}
+            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
+              <img src={`${import.meta.env.BASE_URL}assets/deals/d5.jpg`} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
+                <p className="text-white font-bold text-[10px] leading-[13px]">Lyžování v Alpách</p>
+              </div>
+            </div>
+            {/* Card 4 */}
+            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
+              <div className="w-full h-full bg-gradient-to-br from-[#ff6b35] via-[#f7c948] to-[#ff6b35] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-[35px] h-[35px] mx-auto mb-[3px] rounded-full bg-white/20 flex items-center justify-center">
+                    <span className="text-[14px]">🎡</span>
+                  </div>
+                  <p className="text-white font-bold text-[9px] leading-[11px] uppercase">Zatočit</p>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
+                <p className="text-white font-bold text-[10px] leading-[13px]">Zkuste štěstí<br/>každý den</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Nedávno prohlížené */}
+          <div className="px-[10px] pt-[16px] pb-[8px]">
+            <h3 className="text-[16px] font-bold text-[#1a1a1a] mb-[10px]">Nedávno prohlížené</h3>
+            <div className="flex gap-[8px] overflow-x-auto pb-[8px]">
+              {/* Recently viewed card 1 */}
+              <div className="flex-shrink-0 w-[140px] rounded-[8px] overflow-hidden bg-white shadow-sm">
+                <div className="relative h-[85px]">
+                  <img src={`${import.meta.env.BASE_URL}assets/deals/d7.jpg`} alt="" className="w-full h-full object-cover" />
+                  <button className="absolute top-[5px] right-[5px] w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-sm">
+                    <Heart className="w-[10px] h-[10px] text-red-500 fill-red-500" />
+                  </button>
+                  <div className="absolute bottom-[4px] left-[4px] flex items-center gap-[3px]">
+                    <span className="bg-[#00a84f] text-white text-[9px] font-bold px-[5px] py-[1px] rounded-[3px]">699 Kč</span>
+                    <span className="text-white text-[8px] line-through opacity-90">834 Kč</span>
+                    <span className="bg-[#f0c850] text-[#333] text-[7px] font-bold px-[3px] py-[0.5px] rounded-[2px]">–16 %</span>
+                  </div>
+                </div>
+                <div className="p-[6px]">
+                  <p className="text-[9px] font-semibold text-[#1a1a1a] leading-[12px] line-clamp-2">Tvorba vlastního šperku: pro 1 či 2 osoby</p>
+                  <div className="flex items-center gap-[2px] mt-[3px]">
+                    <span className="text-[8px] text-yellow-500">⭐</span>
+                    <span className="text-[8px] text-[#666]">5,0 / 5 (5 hodnocení)</span>
+                  </div>
+                  <p className="text-[7px] text-[#999] mt-[2px]">Charm Bar Prague</p>
+                </div>
+              </div>
+              {/* Recently viewed card 2 */}
+              <div className="flex-shrink-0 w-[140px] rounded-[8px] overflow-hidden bg-white shadow-sm">
+                <div className="relative h-[85px]">
+                  <img src={`${import.meta.env.BASE_URL}assets/deals/d9.jpg`} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute bottom-[4px] left-[4px] flex items-center gap-[3px]">
+                    <span className="bg-[#00a84f] text-white text-[9px] font-bold px-[5px] py-[1px] rounded-[3px]">1 299 Kč</span>
+                  </div>
+                </div>
+                <div className="p-[6px]">
+                  <p className="text-[9px] font-semibold text-[#1a1a1a] leading-[12px] line-clamp-2">Ruční lymfatická masáž 90 minut</p>
+                  <div className="flex items-center gap-[2px] mt-[3px]">
+                    <span className="text-[8px] text-yellow-500">⭐</span>
+                    <span className="text-[8px] text-[#666]">4,7 / 5 (3 218 hodnocení)</span>
+                  </div>
+                  <p className="text-[7px] text-[#999] mt-[2px]">Estetické centrum</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom spacer for floating button */}
+          <div className="h-[80px]" />
+        </div>
+
+        {/* ===== CHATBOT OVERLAY ===== */}
         
         {/* Backdrop */}
         <AnimatePresence>
@@ -59,7 +309,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/20 z-10"
+              className="absolute inset-0 bg-black/20 z-30"
               onClick={onToggle}
             />
           )}
@@ -77,7 +327,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 stiffness: 300,
                 damping: 30
               }}
-              className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-20 flex flex-col h-[480px]"
+              className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-40 flex flex-col h-[480px]"
             >
               {/* Drag Handle */}
               <div className="flex justify-center pt-[6px] pb-[2px] flex-shrink-0">
@@ -198,10 +448,10 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           )}
         </AnimatePresence>
 
-        {/* Floating Button */}
+        {/* Floating Button - HIGH Z-INDEX */}
         <motion.button
           onClick={onToggle}
-          className="absolute right-[8px] bottom-[8px] flex items-center p-[6px] rounded-[58px] cursor-pointer z-30"
+          className="absolute right-[8px] bottom-[8px] flex items-center p-[6px] rounded-[58px] cursor-pointer z-50"
           animate={
             isOpen 
               ? { scale: 0, opacity: 0, backgroundColor: 'transparent' }
