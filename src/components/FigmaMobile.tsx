@@ -94,7 +94,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           {/* Hero Section */}
           <div className="relative bg-[#E5F0F7] px-[14px] pt-[16px] pb-[20px] overflow-hidden">
             <div className="flex items-start justify-between">
-              <h2 className="text-[#1a1a1a] font-bold text-[18px] leading-[22px] max-w-[180px]">
+              <h2 className="text-[#1a1a1a] font-bold text-[22px] leading-[26px] max-w-[180px]">
                 Pomůžu vám najít nabídky, které vám sednou
               </h2>
               {/* Mrkatko avatar */}
