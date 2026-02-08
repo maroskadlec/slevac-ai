@@ -15,7 +15,21 @@ interface MobileProps {
 export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
+  const [heroInput, setHeroInput] = useState('')
+  const [heroFocused, setHeroFocused] = useState(false)
   const chat = useChatbot(isOpen)
+
+  const handleHeroSend = () => {
+    const text = heroInput.trim()
+    if (!text) return
+    setHeroInput('')
+    setHeroFocused(false)
+    onToggle() // Open modal
+    // Small delay to let modal open, then send message
+    setTimeout(() => {
+      chat.sendMessageWithText(text)
+    }, 400)
+  }
 
   useEffect(() => {
     if (!isOpen) {
@@ -111,13 +125,27 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             </div>
 
             {/* Search Input */}
-            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[10px] flex items-center justify-between border border-solid border-[#CBCCCE]">
+            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[10px] flex items-center border border-solid border-[#CBCCCE]">
               <input
                 type="text"
+                value={heroInput}
+                onChange={(e) => setHeroInput(e.target.value)}
+                onFocus={() => setHeroFocused(true)}
+                onBlur={() => setTimeout(() => setHeroFocused(false), 200)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleHeroSend() }}
                 placeholder="Popište mi, co chcete zažít ..."
                 className="flex-1 bg-transparent text-[12px] text-[#333] placeholder-[#999] outline-none border-none"
               />
               <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
+              {heroFocused && (
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={handleHeroSend}
+                  className="w-[28px] h-[28px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-colors cursor-pointer ml-[6px]"
+                >
+                  <Send className="w-[12px] h-[12px] text-white" />
+                </button>
+              )}
             </div>
           </div>
 

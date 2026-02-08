@@ -299,8 +299,7 @@ export function useChatbot(_isOpen?: boolean) {
     scrollToBottom()
   }, [messages, isTyping, scrollToBottom])
 
-  const sendMessage = useCallback(() => {
-    const text = inputValue.trim()
+  const sendMessageInternal = useCallback((text: string) => {
     if (!text || isTyping) return
 
     const userMsgId = nextIdRef.current++
@@ -330,7 +329,16 @@ export function useChatbot(_isOpen?: boolean) {
       setIsTyping(false)
       setTypingText('')
     }, delay)
-  }, [inputValue, isTyping, messages])
+  }, [isTyping, messages])
+
+  const sendMessage = useCallback(() => {
+    const text = inputValue.trim()
+    sendMessageInternal(text)
+  }, [inputValue, sendMessageInternal])
+
+  const sendMessageWithText = useCallback((text: string) => {
+    sendMessageInternal(text.trim())
+  }, [sendMessageInternal])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -382,6 +390,7 @@ export function useChatbot(_isOpen?: boolean) {
     typingText,
     messagesEndRef,
     sendMessage,
+    sendMessageWithText,
     handleKeyDown,
     handleFeedback,
     handleDisclaimer,
