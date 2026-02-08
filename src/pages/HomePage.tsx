@@ -71,6 +71,16 @@ function HomePage() {
           </motion.a>
         </motion.div>
 
+        {/* Hidden desktop link */}
+        <motion.div variants={itemVariants} className="mt-16">
+          <span
+            onClick={() => navigate('/desktop')}
+            className="text-xs text-gray-400 hover:text-gray-500 cursor-pointer transition-colors"
+          >
+            Na tohle neklikat
+          </span>
+        </motion.div>
+
       </motion.div>
     </div>
   )
