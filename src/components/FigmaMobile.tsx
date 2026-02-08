@@ -111,9 +111,13 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             </div>
 
             {/* Search Input */}
-            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[10px] flex items-center justify-between shadow-sm">
-              <span className="text-[12px] text-[#999]">Popište mi, co chcete zažít ...</span>
-              <Mic className="w-[16px] h-[16px] text-[#333]" />
+            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[10px] flex items-center justify-between border border-solid border-[#CBCCCE]">
+              <input
+                type="text"
+                placeholder="Popište mi, co chcete zažít ..."
+                className="flex-1 bg-transparent text-[12px] text-[#333] placeholder-[#999] outline-none border-none"
+              />
+              <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
             </div>
           </div>
 
