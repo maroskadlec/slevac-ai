@@ -134,7 +134,7 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
       {/* Feedback Row */}
       {feedback === 'none' && (
         <div className="flex items-center justify-between">
-          <span className={`text-[#8e8e93] ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
+          <span className={`text-[#8e8e93] ${compact ? 'text-[12px]' : 'text-[13px]'}`}>
             Vyhovují vám doporučení?
           </span>
           <div className="flex gap-[8px]">
@@ -142,13 +142,13 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
               onClick={() => { setFeedback('up'); onFeedback?.('up') }}
               className="hover:scale-110 transition-transform cursor-pointer"
             >
-              <ThumbsUp className={`text-[#b0b0b5] hover:text-[#006eb9] transition-colors ${compact ? 'w-[13px] h-[13px]' : 'w-[15px] h-[15px]'}`} />
+              <ThumbsUp className={`text-[#b0b0b5] hover:text-[#006eb9] transition-colors ${compact ? 'w-[14px] h-[14px]' : 'w-[16px] h-[16px]'}`} />
             </button>
             <button
               onClick={() => { setFeedback('down'); onFeedback?.('down') }}
               className="hover:scale-110 transition-transform cursor-pointer"
             >
-              <ThumbsDown className={`text-[#b0b0b5] hover:text-red-400 transition-colors ${compact ? 'w-[13px] h-[13px]' : 'w-[15px] h-[15px]'}`} />
+              <ThumbsDown className={`text-[#b0b0b5] hover:text-red-400 transition-colors ${compact ? 'w-[14px] h-[14px]' : 'w-[16px] h-[16px]'}`} />
             </button>
           </div>
         </div>
