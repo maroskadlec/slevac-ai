@@ -94,10 +94,13 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                 </div>
                 
                 {/* Disclaimer */}
-                <div className="flex items-center gap-[4px] flex-1 min-w-0">
+                <button
+                  onClick={chat.handleDisclaimer}
+                  className="flex items-center gap-[4px] flex-1 min-w-0 cursor-pointer hover:opacity-70 transition-opacity"
+                >
                   <p className="text-[11px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
                   <Info className="w-[12px] h-[12px] text-[#8e8e93] flex-shrink-0" />
-                </div>
+                </button>
                 
                 {/* Close button */}
                 <motion.button

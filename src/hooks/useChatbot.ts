@@ -339,6 +339,24 @@ export function useChatbot(_isOpen?: boolean) {
     }
   }, [sendMessage])
 
+  const handleDisclaimer = useCallback(() => {
+    if (isTyping) return
+    setIsTyping(true)
+    setTypingText(getThinkingTypingText())
+
+    const delay = 500 + Math.random() * 500
+    setTimeout(() => {
+      const botMsgId = nextIdRef.current++
+      setMessages(prev => [...prev, {
+        id: botMsgId,
+        text: 'Jsem tu teprve chvilku a učím se za pochodu. Doporučení dávám podle tvých odpovědí, ale občas se můžu splést.',
+        sender: 'bot',
+      }])
+      setIsTyping(false)
+      setTypingText('')
+    }, delay)
+  }, [isTyping])
+
   const handleFeedback = useCallback((type: 'up' | 'down') => {
     setIsTyping(true)
     setTypingText(getThinkingTypingText())
@@ -366,5 +384,6 @@ export function useChatbot(_isOpen?: boolean) {
     sendMessage,
     handleKeyDown,
     handleFeedback,
+    handleDisclaimer,
   }
 }

@@ -99,10 +99,13 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 </div>
                 
                 {/* Disclaimer */}
-                <div className="flex items-center gap-[3px] flex-1 min-w-0">
+                <button
+                  onClick={chat.handleDisclaimer}
+                  className="flex items-center gap-[3px] flex-1 min-w-0 cursor-pointer hover:opacity-70 transition-opacity"
+                >
                   <p className="text-[10px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
                   <Info className="w-[10px] h-[10px] text-[#8e8e93] flex-shrink-0" />
-                </div>
+                </button>
                 
                 {/* Close button */}
                 <motion.button
