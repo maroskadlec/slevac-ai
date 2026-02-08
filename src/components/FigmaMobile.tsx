@@ -84,7 +84,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           </div>
 
           {/* Category Tabs */}
-          <div className="bg-white px-[10px] pb-[8px] flex gap-[12px] overflow-x-auto text-[11px] font-medium whitespace-nowrap border-b border-[#e8e8e8]">
+          <div className="bg-white px-[10px] pb-[8px] flex gap-[12px] overflow-x-auto text-[11px] font-medium whitespace-nowrap border-b border-[#e8e8e8]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
             <span className="text-[#333] border-b-2 border-[#333] pb-[6px]">Cestování</span>
             <span className="text-[#666] pb-[6px]">Zážitky a zábava</span>
             <span className="text-[#666] pb-[6px]">Krása a relax</span>
@@ -150,54 +150,8 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           </div>
 
           {/* Promo Banner */}
-          <div className="mx-[10px] mt-[10px] rounded-[10px] overflow-hidden relative bg-gradient-to-r from-[#1a6fb5] via-[#2a80c0] to-[#1a6fb5] p-[12px] min-h-[90px]">
-            {/* Stars */}
-            {[...Array(8)].map((_, i) => (
-              <motion.div
-                key={`star-${i}`}
-                className="absolute w-[2px] h-[2px] bg-yellow-300/70 rounded-full"
-                style={{
-                  top: `${15 + Math.random() * 70}%`,
-                  left: `${5 + Math.random() * 90}%`,
-                }}
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 1 + Math.random(), repeat: Infinity, delay: Math.random() }}
-              />
-            ))}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-bold text-[13px] leading-[16px]">TÝDEN EXTRA SLEV</p>
-                <p className="text-white font-bold text-[13px] leading-[16px]">NA NEJLEPŠÍ POBYTY</p>
-                <div className="mt-[8px] bg-[#00a84f] text-white text-[10px] font-bold px-[10px] py-[4px] rounded-[4px] inline-block">
-                  Chci slevu
-                </div>
-              </div>
-              {/* Small Kolečko */}
-              <div className="w-[55px] h-[55px] relative flex-shrink-0">
-                <div className="absolute inset-0 bg-[#e8a020] rounded-full flex items-center justify-center overflow-hidden border-[2px] border-[#d4901a]">
-                  {[...Array(8)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute w-[9px] h-[9px] bg-[#e8a020] border-[1.5px] border-[#d4901a] rounded-[1px]"
-                      style={{
-                        transform: `rotate(${i * 45}deg) translateY(-25px)`,
-                      }}
-                    />
-                  ))}
-                  <div className="relative z-10 flex flex-col items-center">
-                    <div className="flex gap-[7px] mb-[2px]">
-                      <div className="w-[9px] h-[9px] bg-white rounded-full flex items-center justify-center">
-                        <div className="w-[4px] h-[4px] bg-[#333] rounded-full" />
-                      </div>
-                      <div className="w-[9px] h-[9px] bg-white rounded-full flex items-center justify-center">
-                        <div className="w-[4px] h-[4px] bg-[#333] rounded-full" />
-                      </div>
-                    </div>
-                    <div className="w-[12px] h-[5px] border-b-[1.5px] border-[#333] rounded-b-full" />
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="mx-[10px] mt-[10px] rounded-[10px] overflow-hidden">
+            <img src={`${import.meta.env.BASE_URL}assets/banner.jpg`} alt="Promo banner" className="w-full h-auto block" />
           </div>
 
           {/* Location */}
@@ -253,7 +207,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           {/* Nedávno prohlížené */}
           <div className="px-[10px] pt-[16px] pb-[8px]">
             <h3 className="text-[16px] font-bold text-[#1a1a1a] mb-[10px]">Nedávno prohlížené</h3>
-            <div className="flex gap-[8px] overflow-x-auto pb-[8px]">
+            <div className="flex gap-[8px] overflow-x-auto pb-[8px]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
               {/* Recently viewed card 1 */}
               <div className="flex-shrink-0 w-[140px] rounded-[8px] overflow-hidden bg-white shadow-sm">
                 <div className="relative h-[85px]">

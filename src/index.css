@@ -8,6 +8,16 @@
   }
 }
 
+/* Hide scrollbars globally for elements that use overflow-auto/scroll */
+*::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 body {
   margin: 0;
   padding: 0;
