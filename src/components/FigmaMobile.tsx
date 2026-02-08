@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Info, Mic, Send, Search, Heart, Tag, ShoppingCart } from 'lucide-react'
+import { X, Info, Mic, Send } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
@@ -69,41 +69,8 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
         {/* ===== SLEVOMAT APP LAYOUT ===== */}
         <div className="h-full overflow-y-auto z-0">
           
-          {/* Top App Bar */}
-          <div className="bg-white px-[10px] py-[8px] flex items-center justify-between">
-            {/* Logo */}
-            <div className="w-[22px] h-[22px] bg-[#0098e5] rounded-full flex items-center justify-center">
-              <div className="w-[12px] h-[12px] border-2 border-white rounded-full" />
-            </div>
-            
-            {/* Right icons */}
-            <div className="flex items-center gap-[10px]">
-              <Search className="w-[16px] h-[16px] text-[#333]" />
-              <div className="relative">
-                <Heart className="w-[16px] h-[16px] text-[#333]" />
-                <span className="absolute -top-[5px] -right-[6px] bg-red-500 text-white text-[7px] font-bold rounded-full w-[12px] h-[12px] flex items-center justify-center">2</span>
-              </div>
-              <div className="relative">
-                <Tag className="w-[16px] h-[16px] text-[#00a84f]" />
-                <span className="absolute -top-[5px] -right-[6px] bg-red-500 text-white text-[7px] font-bold rounded-full w-[12px] h-[12px] flex items-center justify-center">1</span>
-              </div>
-              <div className="w-[22px] h-[22px] rounded-full bg-gradient-to-br from-blue-400 to-blue-600 overflow-hidden">
-                <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white text-[8px] font-bold">M</div>
-              </div>
-              <div className="relative">
-                <ShoppingCart className="w-[16px] h-[16px] text-[#333]" />
-                <span className="absolute -top-[5px] -right-[6px] bg-[#00a84f] text-white text-[7px] font-bold rounded-full w-[12px] h-[12px] flex items-center justify-center">0</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Category Tabs */}
-          <div className="bg-white px-[10px] pb-[8px] flex gap-[12px] overflow-x-auto text-[11px] font-medium whitespace-nowrap border-b border-[#e8e8e8]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
-            <span className="text-[#333] border-b-2 border-[#333] pb-[6px]">Cestování</span>
-            <span className="text-[#666] pb-[6px]">Zážitky a zábava</span>
-            <span className="text-[#666] pb-[6px]">Krása a relax</span>
-            <span className="text-[#666] pb-[6px]">Restaur…</span>
-          </div>
+          {/* Header */}
+          <img src={`${import.meta.env.BASE_URL}assets/header.jpg`} alt="Header" className="w-full h-auto block" />
 
           {/* Hero Section */}
           <div className="relative bg-[#E5F0F7] px-[14px] pt-[16px] pb-[20px] overflow-hidden">
