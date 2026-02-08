@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/cursor-ideas" element={<CursorIdeas />} />
-        <Route path="/figma-mcp" element={<FigmaMCP />} />
+        <Route path="/mobile" element={<FigmaMCP />} />
       </Routes>
     </BrowserRouter>
   )

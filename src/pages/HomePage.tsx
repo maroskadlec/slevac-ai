@@ -50,7 +50,7 @@ function HomePage() {
         <motion.div variants={itemVariants} className="flex flex-col gap-4 items-center">
           {/* Primary Button → Figma MCP page */}
           <motion.button
-            onClick={() => navigate('/figma-mcp')}
+            onClick={() => navigate('/mobile')}
             className="w-full max-w-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg rounded-2xl px-8 py-4 shadow-lg hover:shadow-xl transition-all cursor-pointer"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
