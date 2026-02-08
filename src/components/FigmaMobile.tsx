@@ -161,93 +161,9 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             <span className="text-[#00a84f] font-medium">Změnit lokalitu</span>
           </div>
 
-          {/* Category Cards Grid */}
-          <div className="px-[10px] grid grid-cols-2 gap-[6px]">
-            {/* Card 1 */}
-            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
-              <img src={`${import.meta.env.BASE_URL}assets/deals/d3.jpg`} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
-                <p className="text-white font-bold text-[10px] leading-[13px]">Wellness pobyty<br/>za skvělé ceny</p>
-              </div>
-            </div>
-            {/* Card 2 */}
-            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
-              <img src={`${import.meta.env.BASE_URL}assets/deals/d1.jpg`} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
-                <p className="text-white font-bold text-[10px] leading-[13px]">Kam na jarňáky?</p>
-              </div>
-            </div>
-            {/* Card 3 */}
-            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
-              <img src={`${import.meta.env.BASE_URL}assets/deals/d5.jpg`} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
-                <p className="text-white font-bold text-[10px] leading-[13px]">Lyžování v Alpách</p>
-              </div>
-            </div>
-            {/* Card 4 */}
-            <div className="rounded-[8px] overflow-hidden relative h-[90px]">
-              <div className="w-full h-full bg-gradient-to-br from-[#ff6b35] via-[#f7c948] to-[#ff6b35] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-[35px] h-[35px] mx-auto mb-[3px] rounded-full bg-white/20 flex items-center justify-center">
-                    <span className="text-[14px]">🎡</span>
-                  </div>
-                  <p className="text-white font-bold text-[9px] leading-[11px] uppercase">Zatočit</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <div className="absolute bottom-[6px] left-[6px] right-[6px]">
-                <p className="text-white font-bold text-[10px] leading-[13px]">Zkuste štěstí<br/>každý den</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Nedávno prohlížené */}
-          <div className="px-[10px] pt-[16px] pb-[8px]">
-            <h3 className="text-[16px] font-bold text-[#1a1a1a] mb-[10px]">Nedávno prohlížené</h3>
-            <div className="flex gap-[8px] overflow-x-auto pb-[8px]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
-              {/* Recently viewed card 1 */}
-              <div className="flex-shrink-0 w-[140px] rounded-[8px] overflow-hidden bg-white shadow-sm">
-                <div className="relative h-[85px]">
-                  <img src={`${import.meta.env.BASE_URL}assets/deals/d7.jpg`} alt="" className="w-full h-full object-cover" />
-                  <button className="absolute top-[5px] right-[5px] w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-sm">
-                    <Heart className="w-[10px] h-[10px] text-red-500 fill-red-500" />
-                  </button>
-                  <div className="absolute bottom-[4px] left-[4px] flex items-center gap-[3px]">
-                    <span className="bg-[#00a84f] text-white text-[9px] font-bold px-[5px] py-[1px] rounded-[3px]">699 Kč</span>
-                    <span className="text-white text-[8px] line-through opacity-90">834 Kč</span>
-                    <span className="bg-[#f0c850] text-[#333] text-[7px] font-bold px-[3px] py-[0.5px] rounded-[2px]">–16 %</span>
-                  </div>
-                </div>
-                <div className="p-[6px]">
-                  <p className="text-[9px] font-semibold text-[#1a1a1a] leading-[12px] line-clamp-2">Tvorba vlastního šperku: pro 1 či 2 osoby</p>
-                  <div className="flex items-center gap-[2px] mt-[3px]">
-                    <span className="text-[8px] text-yellow-500">⭐</span>
-                    <span className="text-[8px] text-[#666]">5,0 / 5 (5 hodnocení)</span>
-                  </div>
-                  <p className="text-[7px] text-[#999] mt-[2px]">Charm Bar Prague</p>
-                </div>
-              </div>
-              {/* Recently viewed card 2 */}
-              <div className="flex-shrink-0 w-[140px] rounded-[8px] overflow-hidden bg-white shadow-sm">
-                <div className="relative h-[85px]">
-                  <img src={`${import.meta.env.BASE_URL}assets/deals/d9.jpg`} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute bottom-[4px] left-[4px] flex items-center gap-[3px]">
-                    <span className="bg-[#00a84f] text-white text-[9px] font-bold px-[5px] py-[1px] rounded-[3px]">1 299 Kč</span>
-                  </div>
-                </div>
-                <div className="p-[6px]">
-                  <p className="text-[9px] font-semibold text-[#1a1a1a] leading-[12px] line-clamp-2">Ruční lymfatická masáž 90 minut</p>
-                  <div className="flex items-center gap-[2px] mt-[3px]">
-                    <span className="text-[8px] text-yellow-500">⭐</span>
-                    <span className="text-[8px] text-[#666]">4,7 / 5 (3 218 hodnocení)</span>
-                  </div>
-                  <p className="text-[7px] text-[#999] mt-[2px]">Estetické centrum</p>
-                </div>
-              </div>
-            </div>
+          {/* Category Cards Grid + Nedávno prohlížené */}
+          <div className="px-[10px]">
+            <img src={`${import.meta.env.BASE_URL}assets/grid.jpg`} alt="Kategorie a nedávno prohlížené" className="w-full h-auto block" />
           </div>
 
           {/* Bottom spacer for floating button */}
