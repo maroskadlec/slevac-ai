@@ -81,25 +81,187 @@ function getHowIRecommendResponse(): string {
   return pickUnused(HOW_I_RECOMMEND_RESPONSES, usedHowIRecommendTexts)
 }
 
+// ─── Conversation state tracking ───────────────────────────────────
+interface ConversationState {
+  location: string | null
+  people: string | null
+  dates: string | null
+  meals: string | null
+  amenities: string | null        // null = not yet asked, value = answered
+  amenitiesAsked: boolean         // whether the bot already asked about amenities
+}
+
+function normalize(text: string): string {
+  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+/** Extract location from text */
+function extractLocation(text: string): string | null {
+  const n = normalize(text)
+  if (n.match(/\b(krkonos|spindl|harrachov|pec pod|snezk)/)) return 'Krkonoše'
+  if (n.match(/\b(beskydy|pustevn|radhost)/)) return 'Beskydy'
+  if (n.match(/\b(sumav|lipno|kvild)/)) return 'Šumava'
+  if (n.match(/\b(jeseniky|praded|karlova studank)/)) return 'Jeseníky'
+  if (n.match(/\b(cesky raj)/)) return 'Český ráj'
+  if (n.match(/\b(vysocin)/)) return 'Vysočina'
+  if (n.match(/\b(praha)/)) return 'Praha'
+  if (n.match(/\b(brno)/)) return 'Brno'
+  return null
+}
+
+/** Extract number of people from text */
+function extractPeople(text: string): string | null {
+  const n = normalize(text)
+  // "já s partnerkou/partnerem", "s manželkou/manželem", "ve dvou", "pro dva"
+  if (n.match(/\b(s partnerkou|s partnerem|s manzelkou|s manzelem|ve dvou|pro dva|pro dve|dva lidi|dve osoby|2 osoby|2 lidi)\b/)) return '2 osoby'
+  if (n.match(/\b(sam\b|sama\b|solo\b|jen ja\b|jedna osoba|1 osoba|jednoho)\b/)) return '1 osoba'
+  if (n.match(/\b(s det|s rodinou|rodina|rodinny|rodinn)\b/)) return 'rodina'
+  // "pro X", "X osob/lidí/osoby/lidi", or just a digit in relevant context
+  const numMatch = n.match(/\b(pro|pocet)\s*(\d+)/) || n.match(/(\d+)\s*(osob|lid|osoby|lidi|clov|dospel)/) || n.match(/\b(\d+)\s*a\s*(\d+)\s*(det|dite)/)
+  if (numMatch) {
+    // Try to figure out the number
+    const digits = n.match(/\d+/g)
+    if (digits) {
+      const total = digits.map(Number).reduce((a, b) => a + b, 0)
+      return `${total} ${total === 1 ? 'osoba' : total < 5 ? 'osoby' : 'osob'}`
+    }
+  }
+  // Simple number standalone in a short message (probably answering "how many people")
+  const simpleNum = n.match(/^\s*(\d+)\s*$/)
+  if (simpleNum) {
+    const num = parseInt(simpleNum[1])
+    return `${num} ${num === 1 ? 'osoba' : num < 5 ? 'osoby' : 'osob'}`
+  }
+  // Textual numbers
+  if (n.match(/\b(tri|tři|3)\b/) && !n.match(/\b(strav|penz|snidan)/)) return '3 osoby'
+  if (n.match(/\b(ctyri|čtyři|4)\b/) && !n.match(/\b(strav|penz|snidan)/)) return '4 osoby'
+  if (n.match(/\b(pet|pět|5)\b/) && !n.match(/\b(strav|penz|snidan)/)) return '5 osob'
+  return null
+}
+
+/** Extract dates/period from text */
+function extractDates(text: string): string | null {
+  const n = normalize(text)
+  // Specific date patterns: "15.3.", "15. března", "15.3.2026", "15.3. - 18.3."
+  if (n.match(/\d{1,2}\.\s*\d{1,2}\./)) return text.trim()
+  // Month mentions
+  if (n.match(/\b(leden|unor|brezen|duben|kveten|cerven|cervenec|srpen|zari|rijen|listopad|prosinec|ledna|unora|brezna|dubna|kvetna|cervna|cervence|srpna|zari|rijna|listopadu|prosince)\b/)) return text.trim()
+  // Relative time
+  if (n.match(/\b(pristi vikend|tento vikend|pristi tyden|tento tyden|za tyden|za dva tydny|za mesic)\b/)) return text.trim()
+  // Season / vague
+  if (n.match(/\b(jaro|leto|podzim|zima|jarni|letni|podzimni|zimni|prazdnin|prazdniny|svatk|velikonoc|vanoce|silvestr)\b/)) return text.trim()
+  // "víkend v červnu", "první týden v srpnu" etc.
+  if (n.match(/\b(vikend|tyden|mesic)\b/) && n.match(/\b(v|na|behem|kolem|zacatek|konec|polovina)\b/)) return text.trim()
+  // "na 3 noci", "na víkend", "na týden"
+  if (n.match(/\b(na\s+\d+\s*(noc|den|dni))\b/)) return text.trim()
+  if (n.match(/\bna vikend\b/)) return text.trim()
+  if (n.match(/\bna tyden\b/)) return text.trim()
+  return null
+}
+
+/** Extract meal preference from text */
+function extractMeals(text: string): string | null {
+  const n = normalize(text)
+  if (n.match(/\b(plna penze|plnou penzi|plna penzi)\b/)) return 'plná penze'
+  if (n.match(/\b(polopenze|polopenzi)\b/)) return 'polopenze'
+  if (n.match(/\b(snidane|se snidani|vcetne snidane)\b/)) return 'se snídaní'
+  if (n.match(/\b(vlastni stravovani|bez stravy|bez stravovani|stravovani vlastni|sam si|sami si)\b/)) return 'vlastní stravování'
+  if (n.match(/\b(all inclusive|all-inclusive|all in)\b/)) return 'all inclusive'
+  // Generic "strava" mentions when answering the bot's question
+  if (n.match(/\b(strav)\b/) && n.length < 40) {
+    if (n.match(/\b(neres|jedno|nemusí|nepotreb|bez)\b/)) return 'bez preference'
+  }
+  // "je mi to jedno" in context of meals question
+  if (n.match(/\b(jedno|neres|nemusí|jakakoli|jakakoliv|cokoliv|nezalezi)\b/) && n.length < 30) return null // will be handled contextually
+  return null
+}
+
+/** Extract hotel amenities from text */
+function extractAmenities(text: string): string | null {
+  const n = normalize(text)
+  const found: string[] = []
+  if (n.match(/\b(bazen|bazén)\b/)) found.push('bazén')
+  if (n.match(/\b(wellness|spa|virivk|vířivk|saun)\b/)) found.push('wellness')
+  if (n.match(/\b(detsky koutek|detsky kout|hern|pro deti)\b/)) found.push('dětský koutek')
+  if (n.match(/\b(pet friendly|zvire|pes |psa |pejsk|mazlicek|se psem)\b/)) found.push('pet friendly')
+  if (n.match(/\b(restaurac|restauraci)\b/)) found.push('restaurace')
+  if (n.match(/\b(parkovani|parking|garaz)\b/)) found.push('parkování')
+  if (n.match(/\b(fitness|posilovna|gym)\b/)) found.push('fitness')
+  if (found.length > 0) return found.join(', ')
+  // "je mi to jedno" / "bez preference" / "neřeším"
+  if (n.match(/\b(jedno|neres|nemusí|cokoliv|nezalezi|nic extra|nic specialni|zadne|nemam pozadavk|nemam preference|nepotreb|nevyzaduj|neni to pro)\b/)) return 'bez preference'
+  return null
+}
+
+/** Extract conversation state from the entire history */
+function extractConversationState(messages: ChatMessage[]): ConversationState {
+  const state: ConversationState = {
+    location: null,
+    people: null,
+    dates: null,
+    meals: null,
+    amenities: null,
+    amenitiesAsked: false,
+  }
+
+  const botMessages = messages.filter(m => m.sender === 'bot')
+
+  // Check if amenities were already asked by the bot
+  for (const bm of botMessages) {
+    const bn = normalize(bm.text)
+    if (bn.includes('vybaveni') || bn.includes('bazen') && bn.includes('wellness') && (bn.includes('?') || bn.includes('koutek'))) {
+      state.amenitiesAsked = true
+    }
+  }
+
+  // Go through user messages and extract information
+  for (const m of messages) {
+    if (m.sender !== 'user') continue
+    const text = m.text
+
+    if (!state.location) state.location = extractLocation(text)
+    if (!state.people) state.people = extractPeople(text)
+    if (!state.dates) state.dates = extractDates(text)
+    if (!state.meals) state.meals = extractMeals(text)
+    if (!state.amenities) state.amenities = extractAmenities(text)
+  }
+
+  return state
+}
+
+/** Check what the bot last asked about, to handle contextual short answers */
+function getLastBotQuestion(messages: ChatMessage[]): 'location' | 'people' | 'dates' | 'meals' | 'amenities' | null {
+  const botMessages = messages.filter(m => m.sender === 'bot')
+  if (botMessages.length === 0) return null
+  const last = normalize(botMessages[botMessages.length - 1].text)
+  
+  if (last.includes('lokalit') || last.includes('kam') || last.includes('oblast') || last.includes('mist')) return 'location'
+  if (last.includes('kolik') && (last.includes('osob') || last.includes('lid') || last.includes('vas') || last.includes('pojed'))) return 'people'
+  if (last.includes('termin') || last.includes('kdy') || last.includes('datum') || last.includes('obdobi')) return 'dates'
+  if (last.includes('strav') || last.includes('penz') || last.includes('snidan')) return 'meals'
+  if (last.includes('vybaven') || last.includes('bazen') || last.includes('koutek')) return 'amenities'
+  return null
+}
+
+// ─── Main response logic ───────────────────────────────────────────
+
 interface BotResponse {
   text: string
   deals?: DealCard[]
 }
 
 function getBotResponse(userMessage: string, conversationHistory: ChatMessage[]): BotResponse {
-  const msg = userMessage.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  const msg = normalize(userMessage)
 
-  // Check conversation context - what was the previous topic
+  // Check conversation context
   const prevBotMessages = conversationHistory.filter(m => m.sender === 'bot')
   const lastBotMsg = prevBotMessages.length > 0
-    ? prevBotMessages[prevBotMessages.length - 1].text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    ? normalize(prevBotMessages[prevBotMessages.length - 1].text)
     : ''
-  const prevUserMessages = conversationHistory.filter(m => m.sender === 'user')
-  const allUserText = prevUserMessages.map(m => m.text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')).join(' ')
 
   // --- Greetings (no deals) ---
-  if (msg.match(/\b(ahoj|cau|dobr[ye]|hey|hi|hello|zdar|nazdar)\b/)) {
-    return { text: 'Ahoj! 👋 Rád tě vidím. Jak ti mohu dnes pomoci s výběrem nabídky na Sleváči?' }
+  if (msg.match(/\b(ahoj|cau|dobr[ye]|hey|hi|hello|zdar|nazdar)\b/) && conversationHistory.filter(m => m.sender === 'user').length <= 1) {
+    return { text: 'Ahoj! 👋 Rád tě vidím. Řekni mi, kam chceš vyrazit, a já ti najdu ty nejlepší nabídky.' }
   }
 
   // --- Name question ---
@@ -114,11 +276,11 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
 
   // --- Help / capabilities (no deals) ---
   if (msg.match(/\b(co umis|pomoc|help|co delas|jak funguj|co jsi|co vse|co muzes|co dokazes|co zvlad)/)) {
-    return { text: 'Jsem tu, abych ti usnadnil výběr z nabídek na Slevomatu. Tady je, co pro tebe můžu udělat:\n\n🏖️ Cestování – najdu ti dovolenou podle destinace, termínu nebo rozpočtu\n\n🎁 Zážitky – poradím s výběrem adrenalinových, relaxačních nebo romantických zážitků\n\n⭐ Doporučení – vybírám podle hodnocení a recenzí od ostatních zákazníků\n\nProstě mi řekni, co hledáš, a já ti ukážu to nejlepší!' }
+    return { text: 'Jsem tu, abych ti usnadnil výběr z nabídek na Slevomatu. Řekni mi kam chceš jet, s kolika lidmi, kdy a jakou preferuješ stravu – a já ti najdu to nejlepší! 🏖️' }
   }
 
   // --- Thanks (no deals) ---
-  if (msg.match(/\b(dekuj|diky|dik|dikes|super|parad|skvel)/)) {
+  if (msg.match(/\b(dekuj|diky|dik|dikes)\b/)) {
     return { text: 'Rádo se stalo! 😊 Pokud budeš potřebovat cokoliv dalšího, jsem tu pro tebe.' }
   }
 
@@ -129,156 +291,170 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
   }
 
   // --- More offers / different offers ---
-  if (msg.match(/\b(vic nabid|dalsi nabid|jeste nec|jine nabid|neco jineho|dalsi moznost|vice moznost|zkus jine|ukaz dalsi|jeste dalsi|nemáš jiné|jinè nabíd)/)) {
+  if (msg.match(/\b(vic nabid|dalsi nabid|jeste nec|jine nabid|neco jineho|dalsi moznost|vice moznost|zkus jine|ukaz dalsi|jeste dalsi)/)) {
     return {
       text: 'Jasně, tady je další várka nabídek. Snad tady najdeš, co hledáš:',
       deals: pickRandomDeals(5),
     }
   }
 
-  // Determine if we have enough context to show deals
-  // Early conversation = user sent fewer than 2 messages before this one
-  const isEarlyConversation = prevUserMessages.length < 2
-  const hasLocationContext = allUserText.match(/\b(krkonos|beskydy|sumav|lipno|jeseniky|cesky raj|vysocin|praha|brno|spindl|harrachov|pec|snezk)/)
-  const hasTypeContext = allUserText.match(/\b(wellness|relax|masaz|spa|hotel|ubytovan|dovolen|restaurac|jidlo|romanticke|rodina|deti|sport|aktivit)/)
+  // ─── Gather information flow ─────────────────────────────────────
+  // Extract current state from the full conversation (including this new message)
+  const state = extractConversationState(conversationHistory)
+  const lastQuestion = getLastBotQuestion(conversationHistory)
 
-  // --- Specific location: Krkonoše ---
-  if (msg.match(/\b(krkonos|spindl|harrachov|pec|snezk)/)) {
-    if (isEarlyConversation && !hasTypeContext) {
-      return { text: 'Krkonoše jsou skvělá volba! 🏔️ Abych ti našel to pravé – hledáš spíš wellness a relax, aktivní dovolenou, nebo rodinný pobyt?' }
-    }
-    return {
-      text: 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe. Který se ti líbí nejvíc?',
-      deals: pickRandomDeals(5),
-    }
-  }
+  // Also try to extract from the current message specifically
+  const currentLocation = extractLocation(userMessage)
+  const currentPeople = extractPeople(userMessage)
+  const currentDates = extractDates(userMessage)
+  const currentMeals = extractMeals(userMessage)
+  const currentAmenities = extractAmenities(userMessage)
 
-  // --- Specific location: Beskydy, Šumava, other mountains ---
-  if (msg.match(/\b(beskydy|sumav|lipno|jeseniky|cesky raj|vysocin)/)) {
-    if (isEarlyConversation && !hasTypeContext) {
-      return { text: 'Výborný tip na lokalitu! Co tam chceš hlavně dělat – relaxovat ve wellness, vyrazit na výlety, nebo si užít pobyt s rodinou?' }
-    }
-    return {
-      text: 'Skvělá volba! Našel jsem pro tebe nabídky v této oblasti. Podívej se, co jsem vybral:',
-      deals: pickRandomDeals(5),
-    }
-  }
+  // Merge current extractions into state
+  if (currentLocation) state.location = currentLocation
+  if (currentPeople) state.people = currentPeople
+  if (currentDates) state.dates = currentDates
+  if (currentMeals) state.meals = currentMeals
+  if (currentAmenities) state.amenities = currentAmenities
 
-  // --- Wellness ---
-  if (msg.match(/\b(wellness|relax|masaz|spa|bazen|saun|virivk)/)) {
-    if (isEarlyConversation && !hasLocationContext) {
-      return { text: 'Wellness zní skvěle! 🧖 Máš představu o lokalitě? Třeba Krkonoše, Beskydy, Šumava – nebo ti to je jedno a hledáš prostě nejlepší nabídku?' }
-    }
-    return {
-      text: 'Našel jsem pár wellness pobytů, kde si užiješ vířivku s výhledem přímo do přírody nebo na klidnou hladinu jezera. Ideální víkend ve dvou s polopenzí, saunou a jen kousek autem od tebe.',
-      deals: pickRandomDeals(5),
-    }
-  }
+  // Handle contextual short answers based on what the bot last asked
+  if (lastQuestion && !currentLocation && !currentPeople && !currentDates && !currentMeals && !currentAmenities) {
+    const isShortAnswer = msg.length < 50
 
-  // --- Restaurant ---
-  if (msg.match(/\b(jidlo|restaurac|jist|obed|vecere|snidane|kuchyn|gastr|menu|degustac)/)) {
-    if (isEarlyConversation && msg.length < 25) {
-      return { text: 'Skvělá volba! Máme úžasné nabídky restaurací. Hledáš spíš degustační menu, zážitkovou večeři, nebo něco jiného? A v jakém městě?' }
-    }
-    return {
-      text: 'Tady jsou moje top doporučení. Všechny mají skvělé hodnocení a nabízí nezapomenutelný zážitek:',
-      deals: pickRandomDeals(5),
-    }
-  }
+    if (isShortAnswer) {
+      // "je mi to jedno" type answers
+      const isDontCare = msg.match(/\b(jedno|neres|nemusí|cokoliv|nezalezi|jakkoliv|jakykoliv|jakakoli|jakakoliv|uplne jedno|je to jedno|fakt jedno|vzdycky|vse|vsechno)\b/)
 
-  // --- Travel/Hotel ---
-  if (msg.match(/\b(hotel|ubytovan|dovolen|cestovan|vylet|pobyt|chata|chalup)/)) {
-    if (isEarlyConversation && !hasLocationContext) {
-      return { text: 'Cestování je moje specialita! Máme nabídky od horských chat po luxusní resorty. Kam by ses chtěl/a podívat a co je pro tebe důležité – wellness, příroda, sport?' }
-    }
-    return {
-      text: 'Tady jsou nabídky pobytů, které jsem pro tebe vybral. Všechny mají výborné hodnocení:',
-      deals: pickRandomDeals(5),
-    }
-  }
-
-  // --- Price focused ---
-  if (msg.match(/\b(cena|levn|slev|akce|vyhod|peniz|korun|kc|czk|lacin)/)) {
-    if (isEarlyConversation) {
-      return { text: 'Rozumím, hledáš nejlepší poměr cena/výkon! Momentálně máme akce až -60% na vybrané pobyty. O jaký typ zážitku máš zájem a kam by ses chtěl/a podívat?' }
-    }
-    return {
-      text: 'Tady jsou nejlepší nabídky s výborným poměrem cena/výkon. Všechny pod super cenou:',
-      deals: pickRandomDeals(5),
-    }
-  }
-
-  // --- Romantic ---
-  if (msg.match(/\b(romanticke|partner|dvou|valentyn|vyrocí|ve dvou)/)) {
-    if (isEarlyConversation && !hasLocationContext) {
-      return { text: 'Romantika pro dva – to zní krásně! 💑 Máš představu kam? A láká tě spíš wellness, večeře při svíčkách, nebo obojí?' }
-    }
-    return {
-      text: 'Romantický pobyt pro dva? Mám pro tebe skvělé tipy – privátní wellness, večeře při svíčkách a krásné prostředí:',
-      deals: pickRandomDeals(5),
-    }
-  }
-
-  // --- Family ---
-  if (msg.match(/\b(rodina|deti|dite|rodinny|rodinn)/)) {
-    if (isEarlyConversation && !hasLocationContext) {
-      return { text: 'Rodinný pobyt je super nápad! 👨‍👩‍👧‍👦 Kam byste chtěli vyrazit? A jak staré jsou děti – ať najdu něco, co bude bavit celou rodinu.' }
-    }
-    return {
-      text: 'Pro rodiny s dětmi mám super tipy! Aquaparky, animační programy a pobyty, kde si užijí malí i velcí:',
-      deals: pickRandomDeals(5),
-    }
-  }
-
-  // --- Sports ---
-  if (msg.match(/\b(sport|aktivit|kolo|lyzov|bruslen|turistik|golf|cykl)/)) {
-    if (isEarlyConversation && !hasLocationContext) {
-      return { text: 'Aktivní dovolená – to je moje! 🚴 Jaký sport tě zajímá a kam by ses chtěl/a podívat?' }
-    }
-    return {
-      text: 'Sportovní nabídky jsou super! Tady je pár tipů, co jsem pro tebe našel:',
-      deals: pickRandomDeals(5),
-    }
-  }
-
-  // --- Views / nature ---
-  if (msg.match(/\b(vyhled|prirod|hory|more|krajin|les)/)) {
-    if (isEarlyConversation && !hasLocationContext) {
-      return { text: 'Příroda a krásné výhledy – toho máme hodně! 🌿 Preferuješ hory, vodní plochy, nebo ti je to jedno? A hledáš spíš relax nebo aktivní program?' }
-    }
-    return {
-      text: 'Krásné výhledy a příroda – to je přesně to, co máme. Podívej se na tyto nabídky:',
-      deals: pickRandomDeals(5),
-    }
-  }
-
-  // --- Confirmations: "Ano", "Chci" etc. → check context and show relevant deals ---
-  if (msg.match(/\b(ano|jo|jasne|urcite|rad|bych|chci|chtel|chtela|davej|ukazat|zobraz)/)) {
-    // Determine which deals based on conversation history
-    if (allUserText.match(/\b(wellness|relax|masaz|spa|restaurac|jidlo|vecere|obed|romanticke|partner|dvou|rodina|deti|rodinny|cena|levn|slev)/)) {
-      return {
-        text: 'Tady jsou moje top doporučení pro tebe:',
-        deals: pickRandomDeals(5),
+      switch (lastQuestion) {
+        case 'people':
+          if (!state.people) {
+            const p = extractPeople(userMessage)
+            if (p) { state.people = p; break }
+            // Try to interpret the answer loosely
+            if (msg.match(/\d/)) {
+              const num = parseInt(msg.match(/\d+/)![0])
+              state.people = `${num} ${num === 1 ? 'osoba' : num < 5 ? 'osoby' : 'osob'}`
+            }
+          }
+          break
+        case 'dates':
+          if (!state.dates) {
+            // Accept any answer as a date description
+            state.dates = userMessage.trim()
+          }
+          break
+        case 'meals':
+          if (!state.meals) {
+            if (isDontCare) {
+              state.meals = 'bez preference'
+            } else {
+              // Try to interpret
+              state.meals = userMessage.trim()
+            }
+          }
+          break
+        case 'amenities':
+          if (!state.amenities) {
+            if (isDontCare) {
+              state.amenities = 'bez preference'
+            } else {
+              state.amenities = userMessage.trim()
+            }
+          }
+          break
       }
     }
-    // Default: show general deals
-    if (lastBotMsg.includes('aktivit') || lastBotMsg.includes('pripojime')) {
-      return {
-        text: 'Mám pro tebe pár tipů na aktivity a výlety v okolí:',
-        deals: pickRandomDeals(5),
+  }
+
+  // ─── Determine what to ask next ──────────────────────────────────
+
+  // 1. Location
+  if (!state.location) {
+    // Check if the message has travel-related content but no location
+    if (msg.match(/\b(hotel|ubytovan|dovolen|pobyt|chata|chalup|wellness|hory|cestovan)/)) {
+      return { text: 'To zní skvěle! 🏔️ A kam by ses chtěl/a podívat? Třeba Krkonoše, Beskydy, Šumava…?' }
+    }
+    // If nothing travel-related detected, it might be off-topic or the user just started
+    if (conversationHistory.filter(m => m.sender === 'user').length <= 1 && !msg.match(/\b(krkonos|beskydy|sumav|hotel|pobyt|dovolen)/)) {
+      // Check if it's genuinely off-topic
+      if (msg.length > 5 && !msg.match(/\b(jet|jedeme|chci|chteli|chtela|chtel|hledam|hledame|zajimat|zajima|planuji|planujeme|radi|rada|bychom|potreb)/)) {
+        return { text: getOffTopicResponse() }
       }
     }
-    return { text: 'Připojíme k tomu nějakou aktivitu v okolí?' }
+    return { text: 'Super, rád pomůžu! Nejdřív mi řekni, kam to má být – jaká lokalita tě láká? 🗺️' }
   }
 
-  // --- Short messages ---
-  if (msg.length < 5) {
-    return { text: 'Můžeš mi říct trochu víc? Rád ti pomohu najít perfektní nabídku na Sleváči!' }
+  // Acknowledge location if just provided
+  const locationJustProvided = currentLocation && !extractPeople(userMessage) && !extractDates(userMessage) && !extractMeals(userMessage)
+
+  // 2. Number of people
+  if (!state.people) {
+    if (locationJustProvided) {
+      return { text: `${state.location} – skvělá volba! 🏔️ A kolik vás pojede? Jen ty, ve dvou, nebo víc?` }
+    }
+    return { text: 'Kolik vás pojede? Sám/sama, ve dvou, nebo víc lidí?' }
   }
 
-  // --- Off-topic: anything not matching travel / experiences ---
-  return { text: getOffTopicResponse() }
+  // Acknowledge people if just provided
+  const peopleJustProvided = currentPeople && !extractDates(userMessage) && !extractMeals(userMessage)
+
+  // 3. Date/period
+  if (!state.dates) {
+    if (peopleJustProvided) {
+      return { text: `Dobře, ${state.people}. A kdy byste chtěli jet? Může být konkrétní datum, víkend, nebo třeba „během léta" – cokoli mi pomůže. 📅` }
+    }
+    return { text: 'A kdy by se ti to hodilo? Napiš mi termín, období nebo třeba jen měsíc. 📅' }
+  }
+
+  // Acknowledge dates if just provided
+  const datesJustProvided = currentDates && !extractMeals(userMessage)
+
+  // 4. Meals
+  if (!state.meals) {
+    if (datesJustProvided) {
+      return { text: 'Výborně! A co stravování? Preferuješ vlastní stravování, snídani, polopenzi, plnou penzi, nebo all inclusive? 🍽️' }
+    }
+    return { text: 'Jaké stravování by ti vyhovovalo? Třeba polopenze, plná penze, se snídaní, nebo vlastní stravování? 🍽️' }
+  }
+
+  // Acknowledge meals if just provided
+  const mealsJustProvided = currentMeals || (lastQuestion === 'meals' && !state.amenitiesAsked)
+
+  // 5. Hotel amenities
+  if (!state.amenities) {
+    if (!state.amenitiesAsked || mealsJustProvided) {
+      return { text: 'Ještě poslední věc – je pro tebe důležité nějaké vybavení hotelu? Třeba bazén, wellness, dětský koutek, pet friendly, restaurace, parkování…? Nebo ti to je jedno? 🏊' }
+    }
+    // If amenities were asked and user responded with something we couldn't parse, treat as provided
+    if (state.amenitiesAsked) {
+      state.amenities = 'bez preference'
+    }
+  }
+
+  // ─── All criteria gathered → show deals! ─────────────────────────
+
+  // Build a nice summary
+  const summaryParts: string[] = []
+  summaryParts.push(`📍 ${state.location}`)
+  summaryParts.push(`👥 ${state.people}`)
+  summaryParts.push(`📅 ${state.dates}`)
+  summaryParts.push(`🍽️ ${state.meals}`)
+  if (state.amenities && state.amenities !== 'bez preference') {
+    summaryParts.push(`🏨 ${state.amenities}`)
+  }
+
+  const summary = summaryParts.join('\n')
+
+  return {
+    text: `Mám vše, co potřebuji! Tady je shrnutí:\n\n${summary}\n\nA tady jsou nabídky, které jsem pro tebe vybral:`,
+    deals: pickRandomDeals(5),
+  }
 }
+
+// ─── Short messages ---
+// Moved inside the main logic as needed
+
+// ─── Hook ──────────────────────────────────────────────────────────
 
 export function useChatbot(_isOpen?: boolean) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
