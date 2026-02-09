@@ -317,66 +317,43 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
   if (currentMeals) state.meals = currentMeals
   if (currentAmenities) state.amenities = currentAmenities
 
-  // Handle contextual short answers based on what the bot last asked
-  if (lastQuestion && !currentLocation && !currentPeople && !currentDates && !currentMeals && !currentAmenities) {
-    const isShortAnswer = msg.length < 50
+  // Handle contextual answers when bot asked about missing info
+  // The user may answer multiple things at once, or answer with "je mi to jedno"
+  if (lastQuestion) {
+    const isDontCare = msg.match(/\b(jedno|neres|nemusí|cokoliv|nezalezi|jakkoliv|jakykoliv|jakakoli|jakakoliv|uplne jedno|je to jedno|fakt jedno|vzdycky|vse|vsechno)\b/)
 
-    if (isShortAnswer) {
-      // "je mi to jedno" type answers
-      const isDontCare = msg.match(/\b(jedno|neres|nemusí|cokoliv|nezalezi|jakkoliv|jakykoliv|jakakoli|jakakoliv|uplne jedno|je to jedno|fakt jedno|vzdycky|vse|vsechno)\b/)
+    // If "je mi to jedno" and bot asked about amenities
+    if (isDontCare && !state.amenities && state.amenitiesAsked) {
+      state.amenities = 'bez preference'
+    }
+    // If "je mi to jedno" and bot asked about meals
+    if (isDontCare && !state.meals && lastBotMsg.includes('strav')) {
+      state.meals = 'bez preference'
+    }
 
-      switch (lastQuestion) {
-        case 'people':
-          if (!state.people) {
-            const p = extractPeople(userMessage)
-            if (p) { state.people = p; break }
-            // Try to interpret the answer loosely
-            if (msg.match(/\d/)) {
-              const num = parseInt(msg.match(/\d+/)![0])
-              state.people = `${num} ${num === 1 ? 'osoba' : num < 5 ? 'osoby' : 'osob'}`
-            }
-          }
-          break
-        case 'dates':
-          if (!state.dates) {
-            // Accept any answer as a date description
-            state.dates = userMessage.trim()
-          }
-          break
-        case 'meals':
-          if (!state.meals) {
-            if (isDontCare) {
-              state.meals = 'bez preference'
-            } else {
-              // Try to interpret
-              state.meals = userMessage.trim()
-            }
-          }
-          break
-        case 'amenities':
-          if (!state.amenities) {
-            if (isDontCare) {
-              state.amenities = 'bez preference'
-            } else {
-              state.amenities = userMessage.trim()
-            }
-          }
-          break
-      }
+    // Try to interpret short numeric answers as people count
+    if (!state.people && msg.match(/^\s*\d+\s*$/)) {
+      const num = parseInt(msg.match(/\d+/)![0])
+      state.people = `${num} ${num === 1 ? 'osoba' : num < 5 ? 'osoby' : 'osob'}`
+    }
+
+    // If bot asked and user gave a text answer that we couldn't parse for specific fields,
+    // try to assign it to the first missing field the bot asked about
+    if (!currentLocation && !currentPeople && !currentDates && !currentMeals && !currentAmenities && !isDontCare) {
+      if (!state.dates && lastBotMsg.includes('termin')) state.dates = userMessage.trim()
+      if (!state.meals && lastBotMsg.includes('strav')) state.meals = userMessage.trim()
+      if (!state.amenities && (lastBotMsg.includes('vybaven') || lastBotMsg.includes('bazen'))) state.amenities = userMessage.trim()
     }
   }
 
-  // ─── Determine what to ask next ──────────────────────────────────
+  // ─── Determine missing information and ask ALL at once ───────────
 
-  // 1. Location
+  // If no location yet, ask for it first (without location we can't start)
   if (!state.location) {
-    // Check if the message has travel-related content but no location
     if (msg.match(/\b(hotel|ubytovan|dovolen|pobyt|chata|chalup|wellness|hory|cestovan)/)) {
       return { text: 'To zní skvěle! 🏔️ A kam by ses chtěl/a podívat? Třeba Krkonoše, Beskydy, Šumava…?' }
     }
-    // If nothing travel-related detected, it might be off-topic or the user just started
-    if (conversationHistory.filter(m => m.sender === 'user').length <= 1 && !msg.match(/\b(krkonos|beskydy|sumav|hotel|pobyt|dovolen)/)) {
-      // Check if it's genuinely off-topic
+    if (conversationHistory.filter(m => m.sender === 'user').length <= 1) {
       if (msg.length > 5 && !msg.match(/\b(jet|jedeme|chci|chteli|chtela|chtel|hledam|hledame|zajimat|zajima|planuji|planujeme|radi|rada|bychom|potreb)/)) {
         return { text: getOffTopicResponse() }
       }
@@ -384,51 +361,36 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     return { text: 'Super, rád pomůžu! Nejdřív mi řekni, kam to má být – jaká lokalita tě láká? 🗺️' }
   }
 
-  // Acknowledge location if just provided
-  const locationJustProvided = currentLocation && !extractPeople(userMessage) && !extractDates(userMessage) && !extractMeals(userMessage)
+  // Collect ALL missing fields
+  const missing: string[] = []
+  if (!state.people) missing.push('people')
+  if (!state.dates) missing.push('dates')
+  if (!state.meals) missing.push('meals')
+  if (!state.amenities) missing.push('amenities')
 
-  // 2. Number of people
-  if (!state.people) {
-    if (locationJustProvided) {
-      return { text: `${state.location} – skvělá volba! 🏔️ A kolik vás pojede? Jen ty, ve dvou, nebo víc?` }
+  // If there are missing fields, ask about ALL of them in one message
+  if (missing.length > 0) {
+    const parts: string[] = []
+
+    // Acknowledge location if just provided
+    if (currentLocation) {
+      parts.push(`${state.location} – skvělá volba! 🏔️`)
+    } else {
+      parts.push('Díky za info!')
     }
-    return { text: 'Kolik vás pojede? Sám/sama, ve dvou, nebo víc lidí?' }
-  }
 
-  // Acknowledge people if just provided
-  const peopleJustProvided = currentPeople && !extractDates(userMessage) && !extractMeals(userMessage)
+    parts.push('Ještě potřebuji pár věcí, abych ti našel to pravé:')
 
-  // 3. Date/period
-  if (!state.dates) {
-    if (peopleJustProvided) {
-      return { text: `Dobře, ${state.people}. A kdy byste chtěli jet? Může být konkrétní datum, víkend, nebo třeba „během léta" – cokoli mi pomůže. 📅` }
-    }
-    return { text: 'A kdy by se ti to hodilo? Napiš mi termín, období nebo třeba jen měsíc. 📅' }
-  }
+    const questions: string[] = []
+    if (missing.includes('people')) questions.push('👥 Kolik vás pojede? (sám/sama, ve dvou, s rodinou…)')
+    if (missing.includes('dates')) questions.push('📅 Kdy byste chtěli jet? (datum, víkend, měsíc, „během léta"…)')
+    if (missing.includes('meals')) questions.push('🍽️ Jaké stravování? (vlastní, snídaně, polopenze, plná penze, all inclusive)')
+    if (missing.includes('amenities')) questions.push('🏨 Důležité vybavení hotelu? (bazén, wellness, dětský koutek, pet friendly… nebo je ti to jedno)')
 
-  // Acknowledge dates if just provided
-  const datesJustProvided = currentDates && !extractMeals(userMessage)
+    parts.push(questions.join('\n'))
+    parts.push('\nKlidně napiš vše najednou!')
 
-  // 4. Meals
-  if (!state.meals) {
-    if (datesJustProvided) {
-      return { text: 'Výborně! A co stravování? Preferuješ vlastní stravování, snídani, polopenzi, plnou penzi, nebo all inclusive? 🍽️' }
-    }
-    return { text: 'Jaké stravování by ti vyhovovalo? Třeba polopenze, plná penze, se snídaní, nebo vlastní stravování? 🍽️' }
-  }
-
-  // Acknowledge meals if just provided
-  const mealsJustProvided = currentMeals || (lastQuestion === 'meals' && !state.amenitiesAsked)
-
-  // 5. Hotel amenities
-  if (!state.amenities) {
-    if (!state.amenitiesAsked || mealsJustProvided) {
-      return { text: 'Ještě poslední věc – je pro tebe důležité nějaké vybavení hotelu? Třeba bazén, wellness, dětský koutek, pet friendly, restaurace, parkování…? Nebo ti to je jedno? 🏊' }
-    }
-    // If amenities were asked and user responded with something we couldn't parse, treat as provided
-    if (state.amenitiesAsked) {
-      state.amenities = 'bez preference'
-    }
+    return { text: parts.join('\n\n') }
   }
 
   // ─── All criteria gathered → show deals! ─────────────────────────
