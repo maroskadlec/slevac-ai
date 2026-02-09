@@ -101,7 +101,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 onBlur={() => setTimeout(() => setHeroFocused(false), 200)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleHeroSend() }}
                 placeholder="Popište mi, co chcete zažít ..."
-                className="flex-1 bg-transparent text-[12px] text-[#333] placeholder-[#999] outline-none border-none"
+                className="flex-1 bg-transparent text-[16px] text-[#333] placeholder-[#999] outline-none border-none"
               />
               <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
               {heroFocused && (
@@ -264,7 +264,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                       onChange={(e) => chat.setInputValue(e.target.value)}
                       onKeyDown={chat.handleKeyDown}
                       placeholder="Popište svou představu..."
-                      className="flex-1 bg-transparent px-[10px] py-[5px] text-[13px] leading-[18px] text-black placeholder-[#8e8e93] outline-none border-none"
+                      className="flex-1 bg-transparent px-[10px] py-[5px] text-[16px] leading-[20px] text-black placeholder-[#8e8e93] outline-none border-none"
                     />
                     {/* Mic Button inside input */}
                     <button className="w-[26px] h-[26px] rounded-full border border-[#d1d5db] flex items-center justify-center flex-shrink-0 hover:bg-[#f1f3f5] transition-colors cursor-pointer bg-white">
