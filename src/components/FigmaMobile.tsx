@@ -262,10 +262,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                       placeholder="Popište svou představu..."
                       className="flex-1 bg-transparent px-[12px] py-[8px] text-[16px] leading-[20px] text-black placeholder-[#8e8e93] outline-none border-none"
                     />
-                    {/* Mic Button inside input */}
-                    <button className="w-[26px] h-[26px] rounded-full border border-[#d1d5db] flex items-center justify-center flex-shrink-0 hover:bg-[#f1f3f5] transition-colors cursor-pointer bg-white">
-                      <Mic className="w-[12px] h-[12px] text-[#6b7280]" />
-                    </button>
+                    <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
                   </div>
                   
                   {/* Send Button */}
