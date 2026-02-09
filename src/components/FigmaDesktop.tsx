@@ -165,7 +165,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               <div className="px-[10px] pb-[10px] pt-[6px] flex-shrink-0">
                 <div className="flex gap-[8px] items-center">
                   {/* Input with mic inside */}
-                  <div className="flex-1 flex items-center bg-white rounded-[20px] border border-[#d1d5db] px-[4px] py-[3px] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
+                  <div className="flex-1 flex items-center bg-white rounded-[12px] border border-[#d1d5db] px-[4px] py-[3px] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
                     <input
                       type="text"
                       value={chat.inputValue}

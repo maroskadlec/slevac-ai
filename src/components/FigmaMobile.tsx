@@ -90,7 +90,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             </h2>
 
             {/* Search Input */}
-            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[8px] flex items-center border border-solid border-[#CBCCCE]">
+            <div className="mt-[12px] bg-white rounded-[12px] px-[12px] py-[8px] flex items-center border border-solid border-[#CBCCCE]">
               <input
                 type="text"
                 value={heroInput}
@@ -253,7 +253,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               <div className="px-[8px] pb-[8px] pt-[4px] flex-shrink-0">
                 <div className="flex gap-[6px] items-center">
                   {/* Input with mic inside */}
-                  <div className="flex-1 flex items-center bg-white rounded-[18px] border border-[#d1d5db] px-[3px] py-[2px] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
+                  <div className="flex-1 flex items-center bg-white rounded-[12px] border border-[#d1d5db] px-[3px] py-[2px] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
                     <input
                       type="text"
                       value={chat.inputValue}
