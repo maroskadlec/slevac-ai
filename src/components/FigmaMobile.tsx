@@ -24,7 +24,6 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
     const text = heroInput.trim()
     if (!text) return
     setHeroInput('')
-    setHeroFocused(false)
     onToggle() // Open modal
     // Small delay to let modal open, then send message
     setTimeout(() => {
