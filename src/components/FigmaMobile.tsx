@@ -104,7 +104,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 className="flex-1 bg-transparent text-[16px] text-[#333] placeholder-[#999] outline-none border-none"
               />
               <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
-              {heroFocused && (
+              {heroInput.trim().length > 0 && (
                 <button
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={handleHeroSend}
