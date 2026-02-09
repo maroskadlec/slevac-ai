@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Info, Mic, Send } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
 
@@ -13,6 +14,7 @@ interface MobileProps {
 }
 
 export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
+  const navigate = useNavigate()
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
   const [heroInput, setHeroInput] = useState('')
@@ -124,7 +126,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           <div className="px-[10px] py-[10px] flex items-center justify-center gap-[4px] text-[11px]">
             <span className="text-[#333]">Praha a okolí</span>
             <span className="text-[#333]">·</span>
-            <span className="text-[#00a84f] font-medium">Změnit lokalitu</span>
+            <span className="text-[#00a84f] font-medium cursor-pointer hover:underline" onClick={() => navigate('/')}>Změnit lokalitu</span>
           </div>
 
           {/* Category Cards Grid + Nedávno prohlížené */}
