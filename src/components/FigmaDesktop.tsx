@@ -99,7 +99,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                   className="flex items-center gap-[4px] flex-1 min-w-0 cursor-pointer hover:opacity-70 transition-opacity"
                 >
                   <p className="text-[14px] leading-[22px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
-                  <Info className="w-[14px] h-[14px] text-[#8e8e93] flex-shrink-0" />
+                  <Info className="w-[15px] h-[15px] text-[#8e8e93] flex-shrink-0" />
                 </button>
                 
                 {/* Close button */}
