@@ -98,7 +98,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                   onClick={chat.handleDisclaimer}
                   className="flex items-center gap-[4px] flex-1 min-w-0 cursor-pointer hover:opacity-70 transition-opacity"
                 >
-                  <p className="text-[13px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
+                  <p className="text-[14px] leading-[22px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
                   <Info className="w-[14px] h-[14px] text-[#8e8e93] flex-shrink-0" />
                 </button>
                 
@@ -154,7 +154,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                       <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} className="w-[5px] h-[5px] bg-[#8e8e93] rounded-full" />
                       <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} className="w-[5px] h-[5px] bg-[#8e8e93] rounded-full" />
                     </div>
-                    <span className="text-[13px] text-[#8e8e93]">{chat.typingText}</span>
+                    <span className="text-[14px] leading-[22px] text-[#8e8e93]">{chat.typingText}</span>
                   </motion.div>
                 )}
                 

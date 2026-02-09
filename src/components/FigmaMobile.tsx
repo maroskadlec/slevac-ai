@@ -186,7 +186,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   onClick={chat.handleDisclaimer}
                   className="flex items-center gap-[3px] flex-1 min-w-0 cursor-pointer hover:opacity-70 transition-opacity"
                 >
-                  <p className="text-[13px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
+                  <p className="text-[14px] leading-[22px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
                   <Info className="w-[13px] h-[13px] text-[#8e8e93] flex-shrink-0" />
                 </button>
                 
@@ -219,11 +219,11 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   >
                     {msg.sender === 'user' ? (
                       <div className="bg-[#f0f0f3] rounded-[14px] rounded-br-[4px] px-[12px] py-[6px] max-w-[85%]">
-                        <p className="text-[13px] leading-[18px] text-black">{msg.text}</p>
+                        <p className="text-[14px] leading-[22px] text-black">{msg.text}</p>
                       </div>
                     ) : (
                       <>
-                        <p className="text-[13px] leading-[19px] text-[#1a1a1a] whitespace-pre-line">{msg.text}</p>
+                        <p className="text-[14px] leading-[22px] text-[#1a1a1a] whitespace-pre-line">{msg.text}</p>
                         {msg.deals && <DealCarousel deals={msg.deals} compact onFeedback={chat.handleFeedback} />}
                       </>
                     )}
@@ -242,7 +242,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                       <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} className="w-[4px] h-[4px] bg-[#8e8e93] rounded-full" />
                       <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} className="w-[4px] h-[4px] bg-[#8e8e93] rounded-full" />
                     </div>
-                    <span className="text-[13px] text-[#8e8e93]">{chat.typingText}</span>
+                    <span className="text-[14px] leading-[22px] text-[#8e8e93]">{chat.typingText}</span>
                   </motion.div>
                 )}
                 

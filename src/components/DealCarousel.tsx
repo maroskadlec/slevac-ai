@@ -42,7 +42,7 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
     >
       {/* Section Header */}
       <div>
-        <p className={`text-[#8e8e93] leading-tight ${compact ? 'text-[13px]' : 'text-[13px]'}`}>
+        <p className={`text-[#8e8e93] text-[14px] leading-[22px]`}>
           Vybral jsem z nabídek podle toho, co o nich vím a podle toho, co říkají ostatní zákazníci.
         </p>
       </div>
@@ -134,7 +134,7 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
       {/* Feedback Row */}
       {feedback === 'none' && (
         <div className="flex items-center justify-between">
-          <span className={`text-[#8e8e93] ${compact ? 'text-[13px]' : 'text-[13px]'}`}>
+          <span className={`text-[#8e8e93] text-[14px] leading-[22px]`}>
             Vyhovují vám doporučení?
           </span>
           <div className="flex gap-[8px]">
