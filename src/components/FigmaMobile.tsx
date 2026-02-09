@@ -90,7 +90,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             </h2>
 
             {/* Search Input */}
-            <div className="mt-[12px] bg-white rounded-[8px] px-[6px] py-[4px] flex items-center border border-solid border-[#CBCCCE]">
+            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[8px] flex items-center border border-solid border-[#CBCCCE]">
               <input
                 type="text"
                 value={heroInput}
@@ -260,7 +260,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                       onChange={(e) => chat.setInputValue(e.target.value)}
                       onKeyDown={chat.handleKeyDown}
                       placeholder="Popište svou představu..."
-                      className="flex-1 bg-transparent px-[10px] py-[5px] text-[16px] leading-[20px] text-black placeholder-[#8e8e93] outline-none border-none"
+                      className="flex-1 bg-transparent px-[12px] py-[8px] text-[16px] leading-[20px] text-black placeholder-[#8e8e93] outline-none border-none"
                     />
                     {/* Mic Button inside input */}
                     <button className="w-[26px] h-[26px] rounded-full border border-[#d1d5db] flex items-center justify-center flex-shrink-0 hover:bg-[#f1f3f5] transition-colors cursor-pointer bg-white">
