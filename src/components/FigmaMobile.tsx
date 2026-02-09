@@ -65,8 +65,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
   }, [])
 
   return (
-    <div className="relative w-full h-full overflow-visible flex items-center justify-center">
-      <div className="relative w-[320px] h-[568px] bg-white rounded-[32px] overflow-hidden border-4 border-gray-900">
+    <div className="relative w-full max-w-[400px] h-[100dvh] bg-white overflow-hidden mx-auto">
         
         {/* ===== SLEVOMAT APP LAYOUT ===== */}
         <div className="h-full overflow-y-auto z-0">
@@ -165,7 +164,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 stiffness: 300,
                 damping: 30
               }}
-              className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-40 flex flex-col h-[480px]"
+              className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-40 flex flex-col h-[85dvh]"
             >
               {/* Drag Handle */}
               <div className="flex justify-center pt-[6px] pb-[2px] flex-shrink-0">
@@ -356,7 +355,6 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             </div>
           </motion.div>
         </motion.button>
-      </div>
     </div>
   )
 }
