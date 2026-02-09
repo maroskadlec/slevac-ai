@@ -18,7 +18,6 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
   const [heroInput, setHeroInput] = useState('')
-  const [heroFocused, setHeroFocused] = useState(false)
   const chat = useChatbot(isOpen)
 
   const handleHeroSend = () => {
@@ -97,8 +96,6 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 type="text"
                 value={heroInput}
                 onChange={(e) => setHeroInput(e.target.value)}
-                onFocus={() => setHeroFocused(true)}
-                onBlur={() => setTimeout(() => setHeroFocused(false), 200)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleHeroSend() }}
                 placeholder="Popište mi, co chcete zažít ..."
                 className="flex-1 bg-transparent text-[16px] text-[#333] placeholder-[#999] outline-none border-none"
