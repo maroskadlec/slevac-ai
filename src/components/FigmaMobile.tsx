@@ -90,7 +90,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             </h2>
 
             {/* Search Input */}
-            <div className="mt-[12px] bg-white rounded-[8px] px-[12px] py-[10px] flex items-center border border-solid border-[#CBCCCE]">
+            <div className="mt-[12px] bg-white rounded-[8px] px-[6px] py-[4px] flex items-center border border-solid border-[#CBCCCE]">
               <input
                 type="text"
                 value={heroInput}
