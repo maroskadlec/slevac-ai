@@ -34,9 +34,10 @@ const THINKING_TYPING_TEXTS = [
 // ─── Response pools ────────────────────────────────────────────────
 
 const HOW_I_RECOMMEND_RESPONSES = [
-  'Prošel jsem nabídky a vybral ty, které mají dobré hodnocení od ostatních zákazníků. Beru v potaz popis, co v nabídce dostaneš, a taky to, jak ji hodnotí lidi, co ji už vyzkoušeli.',
-  'Při výběru jsem se díval na dvě věci – co nabídka obsahuje a jak ji hodnotí ostatní zákazníci. U každé nabídky znám detaily jako lokalitu, co je v ceně, a další důležité info. K tomu přidávám recenze lidí, kteří už nabídku využili. Díky tomu ti můžu doporučit to, co opravdu stojí za to.',
-  'Výběr není náhodný. Každou nabídku znám do detailu – vím, co obsahuje, kde se nachází a za kolik. Navíc se dívám na hodnocení a recenze od zákazníků, kteří už nabídku vyzkoušeli. Takže ti doporučuji jen to, co má ověřenou kvalitu.',
+  'Prošel jsem nabídky na Slevomatu a hlavně jsem pročetl hodnocení a recenze od zákazníků, kteří už nabídku vyzkoušeli. Na jejich zkušenostech mi záleží nejvíc – díky nim vím, co opravdu stojí za to.',
+  'Čerpám přímo z nabídek na Slevomatu. Ke každé nabídce si pročtu, co zákazníci napsali v recenzích – jejich hodnocení je pro mě klíčové. Právě díky tomu ti doporučuji to, co má ověřenou kvalitu od skutečných lidí.',
+  'Můj hlavní zdroj jsou hodnocení zákazníků na Slevomatu. Pročetl jsem recenze lidí, kteří nabídky už využili, a podle jejich zkušeností vybírám. K tomu samozřejmě znám detaily každé nabídky – co obsahuje, kde se nachází a za kolik.',
+  'Vycházím z toho, co říkají ostatní zákazníci. Na Slevomatu si ke každé nabídce pročtu hodnocení a recenze – a právě ty jsou pro mě rozhodující. Když lidi chválí, doporučím i tobě. 😊',
 ]
 
 const OFF_TOPIC_RESPONSES = [
@@ -538,7 +539,17 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
   }
 
   // How did you recommend / on what basis
-  if (fuzzyMatch(userMessage, ['jak jsi doporucil', 'jak jsi vybral', 'jak jsi vybiral', 'na zaklade ceho', 'podle ceho', 'jak vybiras', 'proc zrovna', 'jak to vybiras', 'jak doporucujes'])) {
+  if (fuzzyMatch(userMessage, [
+    'jak jsi doporucil', 'jak jsi vybral', 'jak jsi vybiral',
+    'na zaklade ceho', 'podle ceho', 'jak vybiras', 'proc zrovna',
+    'jak to vybiras', 'jak doporucujes', 'z ceho cerpas',
+    'odkud beres', 'odkud mas', 'odkud to vis', 'jak to vis',
+    'proc tyto nabidky', 'proc zrovna tyto', 'proc zrovna tyhle',
+    'jak jsi je vybral', 'jak jsi je nasel', 'na cem to stavis',
+    'co je zdrojem', 'jaky je zdroj', 'kde beres informace',
+    'kde cerpas', 'jak doporucujes', 'jak ses rozhodl',
+    'proc zrovna tohle', 'jak je hodnotis', 'jak vyhodnocujes',
+  ])) {
     return { text: getHowIRecommendResponse() }
   }
 
