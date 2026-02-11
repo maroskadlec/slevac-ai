@@ -485,6 +485,31 @@ function hasTravelIntent(text: string): boolean {
   ])
 }
 
+/**
+ * Check if the current user message contains ANY travel-related extractable info
+ * (location, people, dates, meals, amenities) or travel intent keywords.
+ * Used to distinguish between on-topic and off-topic messages.
+ */
+function messageHasTravelContent(text: string): boolean {
+  if (extractLocation(text)) return true
+  if (extractPeople(text)) return true
+  if (extractDates(text)) return true
+  if (extractMeals(text)) return true
+  if (extractAmenities(text)) return true
+  if (hasTravelIntent(text)) return true
+  if (isDontCare(text)) return true // "je mi to jedno" is a valid answer
+  // Also check for deal-related keywords (user talking about offers)
+  if (fuzzyMatch(text, [
+    'nabidka', 'nabidky', 'cena', 'ceny', 'sleva', 'slevy',
+    'kolik stoji', 'kolik to stoji', 'za kolik', 'levnejsi', 'drazsi',
+    'recenze', 'hodnoceni', 'hvezdicky', 'jak hodnotite',
+    'objednat', 'rezervovat', 'koupit', 'zaplatit',
+    'dalsi nabidky', 'jine nabidky', 'vice moznosti',
+    'libi', 'nelibi', 'zaujalo', 'nezaujalo',
+  ])) return true
+  return false
+}
+
 // ─── Main response logic ───────────────────────────────────────────
 
 interface BotResponse {
@@ -656,18 +681,29 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     }
   }
 
+  // ─── Off-topic detection (works at ANY point in conversation) ────
+
+  const hasAnyTravelContent = messageHasTravelContent(userMessage)
+  const alreadyShowedDeals = dealsWereShown(conversationHistory)
+
+  // If message has no travel content AND is not a short contextual answer, it's off-topic
+  if (!hasAnyTravelContent && msg.length > 3 && !msg.match(/^\s*\d+\s*$/) && askedFields.size === 0) {
+    // After deals were shown, ALWAYS catch off-topic (don't show more deals)
+    if (alreadyShowedDeals) {
+      return { text: getOffTopicResponse() }
+    }
+    // Before deals, catch obvious off-topic (longer messages that aren't answers to bot questions)
+    if (msg.length > 8 && !msg.match(/\b(ahoj|cau|hej|hi|hello|zdar|ano|jo|jasne|ok|dobre|nj)\b/)) {
+      return { text: getOffTopicResponse() }
+    }
+  }
+
   // ─── Determine what's missing and respond ────────────────────────
 
   // No location yet → ask or detect off-topic
   if (!state.location) {
     if (hasTravelIntent(userMessage)) {
       return { text: 'To zní skvěle! 🏔️ Kam by ses chtěl/a podívat? Třeba Krkonoše, Beskydy, Šumava…?' }
-    }
-    // Off-topic detection (only if not first message greeting)
-    if (userMsgCount > 1 || (msg.length > 5 && !hasTravelIntent(userMessage) && !msg.match(/\b(ahoj|cau|hej|hi|hello|zdar)/))) {
-      if (!hasTravelIntent(userMessage) && msg.length > 8) {
-        return { text: getOffTopicResponse() }
-      }
     }
     return { text: 'Super, rád pomůžu! Řekni mi, kam to má být – jaká lokalita tě láká? 🗺️' }
   }
@@ -683,6 +719,30 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
   }
 
   // ─── All criteria gathered → show deals! ─────────────────────────
+
+  // If deals were already shown and user is providing new travel info (e.g. parameter change without explicit "change" signal)
+  if (alreadyShowedDeals) {
+    // Check if the current message actually adds NEW information vs. repeating what we already had
+    const prevState = extractFullState(conversationHistory.filter(m => !(m.sender === 'user' && m.text === userMessage)))
+    const hasNewInfo = (fullLoc && fullLoc !== prevState.location) ||
+                       (fullPpl && fullPpl !== prevState.people) ||
+                       (fullDt && fullDt !== prevState.dates) ||
+                       (fullMl && fullMl !== prevState.meals) ||
+                       (fullAm && fullAm !== prevState.amenities)
+
+    if (hasNewInfo) {
+      return buildDealsResponse(state, 'Rozumím, hledám s novými parametry!')
+    }
+
+    // No new info, but has travel content → user is talking about travel in general
+    if (hasAnyTravelContent) {
+      return { text: 'Chceš, abych ti ukázal další nabídky? Nebo chceš změnit některý z parametrů? Klidně řekni, co potřebuješ. 😊' }
+    }
+
+    // Fallback: off-topic
+    return { text: getOffTopicResponse() }
+  }
+
   return buildDealsResponse(state)
 }
 
