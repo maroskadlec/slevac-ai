@@ -553,6 +553,21 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     return { text: getHowIRecommendResponse() }
   }
 
+  // Trips / activities in the area
+  if (fuzzyMatch(userMessage, [
+    'vylet v okoli', 'vylety v okoli', 'co delat v okoli', 'co je v okoli',
+    'co navstivit', 'co se da delat', 'kam na vylet', 'tipy na vylet',
+    'tipy na vylety', 'zajimavosti v okoli', 'pamatky v okoli', 'co videt',
+    'co podniknout', 'aktivity v okoli', 'kam zajit', 'co stoji za to',
+    'co je pobliz', 'co se da videt', 'kam na procházku', 'kam na túru',
+    'turisticke trasy', 'rozhledna', 'rozhledny', 'muzeum', 'hrad', 'zamek',
+    'co navstivit v okoli', 'vylety pobliz', 'kam v okoli',
+    'co se da podniknout', 'doporucis vylet', 'doporuc mi vylet',
+    'jake jsou vylety', 'jake jsou aktivity', 'kam na vychazku',
+  ])) {
+    return { text: 'Tipy na výlety v okolí zatím neumím, ale lidi ze Slevomatu mě to brzy naučí! 🎓 Zatím ti můžu pomoci najít skvělou nabídku pobytu.' }
+  }
+
   // Help / capabilities
   if (fuzzyMatch(userMessage, ['co umis', 'pomoc', 'help', 'co delas', 'jak fungujes', 'co jsi', 'co vse umis', 'co muzes', 'co dokazes', 'co zvladnes'])) {
     return { text: 'Jsem tu, abych ti usnadnil výběr z nabídek na Slevomatu. Řekni mi kam chceš jet, s kolika lidmi, kdy a jakou preferuješ stravu – a já ti najdu to nejlepší! 🏖️' }
