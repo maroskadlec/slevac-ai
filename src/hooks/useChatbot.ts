@@ -9,7 +9,8 @@ export interface ChatMessage {
   deals?: DealCard[]
 }
 
-// Typing texts when chatbot is searching through offers
+// ─── Typing indicator texts ────────────────────────────────────────
+
 const SEARCH_TYPING_TEXTS = [
   'Koumám, co ti nabídnout',
   'Vybírám z nabídek',
@@ -21,7 +22,6 @@ const SEARCH_TYPING_TEXTS = [
   'Moment, ladím detaily',
 ]
 
-// Typing texts for general conversation / thinking (no search context)
 const THINKING_TYPING_TEXTS = [
   'Musím to promyslet',
   'Chvilku, mrknu na to',
@@ -30,6 +30,8 @@ const THINKING_TYPING_TEXTS = [
   'Přemýšlím…',
   'Dej mi vteřinku',
 ]
+
+// ─── Response pools ────────────────────────────────────────────────
 
 const HOW_I_RECOMMEND_RESPONSES = [
   'Prošel jsem nabídky a vybral ty, které mají dobré hodnocení od ostatních zákazníků. Beru v potaz popis, co v nabídce dostaneš, a taky to, jak ji hodnotí lidi, co ji už vyzkoušeli.',
@@ -49,198 +51,438 @@ const OFF_TOPIC_RESPONSES = [
   'Tady ti neporadím. Moje doména jsou slevomatí zážitky a cestování – co tě láká?',
 ]
 
-// Tracks which texts have been used in this session to avoid repetition
+// ─── Non-repeating random picker ───────────────────────────────────
+
 const usedSearchTypingTexts: Set<number> = new Set()
 const usedThinkingTypingTexts: Set<number> = new Set()
 const usedOffTopicTexts: Set<number> = new Set()
 const usedHowIRecommendTexts: Set<number> = new Set()
 
 function pickUnused(pool: string[], used: Set<number>): string {
-  if (used.size >= pool.length) {
-    used.clear()
-  }
+  if (used.size >= pool.length) used.clear()
   const available = pool.map((_, i) => i).filter(i => !used.has(i))
   const idx = available[Math.floor(Math.random() * available.length)]
   used.add(idx)
   return pool[idx]
 }
 
-function getSearchTypingText(): string {
-  return pickUnused(SEARCH_TYPING_TEXTS, usedSearchTypingTexts)
+function getSearchTypingText(): string { return pickUnused(SEARCH_TYPING_TEXTS, usedSearchTypingTexts) }
+function getThinkingTypingText(): string { return pickUnused(THINKING_TYPING_TEXTS, usedThinkingTypingTexts) }
+function getOffTopicResponse(): string { return pickUnused(OFF_TOPIC_RESPONSES, usedOffTopicTexts) }
+function getHowIRecommendResponse(): string { return pickUnused(HOW_I_RECOMMEND_RESPONSES, usedHowIRecommendTexts) }
+
+// ─── Fuzzy matching utilities ──────────────────────────────────────
+
+/** Levenshtein distance between two strings */
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0))
+  for (let i = 0; i <= m; i++) dp[i][0] = i
+  for (let j = 0; j <= n; j++) dp[0][j] = j
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      )
+    }
+  }
+  return dp[m][n]
 }
 
-function getThinkingTypingText(): string {
-  return pickUnused(THINKING_TYPING_TEXTS, usedThinkingTypingTexts)
+/** Normalize text: lowercase, remove diacritics */
+function norm(text: string): string {
+  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
 }
 
-function getOffTopicResponse(): string {
-  return pickUnused(OFF_TOPIC_RESPONSES, usedOffTopicTexts)
+/** Split text into words */
+function words(text: string): string[] {
+  return norm(text).split(/\s+/).filter(Boolean)
 }
 
-function getHowIRecommendResponse(): string {
-  return pickUnused(HOW_I_RECOMMEND_RESPONSES, usedHowIRecommendTexts)
+/**
+ * Check if any word in the text fuzzy-matches any of the target keywords.
+ * For short keywords (<=4 chars): exact match only.
+ * For medium keywords (5-7 chars): allow distance 1.
+ * For long keywords (>=8 chars): allow distance 2.
+ * Also checks 2-word and 3-word n-grams for multi-word keywords.
+ */
+function fuzzyMatch(text: string, keywords: string[]): boolean {
+  const n = norm(text)
+  const ws = words(text)
+
+  // Build n-grams (1-word, 2-word, 3-word)
+  const grams: string[] = [...ws]
+  for (let i = 0; i < ws.length - 1; i++) grams.push(ws[i] + ' ' + ws[i + 1])
+  for (let i = 0; i < ws.length - 2; i++) grams.push(ws[i] + ' ' + ws[i + 1] + ' ' + ws[i + 2])
+
+  for (const kw of keywords) {
+    const nkw = norm(kw)
+    // Direct substring check first (fastest)
+    if (n.includes(nkw)) return true
+
+    // Fuzzy check on n-grams
+    const maxDist = nkw.length <= 4 ? 0 : nkw.length <= 7 ? 1 : 2
+    for (const g of grams) {
+      if (levenshtein(g, nkw) <= maxDist) return true
+    }
+  }
+  return false
 }
 
-// ─── Conversation state tracking ───────────────────────────────────
+/**
+ * Check if any "don't care" expression is in the text.
+ */
+function isDontCare(text: string): boolean {
+  return fuzzyMatch(text, [
+    'je mi to jedno', 'jedno', 'nezalezi', 'neres', 'neresim',
+    'cokoliv', 'cokoli', 'jakkoliv', 'jakkoli', 'jakekoli', 'jakykoli',
+    'uplne jedno', 'fakt jedno', 'vsechno', 'nemusí', 'nemusi',
+    'nemam preferenc', 'nemam pozadav', 'bez preference',
+    'neni to dulezite', 'neni dulezite', 'nevadi', 'necham na tobe',
+    'vyber sam', 'vyber ty', 'je to fuk', 'neni podstatne',
+    'bez narok', 'zadne narok', 'nic specialni', 'nic extra',
+  ])
+}
+
+// ─── Synonym-based extraction ──────────────────────────────────────
+
 interface ConversationState {
   location: string | null
   people: string | null
   dates: string | null
   meals: string | null
-  amenities: string | null        // null = not yet asked, value = answered
-  amenitiesAsked: boolean         // whether the bot already asked about amenities
+  amenities: string | null
 }
 
-function normalize(text: string): string {
-  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-}
+// --- LOCATION ---
 
-/** Extract location from text */
+const LOCATION_MAP: [string[], string][] = [
+  [['krkonose', 'krkonos', 'krkonosi', 'spindleruv mlyn', 'spindl', 'harrachov', 'pec pod snezkou', 'pec pod snezk', 'snezka', 'rokytnice', 'rokytnic'], 'Krkonoše'],
+  [['beskydy', 'beskyd', 'pustevny', 'pustevn', 'radhost', 'lysá hora', 'lysa hora', 'frenstat'], 'Beskydy'],
+  [['sumava', 'sumav', 'lipno', 'kvilda', 'kvild', 'zelezna ruda', 'modrava'], 'Šumava'],
+  [['jeseniky', 'jesenik', 'praded', 'karlova studanka', 'karlova studank'], 'Jeseníky'],
+  [['cesky raj', 'český ráj'], 'Český ráj'],
+  [['vysocina', 'vysočina'], 'Vysočina'],
+  [['praha', 'prague'], 'Praha'],
+  [['brno'], 'Brno'],
+  [['jizni morava', 'jizni morav', 'palava', 'lednice', 'valtice', 'mikulov'], 'Jižní Morava'],
+  [['orlicke hory', 'orlicke hor', 'destne', 'ricky'], 'Orlické hory'],
+]
+
 function extractLocation(text: string): string | null {
-  const n = normalize(text)
-  if (n.match(/\b(krkonos|spindl|harrachov|pec pod|snezk)/)) return 'Krkonoše'
-  if (n.match(/\b(beskydy|pustevn|radhost)/)) return 'Beskydy'
-  if (n.match(/\b(sumav|lipno|kvild)/)) return 'Šumava'
-  if (n.match(/\b(jeseniky|praded|karlova studank)/)) return 'Jeseníky'
-  if (n.match(/\b(cesky raj)/)) return 'Český ráj'
-  if (n.match(/\b(vysocin)/)) return 'Vysočina'
-  if (n.match(/\b(praha)/)) return 'Praha'
-  if (n.match(/\b(brno)/)) return 'Brno'
+  for (const [keywords, label] of LOCATION_MAP) {
+    if (fuzzyMatch(text, keywords)) return label
+  }
   return null
 }
 
-/** Extract number of people from text */
+// --- PEOPLE ---
+
+const PEOPLE_TWO_KEYWORDS = [
+  's partnerkou', 's partnerem', 's manzelkou', 's manzelem',
+  's pritelkyni', 's pritelem', 's frajerkou', 's frajerem',
+  's kamaradkou', 's kamaradem', 's kolegyni', 's kolegou',
+  've dvou', 'pro dva', 'pro dve', 'dva lidi', 'dve osoby',
+  '2 osoby', '2 lidi', 'ja a partner', 'ja a manz', 'ja s partner',
+  'jedeme ve dvou', 'jedeme spolu', 'jsme dva', 'jsme dve',
+  'ja a on', 'ja a ona', 'ja s nim', 'ja s ni',
+]
+
+const PEOPLE_ONE_KEYWORDS = [
+  'sam', 'sama', 'solo', 'jen ja', 'jedna osoba', '1 osoba',
+  'jednoho', 'single', 'ja sam', 'ja sama', 'jedu sam', 'jedu sama',
+  'pojedu sam', 'pojedu sama',
+]
+
+const PEOPLE_FAMILY_KEYWORDS = [
+  's detmi', 's rodinou', 'rodina', 'rodinny', 'rodinn',
+  's ditetem', 'cela rodina', 'rodice a det', 's malym', 's malou',
+  'rodinne', 's nasima detma', 's nasi rodinou',
+]
+
+const TEXT_NUMBERS: [string[], number][] = [
+  [['dva', 'dve', 'dvou', 'dvema'], 2],
+  [['tri', 'trech', 'tremi', 'trem'], 3],
+  [['ctyri', 'ctyr', 'ctyrech', 'ctyrmi', 'ctyrem'], 4],
+  [['pet', 'peti', 'petice'], 5],
+  [['sest', 'sesti'], 6],
+  [['sedm', 'sedmi'], 7],
+  [['osm', 'osmi'], 8],
+]
+
+function peopleSuffix(n: number): string {
+  return n === 1 ? 'osoba' : n < 5 ? 'osoby' : 'osob'
+}
+
 function extractPeople(text: string): string | null {
-  const n = normalize(text)
-  // "já s partnerkou/partnerem", "s manželkou/manželem", "ve dvou", "pro dva"
-  if (n.match(/\b(s partnerkou|s partnerem|s manzelkou|s manzelem|ve dvou|pro dva|pro dve|dva lidi|dve osoby|2 osoby|2 lidi)\b/)) return '2 osoby'
-  if (n.match(/\b(sam\b|sama\b|solo\b|jen ja\b|jedna osoba|1 osoba|jednoho)\b/)) return '1 osoba'
-  if (n.match(/\b(s det|s rodinou|rodina|rodinny|rodinn)\b/)) return 'rodina'
-  // "pro X", "X osob/lidí/osoby/lidi", or just a digit in relevant context
-  const numMatch = n.match(/\b(pro|pocet)\s*(\d+)/) || n.match(/(\d+)\s*(osob|lid|osoby|lidi|clov|dospel)/) || n.match(/\b(\d+)\s*a\s*(\d+)\s*(det|dite)/)
-  if (numMatch) {
-    // Try to figure out the number
-    const digits = n.match(/\d+/g)
-    if (digits) {
-      const total = digits.map(Number).reduce((a, b) => a + b, 0)
-      return `${total} ${total === 1 ? 'osoba' : total < 5 ? 'osoby' : 'osob'}`
+  if (fuzzyMatch(text, PEOPLE_TWO_KEYWORDS)) return '2 osoby'
+  if (fuzzyMatch(text, PEOPLE_ONE_KEYWORDS)) return '1 osoba'
+  if (fuzzyMatch(text, PEOPLE_FAMILY_KEYWORDS)) return 'rodina'
+
+  const n = norm(text)
+
+  // "pro X osob", "X lidí", etc.
+  const numContextMatch = n.match(/(\d+)\s*(osob|lid|osoby|lidi|clov|dospel|lide)/)
+  if (numContextMatch) {
+    const num = parseInt(numContextMatch[1])
+    return `${num} ${peopleSuffix(num)}`
+  }
+  const proMatch = n.match(/pro\s+(\d+)/)
+  if (proMatch) {
+    const num = parseInt(proMatch[1])
+    return `${num} ${peopleSuffix(num)}`
+  }
+
+  // Textual numbers with context
+  for (const [kws, num] of TEXT_NUMBERS) {
+    if (fuzzyMatch(text, kws) && !n.match(/\b(strav|penz|snidan|noc|den|dni|tydn)/)) {
+      return `${num} ${peopleSuffix(num)}`
     }
   }
-  // Simple number standalone in a short message (probably answering "how many people")
-  const simpleNum = n.match(/^\s*(\d+)\s*$/)
-  if (simpleNum) {
-    const num = parseInt(simpleNum[1])
-    return `${num} ${num === 1 ? 'osoba' : num < 5 ? 'osoby' : 'osob'}`
+
+  // Standalone digit (answering "how many people?")
+  const standalone = n.match(/^\s*(\d+)\s*$/)
+  if (standalone) {
+    const num = parseInt(standalone[1])
+    if (num >= 1 && num <= 20) return `${num} ${peopleSuffix(num)}`
   }
-  // Textual numbers
-  if (n.match(/\b(tri|tři|3)\b/) && !n.match(/\b(strav|penz|snidan)/)) return '3 osoby'
-  if (n.match(/\b(ctyri|čtyři|4)\b/) && !n.match(/\b(strav|penz|snidan)/)) return '4 osoby'
-  if (n.match(/\b(pet|pět|5)\b/) && !n.match(/\b(strav|penz|snidan)/)) return '5 osob'
+
   return null
 }
 
-/** Extract dates/period from text */
+// --- DATES ---
+
+const MONTH_KEYWORDS = [
+  'leden', 'unor', 'brezen', 'duben', 'kveten', 'cerven',
+  'cervenec', 'srpen', 'zari', 'rijen', 'listopad', 'prosinec',
+  'ledna', 'unora', 'brezna', 'dubna', 'kvetna', 'cervna',
+  'cervence', 'srpna', 'zari', 'rijna', 'listopadu', 'prosince',
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december',
+]
+
+const RELATIVE_TIME_KEYWORDS = [
+  'pristi vikend', 'tento vikend', 'pristi tyden', 'tento tyden',
+  'za tyden', 'za dva tydny', 'za mesic', 'za 14 dni', 'za ctrnact dni',
+  'zitra', 'pozitri', 'dneska', 'dnes', 'co nejdriv', 'hned',
+  'brzy', 'v brzke dobe',
+]
+
+const SEASON_KEYWORDS = [
+  'jaro', 'leto', 'podzim', 'zima',
+  'jarni', 'letni', 'podzimni', 'zimni',
+  'prazdniny', 'prazdnin', 'svatky', 'svatk',
+  'velikonoce', 'velikonoc', 'vanoce', 'vanoc', 'silvestr',
+  'o prazdninach', 'behem leta', 'behem prazdnin',
+  'na jare', 'na podzim', 'v lete', 'v zime',
+]
+
 function extractDates(text: string): string | null {
-  const n = normalize(text)
+  const n = norm(text)
+
   // Specific date patterns: "15.3.", "15. března", "15.3.2026", "15.3. - 18.3."
   if (n.match(/\d{1,2}\.\s*\d{1,2}\./)) return text.trim()
-  // Month mentions
-  if (n.match(/\b(leden|unor|brezen|duben|kveten|cerven|cervenec|srpen|zari|rijen|listopad|prosinec|ledna|unora|brezna|dubna|kvetna|cervna|cervence|srpna|zari|rijna|listopadu|prosince)\b/)) return text.trim()
-  // Relative time
-  if (n.match(/\b(pristi vikend|tento vikend|pristi tyden|tento tyden|za tyden|za dva tydny|za mesic)\b/)) return text.trim()
-  // Season / vague
-  if (n.match(/\b(jaro|leto|podzim|zima|jarni|letni|podzimni|zimni|prazdnin|prazdniny|svatk|velikonoc|vanoce|silvestr)\b/)) return text.trim()
-  // "víkend v červnu", "první týden v srpnu" etc.
-  if (n.match(/\b(vikend|tyden|mesic)\b/) && n.match(/\b(v|na|behem|kolem|zacatek|konec|polovina)\b/)) return text.trim()
-  // "na 3 noci", "na víkend", "na týden"
-  if (n.match(/\b(na\s+\d+\s*(noc|den|dni))\b/)) return text.trim()
-  if (n.match(/\bna vikend\b/)) return text.trim()
-  if (n.match(/\bna tyden\b/)) return text.trim()
+
+  // "na X nocí/dní", "na víkend", "na týden"
+  if (n.match(/na\s+\d+\s*(noc|den|dni|dnu)/)) return text.trim()
+  if (n.match(/na\s+vikend/)) return text.trim()
+  if (n.match(/na\s+tyden/)) return text.trim()
+
+  // Months
+  if (fuzzyMatch(text, MONTH_KEYWORDS)) return text.trim()
+  // Relative
+  if (fuzzyMatch(text, RELATIVE_TIME_KEYWORDS)) return text.trim()
+  // Season
+  if (fuzzyMatch(text, SEASON_KEYWORDS)) return text.trim()
+
+  // "víkend v ...", "první týden v ..."
+  if (n.match(/vikend/) && n.match(/(v|na|behem|kolem)/)) return text.trim()
+  if (n.match(/tyden/) && n.match(/(v|na|behem|kolem|prvni|druhy|treti|posledni)/)) return text.trim()
+
+  // "kdykoliv" / "nemám termín"
+  if (fuzzyMatch(text, ['kdykoliv', 'kdykoli', 'nemam termin', 'bez terminu', 'nezalezi na terminu'])) return 'kdykoliv'
+
   return null
 }
 
-/** Extract meal preference from text */
+// --- MEALS ---
+
+const MEALS_MAP: [string[], string][] = [
+  [['plna penze', 'plnou penzi', 'plna penzi', 'plnou penz', 'full board', 'trikrat denne', '3x denne', 'snidane obed vecere'], 'plná penze'],
+  [['polopenze', 'polopenzi', 'polopenz', 'half board', 'snidane a vecere', 'snidane vecere', 'rano a vecer', 'rano vecer'], 'polopenze'],
+  [['snidane', 'se snidani', 'vcetne snidane', 'jen snidani', 'snidanovy', 'rano jidlo', 'ranni jidlo'], 'se snídaní'],
+  [['vlastni stravovani', 'bez stravy', 'bez stravovani', 'stravovani vlastni', 'sam si', 'sami si', 'bez jidla', 'neresim stravu', 'jidlo nepotrebuju', 'varime si', 'uvarime si', 'strava vlastni', 'vlastni strava'], 'vlastní stravování'],
+  [['all inclusive', 'all-inclusive', 'all in', 'vse v cene', 'vsechno v cene', 'vsetko v cene'], 'all inclusive'],
+]
+
 function extractMeals(text: string): string | null {
-  const n = normalize(text)
-  if (n.match(/\b(plna penze|plnou penzi|plna penzi)\b/)) return 'plná penze'
-  if (n.match(/\b(polopenze|polopenzi)\b/)) return 'polopenze'
-  if (n.match(/\b(snidane|se snidani|vcetne snidane)\b/)) return 'se snídaní'
-  if (n.match(/\b(vlastni stravovani|bez stravy|bez stravovani|stravovani vlastni|sam si|sami si)\b/)) return 'vlastní stravování'
-  if (n.match(/\b(all inclusive|all-inclusive|all in)\b/)) return 'all inclusive'
-  // Generic "strava" mentions when answering the bot's question
-  if (n.match(/\b(strav)\b/) && n.length < 40) {
-    if (n.match(/\b(neres|jedno|nemusí|nepotreb|bez)\b/)) return 'bez preference'
+  for (const [keywords, label] of MEALS_MAP) {
+    if (fuzzyMatch(text, keywords)) return label
   }
-  // "je mi to jedno" in context of meals question
-  if (n.match(/\b(jedno|neres|nemusí|jakakoli|jakakoliv|cokoliv|nezalezi)\b/) && n.length < 30) return null // will be handled contextually
   return null
 }
 
-/** Extract hotel amenities from text */
+// --- AMENITIES ---
+
+const AMENITY_MAP: [string[], string][] = [
+  [['bazen', 'bazenu', 'bazene', 'plavani', 'aquapark', 'tobogan', 'vodni', 'plavecky'], 'bazén'],
+  [['wellness', 'spa', 'relaxace', 'relaxacni', 'odpocinek', 'odpocinkovy', 'virivka', 'virivku', 'sauna', 'saunu', 'sauny', 'masaz', 'masaze', 'masazni', 'parnich lazni', 'parni lazne', 'whirlpool'], 'wellness'],
+  [['detsky koutek', 'detsky kout', 'herna', 'pro deti', 'detske hriste', 'animacni program', 'detsky bazen', 'detska zona', 'pro male deti'], 'dětský koutek'],
+  [['pet friendly', 'pet-friendly', 'se psem', 'se psy', 'se zviret', 'mazlicek', 'mazlick', 'pejsek', 'pejsk', 'psa', 'zvire', 'domaci zvirat', 'se zviratem'], 'pet friendly'],
+  [['restaurace', 'restauraci', 'stravovani na miste', 'jidelna', 'bufet'], 'restaurace'],
+  [['parkovani', 'parkovan', 'parking', 'garaz', 'garaze', 'misto na auto', 'parkoviste'], 'parkování'],
+  [['fitness', 'posilovna', 'posilovn', 'gym', 'kardio', 'cviceni'], 'fitness'],
+  [['wifi', 'internet', 'pripojeni'], 'WiFi'],
+  [['klimatizace', 'klimatizac', 'klima'], 'klimatizace'],
+]
+
 function extractAmenities(text: string): string | null {
-  const n = normalize(text)
   const found: string[] = []
-  if (n.match(/\b(bazen|bazén)\b/)) found.push('bazén')
-  if (n.match(/\b(wellness|spa|virivk|vířivk|saun)\b/)) found.push('wellness')
-  if (n.match(/\b(detsky koutek|detsky kout|hern|pro deti)\b/)) found.push('dětský koutek')
-  if (n.match(/\b(pet friendly|zvire|pes |psa |pejsk|mazlicek|se psem)\b/)) found.push('pet friendly')
-  if (n.match(/\b(restaurac|restauraci)\b/)) found.push('restaurace')
-  if (n.match(/\b(parkovani|parking|garaz)\b/)) found.push('parkování')
-  if (n.match(/\b(fitness|posilovna|gym)\b/)) found.push('fitness')
+  for (const [keywords, label] of AMENITY_MAP) {
+    if (fuzzyMatch(text, keywords)) found.push(label)
+  }
   if (found.length > 0) return found.join(', ')
-  // "je mi to jedno" / "bez preference" / "neřeším"
-  if (n.match(/\b(jedno|neres|nemusí|cokoliv|nezalezi|nic extra|nic specialni|zadne|nemam pozadavk|nemam preference|nepotreb|nevyzaduj|neni to pro)\b/)) return 'bez preference'
+  if (isDontCare(text)) return 'bez preference'
   return null
 }
 
-/** Extract conversation state from the entire history */
-function extractConversationState(messages: ChatMessage[]): ConversationState {
+// ─── Sentence splitting for multi-extraction ───────────────────────
+
+/**
+ * Split user message into logical segments for independent extraction.
+ * Splits on commas, semicolons, line breaks, and common Czech conjunctions.
+ */
+function splitIntoSegments(text: string): string[] {
+  // Split on punctuation separators and conjunctions
+  const parts = text
+    .split(/[,;.\n]+|(?:\s+a\s+)|(?:\s+dále\s+)|(?:\s+taky\s+)|(?:\s+také\s+)|(?:\s+plus\s+)|(?:\s+ještě\s+)/i)
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+  return parts.length > 0 ? parts : [text]
+}
+
+// ─── State extraction from full conversation ───────────────────────
+
+function extractFullState(messages: ChatMessage[]): ConversationState {
   const state: ConversationState = {
     location: null,
     people: null,
     dates: null,
     meals: null,
     amenities: null,
-    amenitiesAsked: false,
   }
 
-  const botMessages = messages.filter(m => m.sender === 'bot')
-
-  // Check if amenities were already asked by the bot
-  for (const bm of botMessages) {
-    const bn = normalize(bm.text)
-    if (bn.includes('vybaveni') || bn.includes('bazen') && bn.includes('wellness') && (bn.includes('?') || bn.includes('koutek'))) {
-      state.amenitiesAsked = true
-    }
-  }
-
-  // Go through user messages and extract information
   for (const m of messages) {
     if (m.sender !== 'user') continue
-    const text = m.text
 
-    if (!state.location) state.location = extractLocation(text)
-    if (!state.people) state.people = extractPeople(text)
-    if (!state.dates) state.dates = extractDates(text)
-    if (!state.meals) state.meals = extractMeals(text)
-    if (!state.amenities) state.amenities = extractAmenities(text)
+    // Split each user message into segments and extract from each
+    const segments = splitIntoSegments(m.text)
+    const allAmenities: string[] = []
+
+    for (const seg of segments) {
+      const loc = extractLocation(seg)
+      const ppl = extractPeople(seg)
+      const dt = extractDates(seg)
+      const ml = extractMeals(seg)
+      const am = extractAmenities(seg)
+
+      // Always overwrite with the latest value (allows parameter changes)
+      if (loc) state.location = loc
+      if (ppl) state.people = ppl
+      if (dt) state.dates = dt
+      if (ml) state.meals = ml
+      if (am && am !== 'bez preference') allAmenities.push(am)
+      if (am === 'bez preference' && allAmenities.length === 0) allAmenities.push(am)
+    }
+
+    // Also try extraction on the full message (catches multi-word phrases broken by splitting)
+    const fullLoc = extractLocation(m.text)
+    const fullPpl = extractPeople(m.text)
+    const fullDt = extractDates(m.text)
+    const fullMl = extractMeals(m.text)
+    const fullAm = extractAmenities(m.text)
+
+    if (fullLoc) state.location = fullLoc
+    if (fullPpl) state.people = fullPpl
+    if (fullDt) state.dates = fullDt
+    if (fullMl) state.meals = fullMl
+    if (fullAm && !state.amenities) {
+      if (allAmenities.length > 0) {
+        const unique = [...new Set(allAmenities.flatMap(a => a.split(', ')))]
+        state.amenities = unique.join(', ')
+      } else {
+        state.amenities = fullAm
+      }
+    }
+    if (allAmenities.length > 0 && !state.amenities) {
+      const unique = [...new Set(allAmenities.flatMap(a => a.split(', ')))]
+      state.amenities = unique.join(', ')
+    }
   }
 
   return state
 }
 
-/** Check what the bot last asked about, to handle contextual short answers */
-function getLastBotQuestion(messages: ChatMessage[]): 'location' | 'people' | 'dates' | 'meals' | 'amenities' | null {
+/**
+ * Check what fields the bot last asked about (can be multiple).
+ */
+function getBotAskedFields(messages: ChatMessage[]): Set<string> {
+  const fields = new Set<string>()
   const botMessages = messages.filter(m => m.sender === 'bot')
-  if (botMessages.length === 0) return null
-  const last = normalize(botMessages[botMessages.length - 1].text)
-  
-  if (last.includes('lokalit') || last.includes('kam') || last.includes('oblast') || last.includes('mist')) return 'location'
-  if (last.includes('kolik') && (last.includes('osob') || last.includes('lid') || last.includes('vas') || last.includes('pojed'))) return 'people'
-  if (last.includes('termin') || last.includes('kdy') || last.includes('datum') || last.includes('obdobi')) return 'dates'
-  if (last.includes('strav') || last.includes('penz') || last.includes('snidan')) return 'meals'
-  if (last.includes('vybaven') || last.includes('bazen') || last.includes('koutek')) return 'amenities'
+  if (botMessages.length === 0) return fields
+  const last = norm(botMessages[botMessages.length - 1].text)
+
+  if (last.includes('lokalit') || last.includes('kam') || last.includes('oblast')) fields.add('location')
+  if (last.includes('kolik') || last.includes('pojed') || last.includes('osob') || last.includes('vas')) fields.add('people')
+  if (last.includes('termin') || last.includes('kdy') || last.includes('datum') || last.includes('obdobi')) fields.add('dates')
+  if (last.includes('strav') || last.includes('penz') || last.includes('snidan')) fields.add('meals')
+  if (last.includes('vybaven') || last.includes('bazen') || last.includes('koutek') || last.includes('wellness') || last.includes('hotel')) fields.add('amenities')
+
+  return fields
+}
+
+/** Detect if user already got deals shown (to handle post-deal conversation) */
+function dealsWereShown(messages: ChatMessage[]): boolean {
+  return messages.some(m => m.sender === 'bot' && m.deals && m.deals.length > 0)
+}
+
+/** Detect if user wants to change a parameter */
+function detectParameterChange(text: string): { field: string; value: string } | null {
+  const n = norm(text)
+
+  // "vlastně/radši/změň/jiný termín/stravu/..."
+  const changeSignals = n.match(/\b(vlastne|radsi|radeji|zmen|zmenil|zmenim|zmena|jiny|jine|jinou|prece jen|nakonec|ne |ne,)/);
+  if (!changeSignals && !n.match(/\b(chci zmenit|zmenit na|prepis|uprav)/)) return null
+
+  const loc = extractLocation(text)
+  if (loc) return { field: 'location', value: loc }
+  const ppl = extractPeople(text)
+  if (ppl) return { field: 'people', value: ppl }
+  const dt = extractDates(text)
+  if (dt) return { field: 'dates', value: dt }
+  const ml = extractMeals(text)
+  if (ml) return { field: 'meals', value: ml }
+  const am = extractAmenities(text)
+  if (am) return { field: 'amenities', value: am }
+
   return null
+}
+
+// ─── Travel intent detection ───────────────────────────────────────
+
+function hasTravelIntent(text: string): boolean {
+  return fuzzyMatch(text, [
+    'hotel', 'ubytovani', 'dovolena', 'dovolenou', 'pobyt', 'pobytovy',
+    'chata', 'chalupa', 'wellness', 'hory', 'cestovani', 'vylet',
+    'chci jet', 'jedeme', 'planuji', 'planujeme', 'hledam', 'hledame',
+    'chci vyrazit', 'chteli bychom', 'chtel bych', 'chtela bych',
+    'radi bychom', 'rada bych', 'zajima me', 'zajimaji me',
+    'potrebuji', 'potrebujeme', 'objednat', 'zarezervovat',
+    'kam jet', 'kde bydlet', 'kde spat',
+    'krkonose', 'beskydy', 'sumava', 'jeseniky',
+  ])
 }
 
 // ─── Main response logic ───────────────────────────────────────────
@@ -251,170 +493,273 @@ interface BotResponse {
 }
 
 function getBotResponse(userMessage: string, conversationHistory: ChatMessage[]): BotResponse {
-  const msg = normalize(userMessage)
+  const msg = norm(userMessage)
+  const userMsgCount = conversationHistory.filter(m => m.sender === 'user').length
 
-  // Check conversation context
+  // Previous bot context
   const prevBotMessages = conversationHistory.filter(m => m.sender === 'bot')
-  const lastBotMsg = prevBotMessages.length > 0
-    ? normalize(prevBotMessages[prevBotMessages.length - 1].text)
-    : ''
+  const lastBotMsg = prevBotMessages.length > 0 ? norm(prevBotMessages[prevBotMessages.length - 1].text) : ''
 
-  // --- Greetings (no deals) ---
-  if (msg.match(/\b(ahoj|cau|dobr[ye]|hey|hi|hello|zdar|nazdar)\b/) && conversationHistory.filter(m => m.sender === 'user').length <= 1) {
+  // ─── Special intents (always available) ────────────────────────
+
+  // Greetings (only on first message)
+  if (msg.match(/\b(ahoj|cau|cus|dobr[ye]|hey|hi|hello|zdar|nazdar|hej|hoj)\b/) && userMsgCount <= 1) {
     return { text: 'Ahoj! 👋 Rád tě vidím. Řekni mi, kam chceš vyrazit, a já ti najdu ty nejlepší nabídky.' }
   }
 
-  // --- Name question ---
-  if (msg.match(/\b(jak se jmenuj|tve jmeno|tvoje jmeno|kdo jsi|jak ti rikaj)/)) {
+  // Name question
+  if (fuzzyMatch(userMessage, ['jak se jmenujes', 'tve jmeno', 'tvoje jmeno', 'kdo jsi', 'jak ti rikaji'])) {
     return { text: 'Ve Slevomatu mi říkají Kolečko 😊 A jsem tu, abych ti pomohl najít ten nejlepší zážitek nebo dovolenou!' }
   }
 
-  // --- How did you recommend / on what basis ---
-  if (msg.match(/\b(jak jsi.*doporuc|jak jsi.*vyber|jak jsi.*vybir|na zaklade|podle ceho|jak vyber|jak vybir|proc zrovna|jak to vyber|jak to vybir|jak doporuc)/)) {
+  // How did you recommend / on what basis
+  if (fuzzyMatch(userMessage, ['jak jsi doporucil', 'jak jsi vybral', 'jak jsi vybiral', 'na zaklade ceho', 'podle ceho', 'jak vybiras', 'proc zrovna', 'jak to vybiras', 'jak doporucujes'])) {
     return { text: getHowIRecommendResponse() }
   }
 
-  // --- Help / capabilities (no deals) ---
-  if (msg.match(/\b(co umis|pomoc|help|co delas|jak funguj|co jsi|co vse|co muzes|co dokazes|co zvlad)/)) {
+  // Help / capabilities
+  if (fuzzyMatch(userMessage, ['co umis', 'pomoc', 'help', 'co delas', 'jak fungujes', 'co jsi', 'co vse umis', 'co muzes', 'co dokazes', 'co zvladnes'])) {
     return { text: 'Jsem tu, abych ti usnadnil výběr z nabídek na Slevomatu. Řekni mi kam chceš jet, s kolika lidmi, kdy a jakou preferuješ stravu – a já ti najdu to nejlepší! 🏖️' }
   }
 
-  // --- Thanks (no deals) ---
-  if (msg.match(/\b(dekuj|diky|dik|dikes)\b/)) {
-    return { text: 'Rádo se stalo! 😊 Pokud budeš potřebovat cokoliv dalšího, jsem tu pro tebe.' }
+  // Thanks
+  if (fuzzyMatch(userMessage, ['dekuji', 'diky', 'dik', 'dikes', 'moc dik', 'super dik', 'diky moc', 'dekuju'])) {
+    // Only if not providing other info at the same time
+    if (msg.length < 20) {
+      return { text: 'Rádo se stalo! 😊 Pokud budeš potřebovat cokoliv dalšího, jsem tu pro tebe.' }
+    }
   }
 
-  // --- Post-dislike: user is explaining what was wrong ---
+  // Post-dislike: user is explaining what was wrong
   const isAfterDislike = lastBotMsg.includes('pomoz mi pochopit') || lastBotMsg.includes('udelal chybku')
   if (isAfterDislike) {
     return { text: 'Rozumím, díky za vysvětlení! Beru si to k srdci a příště budu chytřejší. Chceš, abych to zkusil znovu s jinými nabídkami?' }
   }
 
-  // --- More offers / different offers ---
-  if (msg.match(/\b(vic nabid|dalsi nabid|jeste nec|jine nabid|neco jineho|dalsi moznost|vice moznost|zkus jine|ukaz dalsi|jeste dalsi)/)) {
+  // More offers / different offers
+  if (fuzzyMatch(userMessage, ['dalsi nabidky', 'jine nabidky', 'neco jineho', 'dalsi moznosti', 'vice moznosti', 'zkus jine', 'ukaz dalsi', 'jeste dalsi', 'nemas jine', 'vic nabidek', 'jeste neco', 'ukazat jine'])) {
     return {
       text: 'Jasně, tady je další várka nabídek. Snad tady najdeš, co hledáš:',
       deals: pickRandomDeals(5),
     }
   }
 
-  // ─── Gather information flow ─────────────────────────────────────
-  // Extract current state from the full conversation (including this new message)
-  const state = extractConversationState(conversationHistory)
-  const lastQuestion = getLastBotQuestion(conversationHistory)
+  // Positive confirmation after deals (wants more / activity)
+  if (dealsWereShown(conversationHistory) && fuzzyMatch(userMessage, ['super', 'parada', 'skvele', 'nadhera', 'krasne', 'perfektni', 'top', 'to se mi libi'])) {
+    return { text: 'To mě těší! 😊 Pokud budeš chtít další nabídky nebo máš jiný dotaz, klidně piš.' }
+  }
 
-  // Also try to extract from the current message specifically
-  const currentLocation = extractLocation(userMessage)
-  const currentPeople = extractPeople(userMessage)
-  const currentDates = extractDates(userMessage)
-  const currentMeals = extractMeals(userMessage)
-  const currentAmenities = extractAmenities(userMessage)
+  // ─── Parameter change detection ──────────────────────────────────
 
-  // Merge current extractions into state
-  if (currentLocation) state.location = currentLocation
-  if (currentPeople) state.people = currentPeople
-  if (currentDates) state.dates = currentDates
-  if (currentMeals) state.meals = currentMeals
-  if (currentAmenities) state.amenities = currentAmenities
+  const paramChange = detectParameterChange(userMessage)
 
-  // Handle contextual answers when bot asked about missing info
-  // The user may answer multiple things at once, or answer with "je mi to jedno"
-  if (lastQuestion) {
-    const isDontCare = msg.match(/\b(jedno|neres|nemusí|cokoliv|nezalezi|jakkoliv|jakykoliv|jakakoli|jakakoliv|uplne jedno|je to jedno|fakt jedno|vzdycky|vse|vsechno)\b/)
+  // ─── State extraction ────────────────────────────────────────────
 
-    // If "je mi to jedno" and bot asked about amenities
-    if (isDontCare && !state.amenities && state.amenitiesAsked) {
-      state.amenities = 'bez preference'
+  const state = extractFullState(conversationHistory)
+  const askedFields = getBotAskedFields(conversationHistory)
+
+  // Apply parameter change if detected
+  if (paramChange) {
+    switch (paramChange.field) {
+      case 'location': state.location = paramChange.value; break
+      case 'people': state.people = paramChange.value; break
+      case 'dates': state.dates = paramChange.value; break
+      case 'meals': state.meals = paramChange.value; break
+      case 'amenities': state.amenities = paramChange.value; break
     }
-    // If "je mi to jedno" and bot asked about meals
-    if (isDontCare && !state.meals && lastBotMsg.includes('strav')) {
-      state.meals = 'bez preference'
+    // If all fields are now filled, show deals with updated summary
+    const missing = getMissing(state)
+    if (missing.length === 0) {
+      return buildDealsResponse(state, `Jasně, změněno! Hledám znovu s novými parametry.`)
     }
+    return { text: `Jasně, změněno! ${buildMissingQuestions(state, missing)}` }
+  }
 
-    // Try to interpret short numeric answers as people count
-    if (!state.people && msg.match(/^\s*\d+\s*$/)) {
-      const num = parseInt(msg.match(/\d+/)![0])
-      state.people = `${num} ${num === 1 ? 'osoba' : num < 5 ? 'osoby' : 'osob'}`
-    }
+  // Handle "je mi to jedno" when bot asked about specific fields
+  if (isDontCare(userMessage) && askedFields.size > 0) {
+    if (askedFields.has('meals') && !state.meals) state.meals = 'bez preference'
+    if (askedFields.has('amenities') && !state.amenities) state.amenities = 'bez preference'
+    if (askedFields.has('dates') && !state.dates) state.dates = 'kdykoliv'
+    if (askedFields.has('people') && !state.people) state.people = 'bez preference'
 
-    // If bot asked and user gave a text answer that we couldn't parse for specific fields,
-    // try to assign it to the first missing field the bot asked about
-    if (!currentLocation && !currentPeople && !currentDates && !currentMeals && !currentAmenities && !isDontCare) {
-      if (!state.dates && lastBotMsg.includes('termin')) state.dates = userMessage.trim()
-      if (!state.meals && lastBotMsg.includes('strav')) state.meals = userMessage.trim()
-      if (!state.amenities && (lastBotMsg.includes('vybaven') || lastBotMsg.includes('bazen'))) state.amenities = userMessage.trim()
+    // If "je mi to jedno" applies to ALL remaining missing fields
+    const remaining = getMissing(state)
+    if (remaining.length > 0 && msg.length < 25) {
+      // Apply "dont care" to all remaining
+      for (const f of remaining) {
+        if (f === 'meals' && !state.meals) state.meals = 'bez preference'
+        if (f === 'amenities' && !state.amenities) state.amenities = 'bez preference'
+        if (f === 'dates' && !state.dates) state.dates = 'kdykoliv'
+        if (f === 'people' && !state.people) state.people = 'bez preference'
+      }
     }
   }
 
-  // ─── Determine missing information and ask ALL at once ───────────
+  // Also extract from the current message (segments for multi-extraction)
+  const segments = splitIntoSegments(userMessage)
+  const currentAmenities: string[] = []
 
-  // If no location yet, ask for it first (without location we can't start)
-  if (!state.location) {
-    if (msg.match(/\b(hotel|ubytovan|dovolen|pobyt|chata|chalup|wellness|hory|cestovan)/)) {
-      return { text: 'To zní skvěle! 🏔️ A kam by ses chtěl/a podívat? Třeba Krkonoše, Beskydy, Šumava…?' }
+  for (const seg of segments) {
+    const loc = extractLocation(seg)
+    const ppl = extractPeople(seg)
+    const dt = extractDates(seg)
+    const ml = extractMeals(seg)
+    const am = extractAmenities(seg)
+
+    if (loc) state.location = loc
+    if (ppl) state.people = ppl
+    if (dt) state.dates = dt
+    if (ml) state.meals = ml
+    if (am && am !== 'bez preference') currentAmenities.push(am)
+    if (am === 'bez preference') state.amenities = 'bez preference'
+  }
+
+  // Also full-message extraction (catches multi-word phrases)
+  const fullLoc = extractLocation(userMessage)
+  const fullPpl = extractPeople(userMessage)
+  const fullDt = extractDates(userMessage)
+  const fullMl = extractMeals(userMessage)
+  const fullAm = extractAmenities(userMessage)
+
+  if (fullLoc) state.location = fullLoc
+  if (fullPpl) state.people = fullPpl
+  if (fullDt) state.dates = fullDt
+  if (fullMl) state.meals = fullMl
+  if (fullAm) {
+    if (currentAmenities.length > 0) {
+      const unique = [...new Set(currentAmenities.flatMap(a => a.split(', ')))]
+      state.amenities = unique.join(', ')
+    } else {
+      state.amenities = fullAm
     }
-    if (conversationHistory.filter(m => m.sender === 'user').length <= 1) {
-      if (msg.length > 5 && !msg.match(/\b(jet|jedeme|chci|chteli|chtela|chtel|hledam|hledame|zajimat|zajima|planuji|planujeme|radi|rada|bychom|potreb)/)) {
+  }
+
+  // Handle contextual short answers to bot's questions
+  if (askedFields.size > 0 && msg.length < 60) {
+    // If bot asked about dates and we didn't extract a date, accept the raw text as date
+    if (askedFields.has('dates') && !state.dates && !fullLoc && !fullPpl && !fullMl && !fullAm) {
+      if (!isDontCare(userMessage) && msg.length > 2) {
+        state.dates = userMessage.trim()
+      }
+    }
+    // If bot asked about meals and we didn't extract, accept raw text
+    if (askedFields.has('meals') && !state.meals && !fullLoc && !fullPpl && !fullDt && !fullAm) {
+      if (!isDontCare(userMessage) && msg.length > 2) {
+        state.meals = userMessage.trim()
+      }
+    }
+    // If bot asked about amenities and we didn't extract, accept raw text
+    if (askedFields.has('amenities') && !state.amenities && !fullLoc && !fullPpl && !fullDt && !fullMl) {
+      if (!isDontCare(userMessage) && msg.length > 2) {
+        state.amenities = userMessage.trim()
+      }
+    }
+  }
+
+  // ─── Determine what's missing and respond ────────────────────────
+
+  // No location yet → ask or detect off-topic
+  if (!state.location) {
+    if (hasTravelIntent(userMessage)) {
+      return { text: 'To zní skvěle! 🏔️ Kam by ses chtěl/a podívat? Třeba Krkonoše, Beskydy, Šumava…?' }
+    }
+    // Off-topic detection (only if not first message greeting)
+    if (userMsgCount > 1 || (msg.length > 5 && !hasTravelIntent(userMessage) && !msg.match(/\b(ahoj|cau|hej|hi|hello|zdar)/))) {
+      if (!hasTravelIntent(userMessage) && msg.length > 8) {
         return { text: getOffTopicResponse() }
       }
     }
-    return { text: 'Super, rád pomůžu! Nejdřív mi řekni, kam to má být – jaká lokalita tě láká? 🗺️' }
+    return { text: 'Super, rád pomůžu! Řekni mi, kam to má být – jaká lokalita tě láká? 🗺️' }
   }
 
-  // Collect ALL missing fields
+  // Collect missing
+  const missing = getMissing(state)
+
+  if (missing.length > 0) {
+    // Acknowledge what we understood so far
+    const ack = buildAcknowledgement(state, userMessage)
+    const questions = buildMissingQuestions(state, missing)
+    return { text: `${ack}\n\n${questions}` }
+  }
+
+  // ─── All criteria gathered → show deals! ─────────────────────────
+  return buildDealsResponse(state)
+}
+
+// ─── Helper functions for response building ────────────────────────
+
+function getMissing(state: ConversationState): string[] {
   const missing: string[] = []
   if (!state.people) missing.push('people')
   if (!state.dates) missing.push('dates')
   if (!state.meals) missing.push('meals')
   if (!state.amenities) missing.push('amenities')
+  return missing
+}
 
-  // If there are missing fields, ask about ALL of them in one message
-  if (missing.length > 0) {
-    const parts: string[] = []
+function buildAcknowledgement(state: ConversationState, currentMessage: string): string {
+  const parts: string[] = []
+  const hasNewLocation = extractLocation(currentMessage)
 
-    // Acknowledge location if just provided
-    if (currentLocation) {
-      parts.push(`${state.location} – skvělá volba! 🏔️`)
-    } else {
-      parts.push('Díky za info!')
-    }
-
-    parts.push('Ještě potřebuji pár věcí, abych ti našel to pravé:')
-
-    const questions: string[] = []
-    if (missing.includes('people')) questions.push('👥 Kolik vás pojede? (sám/sama, ve dvou, s rodinou…)')
-    if (missing.includes('dates')) questions.push('📅 Kdy byste chtěli jet? (datum, víkend, měsíc, „během léta"…)')
-    if (missing.includes('meals')) questions.push('🍽️ Jaké stravování? (vlastní, snídaně, polopenze, plná penze, all inclusive)')
-    if (missing.includes('amenities')) questions.push('🏨 Důležité vybavení hotelu? (bazén, wellness, dětský koutek, pet friendly… nebo je ti to jedno)')
-
-    parts.push(questions.join('\n'))
-    parts.push('\nKlidně napiš vše najednou!')
-
-    return { text: parts.join('\n\n') }
+  if (hasNewLocation) {
+    parts.push(`${state.location} – skvělá volba! 🏔️`)
   }
 
-  // ─── All criteria gathered → show deals! ─────────────────────────
+  // Mention what we already know
+  const known: string[] = []
+  if (state.location && !hasNewLocation) known.push(`📍 ${state.location}`)
+  if (state.people) known.push(`👥 ${state.people}`)
+  if (state.dates) known.push(`📅 ${state.dates}`)
+  if (state.meals) known.push(`🍽️ ${state.meals}`)
+  if (state.amenities && state.amenities !== 'bez preference') known.push(`🏨 ${state.amenities}`)
 
-  // Build a nice summary
+  if (known.length > 0 && !hasNewLocation) {
+    parts.push('Díky, rozumím!')
+  }
+
+  return parts.length > 0 ? parts.join(' ') : 'Díky za info!'
+}
+
+function buildMissingQuestions(_state: ConversationState, missing: string[]): string {
+  const parts: string[] = []
+
+  if (missing.length === 1) {
+    // Single missing field → ask nicely
+    if (missing[0] === 'people') return 'Ještě mi řekni, kolik vás pojede? 👥'
+    if (missing[0] === 'dates') return 'A kdy byste chtěli jet? 📅'
+    if (missing[0] === 'meals') return 'Jaké stravování by ti vyhovovalo? (polopenze, plná penze, snídaně, vlastní…) 🍽️'
+    if (missing[0] === 'amenities') return 'Je pro tebe důležité nějaké vybavení hotelu? Třeba bazén, wellness, dětský koutek… nebo je ti to jedno? 🏨'
+  }
+
+  parts.push('Ještě potřebuji vědět:')
+  const questions: string[] = []
+  if (missing.includes('people')) questions.push('👥 Kolik vás pojede?')
+  if (missing.includes('dates')) questions.push('📅 Kdy byste chtěli jet?')
+  if (missing.includes('meals')) questions.push('🍽️ Jaké stravování? (vlastní, snídaně, polopenze, plná penze, all inclusive)')
+  if (missing.includes('amenities')) questions.push('🏨 Vybavení hotelu? (bazén, wellness, dětský koutek, pet friendly… nebo je ti to jedno)')
+
+  parts.push(questions.join('\n'))
+  if (missing.length > 1) parts.push('\nKlidně napiš vše najednou v jedné zprávě!')
+
+  return parts.join('\n\n')
+}
+
+function buildDealsResponse(state: ConversationState, prefix?: string): BotResponse {
   const summaryParts: string[] = []
   summaryParts.push(`📍 ${state.location}`)
-  summaryParts.push(`👥 ${state.people}`)
-  summaryParts.push(`📅 ${state.dates}`)
-  summaryParts.push(`🍽️ ${state.meals}`)
-  if (state.amenities && state.amenities !== 'bez preference') {
-    summaryParts.push(`🏨 ${state.amenities}`)
-  }
+  if (state.people && state.people !== 'bez preference') summaryParts.push(`👥 ${state.people}`)
+  if (state.dates && state.dates !== 'kdykoliv') summaryParts.push(`📅 ${state.dates}`)
+  if (state.meals && state.meals !== 'bez preference') summaryParts.push(`🍽️ ${state.meals}`)
+  if (state.amenities && state.amenities !== 'bez preference') summaryParts.push(`🏨 ${state.amenities}`)
 
   const summary = summaryParts.join('\n')
+  const intro = prefix || 'Paráda, mám vše!'
 
   return {
-    text: `Mám vše, co potřebuji! Tady je shrnutí:\n\n${summary}\n\nA tady jsou nabídky, které jsem pro tebe vybral:`,
+    text: `${intro}\n\n${summary}\n\nA tady jsou nabídky, které jsem pro tebe vybral:`,
     deals: pickRandomDeals(5),
   }
 }
-
-// ─── Short messages ---
-// Moved inside the main logic as needed
 
 // ─── Hook ──────────────────────────────────────────────────────────
 
@@ -426,7 +771,6 @@ export function useChatbot(_isOpen?: boolean) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const nextIdRef = useRef(1)
 
-  // Auto-scroll to bottom when messages change
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -445,14 +789,12 @@ export function useChatbot(_isOpen?: boolean) {
     setMessages(newMessages)
     setInputValue('')
 
-    // Compute response first to pick contextual typing text
     const response = getBotResponse(text, newMessages)
     const typingLabel = response.deals ? getSearchTypingText() : getThinkingTypingText()
 
     setIsTyping(true)
     setTypingText(typingLabel)
 
-    // Longer delay when deals are included (simulating search)
     const baseDelay = response.deals ? 1200 : 800
     const delay = baseDelay + Math.random() * 800
 
