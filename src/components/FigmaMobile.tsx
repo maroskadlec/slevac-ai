@@ -100,15 +100,12 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 className="flex-1 bg-transparent text-[16px] text-[#333] placeholder-[#999] outline-none border-none"
               />
               <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
-              {heroInput.trim().length > 0 && (
-                <button
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={handleHeroSend}
-                  className="w-[28px] h-[28px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-colors cursor-pointer ml-[6px]"
-                >
-                  <Send className="w-[12px] h-[12px] text-white" />
-                </button>
-              )}
+              <button
+                onMouseDown={(e) => { e.preventDefault(); handleHeroSend() }}
+                className={`w-[28px] h-[28px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-all cursor-pointer ml-[6px] ${heroInput.trim().length > 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
+              >
+                <Send className="w-[12px] h-[12px] text-white" />
+              </button>
             </div>
 
             {/* Tags */}
@@ -117,7 +114,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 <button
                   key={tag}
                   onClick={() => { setHeroInput(tag) }}
-                  className="bg-white/70 border border-[#CBCCCE] rounded-[16px] px-[10px] py-[4px] text-[14px] text-[#333] cursor-pointer hover:bg-white transition-colors"
+                  className="bg-white/70 border border-[#CBCCCE] rounded-[16px] px-[10px] py-[4px] text-[14px] text-[#333] font-bold cursor-pointer hover:bg-white transition-colors"
                 >
                   {tag}
                 </button>
