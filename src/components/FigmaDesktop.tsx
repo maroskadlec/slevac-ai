@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { X, Info, Mic, Send } from 'lucide-react'
+import { X, Mic, Send } from 'lucide-react'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
 
@@ -79,30 +79,8 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               }}
               className="absolute right-[10px] bottom-[10px] w-[380px] h-[480px] bg-white rounded-[8px] border border-[#e3e4e6] shadow-2xl z-20 flex flex-col"
             >
-              {/* Header Bar */}
-              <div className="flex items-center px-[12px] py-[8px] gap-[6px] flex-shrink-0">
-                {/* Mrkatko small circle */}
-                <div className="w-[28px] h-[28px] bg-[#006eb9] rounded-full overflow-hidden flex-shrink-0 relative">
-                  <motion.img 
-                    alt="Mrkatko" 
-                    className="absolute w-[167%] h-[175%] max-w-none left-[-22%] top-[-6%]"
-                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.1, ease: "easeIn" }}
-                  />
-                </div>
-                
-                {/* Disclaimer */}
-                <button
-                  onClick={chat.handleDisclaimer}
-                  className="flex items-center gap-[4px] flex-1 min-w-0 cursor-pointer hover:opacity-70 transition-opacity"
-                >
-                  <p className="text-[14px] leading-[22px] text-[#8e8e93] truncate">Školím se, mohu udělat chybu</p>
-                  <Info className="w-[15px] h-[15px] text-[#8e8e93] flex-shrink-0" />
-                </button>
-                
-                {/* Close button */}
+              {/* Header Bar – only close button on the right */}
+              <div className="flex items-center justify-end px-[12px] py-[8px] flex-shrink-0">
                 <motion.button
                   onClick={onToggle}
                   className="w-[24px] h-[24px] flex items-center justify-center cursor-pointer"
@@ -161,30 +139,40 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                 <div ref={chat.messagesEndRef} />
               </div>
 
-              {/* Input Bar */}
-              <div className="px-[10px] pb-[10px] pt-[6px] flex-shrink-0">
-                <div className="flex gap-[8px] items-center">
-                  {/* Input with mic inside */}
-                  <div className="flex-1 flex items-center bg-white rounded-[12px] border border-[#d1d5db] px-[4px] py-[3px] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
-                    <input
-                      type="text"
-                      value={chat.inputValue}
-                      onChange={(e) => chat.setInputValue(e.target.value)}
-                      onKeyDown={chat.handleKeyDown}
-                      placeholder="Popište svou představu..."
-                      className="flex-1 bg-transparent px-[12px] py-[8px] text-[14px] leading-[20px] text-black placeholder-[#8e8e93] outline-none border-none"
-                    />
-                    <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
+              {/* Input Bar – textarea with buttons inside */}
+              <div className="px-[10px] pb-[8px] pt-[6px] flex-shrink-0">
+                <div className="relative bg-white rounded-[12px] border border-[#d1d5db] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
+                  <textarea
+                    value={chat.inputValue}
+                    onChange={(e) => chat.setInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        chat.sendMessage()
+                      }
+                    }}
+                    placeholder="Popiš svou představu..."
+                    rows={3}
+                    className="w-full bg-transparent px-[12px] pt-[8px] pb-[32px] text-[14px] leading-[20px] text-black placeholder-[#8e8e93] outline-none border-none resize-none"
+                  />
+                  {/* Buttons inside input – bottom right */}
+                  <div className="absolute bottom-[6px] right-[8px] flex items-center gap-[6px]">
+                    <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 cursor-pointer" />
+                    <button
+                      onClick={chat.sendMessage}
+                      className="w-[28px] h-[28px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-colors cursor-pointer"
+                    >
+                      <Send className="w-[12px] h-[12px] text-white" />
+                    </button>
                   </div>
-                  
-                  {/* Send Button */}
-                  <button
-                    onClick={chat.sendMessage}
-                    className="w-[36px] h-[36px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-colors cursor-pointer"
-                  >
-                    <Send className="w-[16px] h-[16px] text-white" />
-                  </button>
                 </div>
+                {/* Disclaimer text below input */}
+                <button
+                  onClick={chat.handleDisclaimer}
+                  className="mt-[4px] w-full text-center cursor-pointer hover:opacity-70 transition-opacity"
+                >
+                  <p className="text-[12px] leading-[16px] text-[#8e8e93]">Jsem tu chvilku a učím se. Občas můžu udělat chybku.</p>
+                </button>
               </div>
             </motion.div>
           )}

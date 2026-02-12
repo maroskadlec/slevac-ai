@@ -812,7 +812,7 @@ function buildMissingQuestions(_state: ConversationState, missing: string[]): st
   if (missing.length === 1) {
     // Single missing field → ask nicely
     if (missing[0] === 'people') return 'Ještě mi řekni, kolik vás pojede? 👥'
-    if (missing[0] === 'dates') return 'A kdy byste chtěli jet? 📅'
+    if (missing[0] === 'dates') return 'A kdy chceš jet? 📅'
     if (missing[0] === 'meals') return 'Jaké stravování by ti vyhovovalo? (polopenze, plná penze, snídaně, vlastní…) 🍽️'
     if (missing[0] === 'amenities') return 'Je pro tebe důležité nějaké vybavení hotelu? Třeba bazén, wellness, dětský koutek… nebo je ti to jedno? 🏨'
   }
@@ -820,7 +820,7 @@ function buildMissingQuestions(_state: ConversationState, missing: string[]): st
   parts.push('Ještě potřebuji vědět:')
   const questions: string[] = []
   if (missing.includes('people')) questions.push('👥 Kolik vás pojede?')
-  if (missing.includes('dates')) questions.push('📅 Kdy byste chtěli jet?')
+  if (missing.includes('dates')) questions.push('📅 Kdy chceš jet?')
   if (missing.includes('meals')) questions.push('🍽️ Jaké stravování? (vlastní, snídaně, polopenze, plná penze, all inclusive)')
   if (missing.includes('amenities')) questions.push('🏨 Vybavení hotelu? (bazén, wellness, dětský koutek, pet friendly… nebo je ti to jedno)')
 
@@ -842,7 +842,7 @@ function buildDealsResponse(state: ConversationState, prefix?: string): BotRespo
   const intro = prefix || 'Paráda, mám vše!'
 
   return {
-    text: `${intro}\n\n${summary}\n\nA tady jsou nabídky, které jsem pro tebe vybral:`,
+    text: `${intro}\n\n${summary}\n\nNašel jsem pár zajímavých pobytů, kde si užiješ, co hledáš. Který se ti líbí nejvíc?`,
     deals: pickRandomDeals(5),
   }
 }

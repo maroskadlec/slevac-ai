@@ -3,6 +3,41 @@ import { motion } from 'framer-motion'
 import { Heart, Star, ThumbsUp, ThumbsDown } from 'lucide-react'
 import type { DealCard } from '../data/mockDeals'
 
+// 20 badge labels for "Líbilo se: XX"
+const BADGE_LABELS = [
+  'Snídaně',
+  'Luxusní interiér',
+  'Výhled',
+  'Skvělý personál',
+  'Klidné místo',
+  'Čistota',
+  'Wellness',
+  'Poloha',
+  'Pohodlné postele',
+  'Krásné okolí',
+  'Milý přístup',
+  'Atmosféra',
+  'Bazén',
+  'Restaurace',
+  'Prostorné pokoje',
+  'Sauna',
+  'Jídlo',
+  'Domácí prostředí',
+  'Příjemná obsluha',
+  'Parkoviště',
+]
+
+/** Pick a consistent badge for a deal based on its id */
+function getBadgeLabel(dealId: string): string {
+  // Hash the string id to get a stable index
+  let hash = 0
+  for (let i = 0; i < dealId.length; i++) {
+    hash = ((hash << 5) - hash) + dealId.charCodeAt(i)
+    hash |= 0
+  }
+  return BADGE_LABELS[Math.abs(hash) % BADGE_LABELS.length]
+}
+
 interface DealCarouselProps {
   deals: DealCard[]
   compact?: boolean
@@ -40,13 +75,6 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
       transition={{ duration: 0.3 }}
       className="flex flex-col gap-[6px] w-full"
     >
-      {/* Section Header */}
-      <div>
-        <p className={`text-[#8e8e93] text-[14px] leading-[22px]`}>
-          Vybral jsem z nabídek podle toho, co o nich vím a podle toho, co říkají ostatní zákazníci.
-        </p>
-      </div>
-
       {/* Scrollable Cards */}
       <div
         ref={scrollRef}
@@ -114,6 +142,12 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
               <div className={`flex items-center gap-[3px] text-[#8e8e93] ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
                 <span>{deal.distance}</span>
               </div>
+              {/* Badge: "Líbilo se: XX" */}
+              <div className="mt-[2px]">
+                <span className={`inline-block bg-[#E5F0F7] text-[#006eb9] rounded-[4px] font-medium ${compact ? 'text-[8px] px-[4px] py-[1px]' : 'text-[9px] px-[5px] py-[1.5px]'}`}>
+                  Líbilo se: {getBadgeLabel(deal.id)}
+                </span>
+              </div>
             </div>
           </div>
         ))}
@@ -133,22 +167,22 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
 
       {/* Feedback Row */}
       {feedback === 'none' && (
-        <div className="flex items-center justify-between">
-          <span className={`text-[#8e8e93] text-[14px] leading-[22px]`}>
-            Vyhovují vám doporučení?
+        <div className="flex items-center justify-between border border-[#e8e8ed] rounded-[10px] px-[10px] py-[8px]">
+          <span className={`text-[#1a1a1a] text-[14px] leading-[22px]`}>
+            Vyhovují ti doporučení? Koukal jsem, co o nich říkají ostatní.
           </span>
-          <div className="flex gap-[8px]">
+          <div className="flex gap-[8px] flex-shrink-0 ml-[8px]">
             <button
               onClick={() => { setFeedback('up'); onFeedback?.('up') }}
               className="hover:scale-110 transition-transform cursor-pointer"
             >
-              <ThumbsUp className={`text-[#b0b0b5] hover:text-[#006eb9] transition-colors ${compact ? 'w-[14px] h-[14px]' : 'w-[16px] h-[16px]'}`} />
+              <ThumbsUp className={`text-[#22c55e] hover:text-[#16a34a] transition-colors ${compact ? 'w-[14px] h-[14px]' : 'w-[16px] h-[16px]'}`} />
             </button>
             <button
               onClick={() => { setFeedback('down'); onFeedback?.('down') }}
               className="hover:scale-110 transition-transform cursor-pointer"
             >
-              <ThumbsDown className={`text-[#b0b0b5] hover:text-red-400 transition-colors ${compact ? 'w-[14px] h-[14px]' : 'w-[16px] h-[16px]'}`} />
+              <ThumbsDown className={`text-[#ef4444] hover:text-[#dc2626] transition-colors ${compact ? 'w-[14px] h-[14px]' : 'w-[16px] h-[16px]'}`} />
             </button>
           </div>
         </div>
