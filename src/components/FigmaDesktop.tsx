@@ -80,7 +80,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               className="absolute right-[10px] bottom-[10px] w-[380px] h-[480px] bg-white rounded-[8px] border border-[#e3e4e6] shadow-2xl z-20 flex flex-col"
             >
               {/* Header Bar – only close button on the right */}
-              <div className="flex items-center justify-end px-[12px] py-[8px] flex-shrink-0">
+              <div className="flex items-center justify-end px-[20px] pt-[14px] pb-[8px] flex-shrink-0">
                 <motion.button
                   onClick={onToggle}
                   className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer"
@@ -92,7 +92,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               </div>
 
               {/* Scrollable Chat Area */}
-              <div className="flex-1 overflow-y-auto px-[16px] pb-[8px] flex flex-col gap-[12px] min-h-0">
+              <div className="flex-1 overflow-y-auto px-[24px] pb-[8px] flex flex-col gap-[12px] min-h-0">
                 {/* Welcome Title */}
                 <h2 className="text-[28px] leading-[34px] font-heading font-bold text-black pt-[4px] pb-[4px]">
                   Ahoj, pomůžu najít nabídky, které ti sednou
@@ -140,7 +140,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               </div>
 
               {/* Input Bar – textarea with buttons inside */}
-              <div className="px-[10px] pb-[8px] pt-[6px] flex-shrink-0">
+              <div className="px-[18px] pb-[16px] pt-[6px] flex-shrink-0">
                 <div className="relative bg-white rounded-[12px] border border-[#d1d5db] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
                   <textarea
                     value={chat.inputValue}

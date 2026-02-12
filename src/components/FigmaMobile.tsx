@@ -173,7 +173,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-40 flex flex-col h-[85dvh]"
             >
               {/* Header Bar – only close button on the right */}
-              <div className="flex items-center justify-end px-[10px] pt-[10px] pb-[6px] flex-shrink-0">
+              <div className="flex items-center justify-end px-[18px] pt-[14px] pb-[6px] flex-shrink-0">
                 <motion.button
                   onClick={onToggle}
                   className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer"
@@ -185,7 +185,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               </div>
 
               {/* Scrollable Chat Area */}
-              <div className="flex-1 overflow-y-auto px-[12px] pb-[6px] flex flex-col gap-[10px] min-h-0">
+              <div className="flex-1 overflow-y-auto px-[20px] pb-[6px] flex flex-col gap-[10px] min-h-0">
                 {/* Welcome Title */}
                 <h2 className="text-[24px] leading-[30px] font-heading font-bold text-black pt-[2px] pb-[2px]">
                   Ahoj, pomůžu najít nabídky, které ti sednou
@@ -233,7 +233,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               </div>
 
               {/* Input Bar – textarea with buttons inside */}
-              <div className="px-[8px] pb-[6px] pt-[4px] flex-shrink-0">
+              <div className="px-[16px] pb-[14px] pt-[4px] flex-shrink-0">
                 <div className="relative bg-white rounded-[12px] border border-[#d1d5db] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
                   <textarea
                     value={chat.inputValue}
