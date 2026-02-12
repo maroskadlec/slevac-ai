@@ -163,13 +163,6 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
         ))}
       </div>
 
-      {/* "Více nabídek" link */}
-      <div className="flex justify-center">
-        <a href="#" className="text-[#006eb9] text-[14px] hover:underline" onClick={(e) => e.preventDefault()}>
-          Více nabídek
-        </a>
-      </div>
-
       {/* Feedback Row */}
       {feedback === 'none' && (
         <div className="flex items-center justify-between border border-[#e8e8ed] rounded-[10px] px-[10px] py-[8px]">

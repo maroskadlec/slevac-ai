@@ -1053,10 +1053,11 @@ export function useChatbot(_isOpen?: boolean) {
       ]
     }
 
-    // 4) Deals were shown → activity tag
+    // 4) Deals were shown → activity tag + fakedoor "Více nabídek"
     if (dealsWereShown(messages)) {
       return [
         { label: '🗺️ Chci výlety v okolí', value: 'Chci výlety v okolí' },
+        { label: '📦 Více nabídek', value: '__fakedoor__' },
       ]
     }
 

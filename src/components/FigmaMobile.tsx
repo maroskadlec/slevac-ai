@@ -241,8 +241,12 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   {chat.quickTags.map((tag) => (
                     <button
                       key={tag.value}
-                      onClick={() => chat.sendMessageWithText(tag.value)}
-                      className="bg-[#E5F0F7] border border-[#006eb9]/20 rounded-[16px] px-[12px] py-[5px] text-[13px] text-[#006eb9] font-medium cursor-pointer hover:bg-[#d6e8f3] transition-colors"
+                      onClick={() => tag.value !== '__fakedoor__' && chat.sendMessageWithText(tag.value)}
+                      className={`border rounded-[16px] px-[12px] py-[5px] text-[13px] font-medium transition-colors ${
+                        tag.value === '__fakedoor__'
+                          ? 'bg-[#E5F0F7] border-[#006eb9]/20 text-[#006eb9] cursor-pointer hover:bg-[#d6e8f3]'
+                          : 'bg-[#E5F0F7] border-[#006eb9]/20 text-[#006eb9] cursor-pointer hover:bg-[#d6e8f3]'
+                      }`}
                     >
                       {tag.label}
                     </button>
