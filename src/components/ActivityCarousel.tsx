@@ -101,9 +101,8 @@ export default function ActivityCarousel({ activities, compact = false }: Activi
                 </span>
               </div>
               {/* Provider + Location */}
-              <div className={`flex items-center gap-[4px] text-[#8e8e93] ${compact ? 'text-[11px]' : 'text-[12px]'}`}>
+              <div className={`flex flex-col text-[#8e8e93] ${compact ? 'text-[11px]' : 'text-[12px]'}`}>
                 <span className="truncate">{activity.provider}</span>
-                <span className="flex-shrink-0 opacity-50">·</span>
                 <span className="truncate">{activity.location}</span>
               </div>
             </div>
