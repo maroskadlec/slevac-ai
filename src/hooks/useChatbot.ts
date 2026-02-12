@@ -553,6 +553,15 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
     return { text: getHowIRecommendResponse() }
   }
 
+  // Reklamace
+  if (fuzzyMatch(userMessage, [
+    'reklamace', 'reklamaci', 'reklamovat', 'reklamuju', 'reklamuji',
+    'chci reklamovat', 'potrebuji reklamaci', 'pomoz s reklamaci',
+    'reklamacni', 'reklamacni rizeni', 'vratit penize', 'vraceni penez',
+  ])) {
+    return { text: 'Reklamaci zatím neumím vyřídit tak dobře jako můj chatbotí kolega Slávek. **Klikni sem** a já ti Slávka spustím. Řeknu mu rovnou, co potřebuješ a budete pokračovat spolu.' }
+  }
+
   // Trips / activities in the area
   if (fuzzyMatch(userMessage, [
     'vylet v okoli', 'vylety v okoli', 'co delat v okoli', 'co je v okoli',
