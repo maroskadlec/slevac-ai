@@ -1013,8 +1013,48 @@ export function useChatbot(_isOpen?: boolean) {
     }, delay)
   }, [])
 
-  // Show activity tag when deals have been shown
-  const showActivityTag = dealsWereShown(messages) && !isTyping
+  // ─── Quick Tags (contextual shortcuts above input) ──────────────
+  const quickTags: { label: string; value: string }[] = (() => {
+    if (isTyping) return []
+    if (messages.length === 0) return []
+
+    // Tags only show when last message is from bot (not after user sends)
+    const lastMsg = messages[messages.length - 1]
+    if (!lastMsg || lastMsg.sender !== 'bot') return []
+
+    const lastBotText = norm(lastMsg.text)
+
+    // 1) After dislike feedback → dislike reason tags
+    if (lastBotText.includes('pomoz mi pochopit') || lastBotText.includes('udelal chybku')) {
+      return [
+        { label: '💰 Příliš drahé', value: 'Příliš drahé' },
+        { label: '📍 Moc daleko', value: 'Moc daleko' },
+        { label: '📋 Málo nabídek', value: 'Málo nabídek' },
+      ]
+    }
+
+    // 2) Bot asking for parameters → "Je mi to jedno"
+    if (
+      lastBotText.includes('kolik vas') || lastBotText.includes('kolik') ||
+      lastBotText.includes('kdy chces') || lastBotText.includes('termin') ||
+      lastBotText.includes('stravovan') || lastBotText.includes('jake stravovan') ||
+      lastBotText.includes('vybaveni hotel') ||
+      lastBotText.includes('potrebuji vedet')
+    ) {
+      return [
+        { label: '🤷 Je mi to jedno', value: 'Je mi to jedno' },
+      ]
+    }
+
+    // 3) Deals were shown → activity tag
+    if (dealsWereShown(messages)) {
+      return [
+        { label: '🗺️ Chci výlety v okolí', value: 'Chci výlety v okolí' },
+      ]
+    }
+
+    return []
+  })()
 
   return {
     messages,
@@ -1028,6 +1068,6 @@ export function useChatbot(_isOpen?: boolean) {
     handleKeyDown,
     handleFeedback,
     handleDisclaimer,
-    showActivityTag,
+    quickTags,
   }
 }

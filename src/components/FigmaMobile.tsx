@@ -235,15 +235,18 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 <div ref={chat.messagesEndRef} />
               </div>
 
-              {/* Activity Quick Tag */}
-              {chat.showActivityTag && (
-                <div className="px-[16px] pt-[4px] flex-shrink-0">
-                  <button
-                    onClick={() => chat.sendMessageWithText('Chci výlety v okolí')}
-                    className="bg-[#E5F0F7] border border-[#006eb9]/20 rounded-[16px] px-[12px] py-[5px] text-[13px] text-[#006eb9] font-medium cursor-pointer hover:bg-[#d6e8f3] transition-colors"
-                  >
-                    🗺️ Chci výlety v okolí
-                  </button>
+              {/* Quick Tags (contextual shortcuts) */}
+              {chat.quickTags.length > 0 && (
+                <div className="px-[16px] pt-[4px] pb-[2px] flex-shrink-0 flex flex-wrap gap-[6px]">
+                  {chat.quickTags.map((tag) => (
+                    <button
+                      key={tag.value}
+                      onClick={() => chat.sendMessageWithText(tag.value)}
+                      className="bg-[#E5F0F7] border border-[#006eb9]/20 rounded-[16px] px-[12px] py-[5px] text-[13px] text-[#006eb9] font-medium cursor-pointer hover:bg-[#d6e8f3] transition-colors"
+                    >
+                      {tag.label}
+                    </button>
+                  ))}
                 </div>
               )}
 
