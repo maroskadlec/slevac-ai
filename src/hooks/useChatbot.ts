@@ -1033,7 +1033,14 @@ export function useChatbot(_isOpen?: boolean) {
       ]
     }
 
-    // 2) Bot asking for parameters → "Je mi to jedno"
+    // 2) After dislike explanation → "Ano" to try again
+    if (lastBotText.includes('beru si to k srdci') || lastBotText.includes('zkusil znovu')) {
+      return [
+        { label: '👍 Ano', value: 'Ano' },
+      ]
+    }
+
+    // 3) Bot asking for parameters → "Je mi to jedno"
     if (
       lastBotText.includes('kolik vas') || lastBotText.includes('kolik') ||
       lastBotText.includes('kdy chces') || lastBotText.includes('termin') ||
@@ -1046,7 +1053,7 @@ export function useChatbot(_isOpen?: boolean) {
       ]
     }
 
-    // 3) Deals were shown → activity tag
+    // 4) Deals were shown → activity tag
     if (dealsWereShown(messages)) {
       return [
         { label: '🗺️ Chci výlety v okolí', value: 'Chci výlety v okolí' },
