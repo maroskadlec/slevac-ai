@@ -83,11 +83,11 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               <div className="flex items-center justify-end px-[12px] py-[8px] flex-shrink-0">
                 <motion.button
                   onClick={onToggle}
-                  className="w-[24px] h-[24px] flex items-center justify-center cursor-pointer"
+                  className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <X className="w-[14px] h-[14px] text-[#006eb9]" strokeWidth={3} />
+                  <X className="w-[18px] h-[18px] text-[#006eb9]" strokeWidth={3} />
                 </motion.button>
               </div>
 

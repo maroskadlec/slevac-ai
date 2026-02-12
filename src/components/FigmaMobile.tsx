@@ -172,20 +172,15 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               }}
               className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-40 flex flex-col h-[85dvh]"
             >
-              {/* Drag Handle */}
-              <div className="flex justify-center pt-[6px] pb-[2px] flex-shrink-0">
-                <div className="bg-[#e4e4e7] h-[3px] w-[32px] rounded-[22px]" />
-              </div>
-
               {/* Header Bar – only close button on the right */}
-              <div className="flex items-center justify-end px-[10px] py-[6px] flex-shrink-0">
+              <div className="flex items-center justify-end px-[10px] pt-[10px] pb-[6px] flex-shrink-0">
                 <motion.button
                   onClick={onToggle}
-                  className="w-[24px] h-[24px] flex items-center justify-center cursor-pointer"
+                  className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <X className="w-[14px] h-[14px] text-[#006eb9]" strokeWidth={3} />
+                  <X className="w-[18px] h-[18px] text-[#006eb9]" strokeWidth={3} />
                 </motion.button>
               </div>
 
