@@ -42,7 +42,7 @@ function HomePage() {
             Rozhovor se Slevomatem
           </h1>
           <p className="text-xl text-gray-600">
-            9.2.2026
+            13.2.2026
           </p>
         </motion.div>
 
