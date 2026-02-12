@@ -110,6 +110,19 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 </button>
               )}
             </div>
+
+            {/* Tags */}
+            <div className="mt-[10px] flex flex-wrap gap-[6px]">
+              {['Chci zažít wellness a odpočinout si', 'S dětmi na týdenní prázdniny', 'Kam vzít holku na rande'].map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => { setHeroInput(tag) }}
+                  className="bg-white/70 border border-[#CBCCCE] rounded-[16px] px-[10px] py-[4px] text-[12px] text-[#333] cursor-pointer hover:bg-white transition-colors"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Promo Banner */}
