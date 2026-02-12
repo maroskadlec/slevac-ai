@@ -113,6 +113,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                       </div>
                     ) : (
                       <>
+                        {msg.image && <img src={msg.image} alt="" className="w-[32px] h-[32px]" />}
                         <p className="text-[14px] leading-[21px] text-[#1a1a1a] whitespace-pre-line" dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.+?)\*\*/g, '<strong class="underline">$1</strong>') }} />
                         {msg.deals && <DealCarousel deals={msg.deals} onFeedback={chat.handleFeedback} />}
                       </>

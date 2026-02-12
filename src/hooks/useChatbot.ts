@@ -7,6 +7,7 @@ export interface ChatMessage {
   text: string
   sender: 'user' | 'bot'
   deals?: DealCard[]
+  image?: string
 }
 
 // ─── Typing indicator texts ────────────────────────────────────────
@@ -951,7 +952,10 @@ export function useChatbot(_isOpen?: boolean) {
       const text = type === 'up'
         ? 'Děkuju, to je milé. 😊'
         : 'To mne mrzí. Pomoz mi pochopit, kde jsem udělal chybku. Školím se a ty mi pomůžeš být příště lepším.'
-      setMessages(prev => [...prev, { id: botMsgId, text, sender: 'bot' }])
+      const image = type === 'up'
+        ? `${import.meta.env.BASE_URL}assets/like.png`
+        : `${import.meta.env.BASE_URL}assets/dislike.png`
+      setMessages(prev => [...prev, { id: botMsgId, text, sender: 'bot', image }])
       setIsTyping(false)
       setTypingText('')
     }, delay)

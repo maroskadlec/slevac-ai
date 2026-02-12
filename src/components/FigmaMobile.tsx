@@ -206,6 +206,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                       </div>
                     ) : (
                       <>
+                        {msg.image && <img src={msg.image} alt="" className="w-[32px] h-[32px]" />}
                         <p className="text-[14px] leading-[22px] text-[#1a1a1a] whitespace-pre-line" dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.+?)\*\*/g, '<strong class="underline">$1</strong>') }} />
                         {msg.deals && <DealCarousel deals={msg.deals} compact onFeedback={chat.handleFeedback} />}
                       </>
