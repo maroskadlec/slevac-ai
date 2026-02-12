@@ -950,7 +950,7 @@ export function useChatbot(_isOpen?: boolean) {
     setTimeout(() => {
       const botMsgId = nextIdRef.current++
       const text = type === 'up'
-        ? 'Děkuju, to je milé. 😊'
+        ? 'Děkuju, to je milé.'
         : 'To mne mrzí. Pomoz mi pochopit, kde jsem udělal chybku. Školím se a ty mi pomůžeš být příště lepším.'
       const image = type === 'up'
         ? `${import.meta.env.BASE_URL}assets/like.png`
