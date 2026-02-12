@@ -1,12 +1,15 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { DealCard } from '../data/mockDeals'
 import { pickRandomDeals } from '../data/mockDeals'
+import type { ActivityCard } from '../data/mockActivities'
+import { getActivities } from '../data/mockActivities'
 
 export interface ChatMessage {
   id: number
   text: string
   sender: 'user' | 'bot'
   deals?: DealCard[]
+  activities?: ActivityCard[]
   image?: string
 }
 
@@ -450,6 +453,39 @@ function dealsWereShown(messages: ChatMessage[]): boolean {
   return messages.some(m => m.sender === 'bot' && m.deals && m.deals.length > 0)
 }
 
+/** Detect if activities were already shown */
+function activitiesWereShown(messages: ChatMessage[]): boolean {
+  return messages.some(m => m.sender === 'bot' && m.activities && m.activities.length > 0)
+}
+
+/** Check if user is asking for activities/trips in the area */
+function isActivityRequest(text: string): boolean {
+  return fuzzyMatch(text, [
+    'vylet v okoli', 'vylety v okoli', 'co delat v okoli', 'co je v okoli',
+    'co navstivit', 'co se da delat', 'kam na vylet', 'tipy na vylet',
+    'tipy na vylety', 'zajimavosti v okoli', 'pamatky v okoli', 'co videt',
+    'co podniknout', 'aktivity v okoli', 'kam zajit', 'co stoji za to',
+    'co je pobliz', 'co se da videt', 'kam na prochazku', 'kam na turu',
+    'turisticke trasy', 'rozhledna', 'rozhledny', 'muzeum', 'hrad', 'zamek',
+    'co navstivit v okoli', 'vylety pobliz', 'kam v okoli',
+    'co se da podniknout', 'doporucis vylet', 'doporuc mi vylet',
+    'jake jsou vylety', 'jake jsou aktivity', 'kam na vychazku',
+    'chci vylety', 'chci vylet', 'vylety', 'aktivity', 'co v okoli',
+    'chci vylety v okoli', 'ukazat vylety', 'ukaz vylety',
+  ])
+}
+
+/** Check if user is asking for stay/accommodation offers (not activities) */
+function isStayRequest(text: string): boolean {
+  return fuzzyMatch(text, [
+    'nabidky pobytu', 'pobyty', 'ubytovani', 'hotel', 'hotely',
+    'dalsi pobyty', 'jine pobyty', 'ukaz pobyty', 'chci pobyt',
+    'chci pobyty', 'nabidky ubytovani', 'zpet na pobyty', 'pobytove nabidky',
+    'dovolena', 'dovolenou', 'chci ubytovani', 'ukazat pobyty',
+    'nabidky hotelu', 'dalsi nabidky pobytu', 'jine hotely',
+  ])
+}
+
 /** Detect if user wants to change a parameter */
 function detectParameterChange(text: string): { field: string; value: string } | null {
   const n = norm(text)
@@ -499,6 +535,8 @@ function messageHasTravelContent(text: string): boolean {
   if (extractMeals(text)) return true
   if (extractAmenities(text)) return true
   if (hasTravelIntent(text)) return true
+  if (isActivityRequest(text)) return true
+  if (isStayRequest(text)) return true
   if (isDontCare(text)) return true // "je mi to jedno" is a valid answer
   // Also check for deal-related keywords (user talking about offers)
   if (fuzzyMatch(text, [
@@ -517,6 +555,7 @@ function messageHasTravelContent(text: string): boolean {
 interface BotResponse {
   text: string
   deals?: DealCard[]
+  activities?: ActivityCard[]
 }
 
 function getBotResponse(userMessage: string, conversationHistory: ChatMessage[]): BotResponse {
@@ -564,18 +603,24 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
   }
 
   // Trips / activities in the area
-  if (fuzzyMatch(userMessage, [
-    'vylet v okoli', 'vylety v okoli', 'co delat v okoli', 'co je v okoli',
-    'co navstivit', 'co se da delat', 'kam na vylet', 'tipy na vylet',
-    'tipy na vylety', 'zajimavosti v okoli', 'pamatky v okoli', 'co videt',
-    'co podniknout', 'aktivity v okoli', 'kam zajit', 'co stoji za to',
-    'co je pobliz', 'co se da videt', 'kam na procházku', 'kam na túru',
-    'turisticke trasy', 'rozhledna', 'rozhledny', 'muzeum', 'hrad', 'zamek',
-    'co navstivit v okoli', 'vylety pobliz', 'kam v okoli',
-    'co se da podniknout', 'doporucis vylet', 'doporuc mi vylet',
-    'jake jsou vylety', 'jake jsou aktivity', 'kam na vychazku',
-  ])) {
-    return { text: 'Tipy na výlety v okolí zatím neumím, ale lidi ze Slevomatu mě to brzy naučí! 🎓 Zatím ti můžu pomoci najít skvělou nabídku pobytu.' }
+  if (isActivityRequest(userMessage)) {
+    // If activities were already shown, user wants more → we don't have more
+    if (activitiesWereShown(conversationHistory)) {
+      return { text: 'Bohužel víc výletů v okolí momentálně nemám. Ale pokud chceš, můžu ti ukázat další nabídky pobytů! 🏨' }
+    }
+    // If deals were shown (or not), show activities
+    return {
+      text: 'Jasně! Mrkl jsem, co se dá v okolí podniknout. Tady je pár tipů:',
+      activities: getActivities(),
+    }
+  }
+
+  // After activities were shown: user asks for stay offers → show stays
+  if (activitiesWereShown(conversationHistory) && isStayRequest(userMessage)) {
+    return {
+      text: 'Jasně, tady jsou nabídky pobytů:',
+      deals: pickRandomDeals(5),
+    }
   }
 
   // Help / capabilities
@@ -599,6 +644,11 @@ function getBotResponse(userMessage: string, conversationHistory: ChatMessage[])
 
   // More offers / different offers
   if (fuzzyMatch(userMessage, ['dalsi nabidky', 'jine nabidky', 'neco jineho', 'dalsi moznosti', 'vice moznosti', 'zkus jine', 'ukaz dalsi', 'jeste dalsi', 'nemas jine', 'vic nabidek', 'jeste neco', 'ukazat jine'])) {
+    // Check if the last bot message with content was activities → user wants more activities
+    const lastBotWithContent = [...conversationHistory].reverse().find(m => m.sender === 'bot' && (m.activities || m.deals))
+    if (lastBotWithContent?.activities) {
+      return { text: 'Bohužel víc výletů v okolí momentálně nemám. Ale pokud chceš, můžu ti ukázat další nabídky pobytů! 🏨' }
+    }
     return {
       text: 'Jasně, tady je další várka nabídek. Snad tady najdeš, co hledáš:',
       deals: pickRandomDeals(5),
@@ -886,12 +936,13 @@ export function useChatbot(_isOpen?: boolean) {
     setInputValue('')
 
     const response = getBotResponse(text, newMessages)
-    const typingLabel = response.deals ? getSearchTypingText() : getThinkingTypingText()
+    const hasContent = response.deals || response.activities
+    const typingLabel = hasContent ? getSearchTypingText() : getThinkingTypingText()
 
     setIsTyping(true)
     setTypingText(typingLabel)
 
-    const baseDelay = response.deals ? 1200 : 800
+    const baseDelay = hasContent ? 1200 : 800
     const delay = baseDelay + Math.random() * 800
 
     setTimeout(() => {
@@ -901,6 +952,7 @@ export function useChatbot(_isOpen?: boolean) {
         text: response.text,
         sender: 'bot',
         deals: response.deals,
+        activities: response.activities,
       }])
       setIsTyping(false)
       setTypingText('')
@@ -961,6 +1013,9 @@ export function useChatbot(_isOpen?: boolean) {
     }, delay)
   }, [])
 
+  // Show activity tag when deals have been shown
+  const showActivityTag = dealsWereShown(messages) && !isTyping
+
   return {
     messages,
     inputValue,
@@ -973,5 +1028,6 @@ export function useChatbot(_isOpen?: boolean) {
     handleKeyDown,
     handleFeedback,
     handleDisclaimer,
+    showActivityTag,
   }
 }

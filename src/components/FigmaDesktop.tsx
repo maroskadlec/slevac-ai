@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { X, Mic, Send } from 'lucide-react'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
+import ActivityCarousel from './ActivityCarousel'
 
 const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
 const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
@@ -116,6 +117,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                         {msg.image && <img src={msg.image} alt="" className="w-[32px] h-[32px]" />}
                         <p className="text-[14px] leading-[21px] text-[#1a1a1a] whitespace-pre-line" dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.+?)\*\*/g, '<strong class="underline">$1</strong>') }} />
                         {msg.deals && <DealCarousel deals={msg.deals} onFeedback={chat.handleFeedback} />}
+                        {msg.activities && <ActivityCarousel activities={msg.activities} />}
                       </>
                     )}
                   </motion.div>
@@ -139,6 +141,18 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                 
                 <div ref={chat.messagesEndRef} />
               </div>
+
+              {/* Activity Quick Tag */}
+              {chat.showActivityTag && (
+                <div className="px-[18px] pt-[4px] flex-shrink-0">
+                  <button
+                    onClick={() => chat.sendMessageWithText('Chci výlety v okolí')}
+                    className="bg-[#E5F0F7] border border-[#006eb9]/20 rounded-[16px] px-[12px] py-[5px] text-[13px] text-[#006eb9] font-medium cursor-pointer hover:bg-[#d6e8f3] transition-colors"
+                  >
+                    🗺️ Chci výlety v okolí
+                  </button>
+                </div>
+              )}
 
               {/* Input Bar – textarea with buttons inside */}
               <div className="px-[18px] pb-[16px] pt-[6px] flex-shrink-0">
