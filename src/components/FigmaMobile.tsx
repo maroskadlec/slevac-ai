@@ -186,7 +186,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               </div>
 
               {/* Scrollable Chat Area */}
-              <div className="flex-1 overflow-y-auto px-[20px] pb-[6px] flex flex-col gap-[10px] min-h-0">
+              <div className="flex-1 overflow-y-auto px-[20px] pb-[6px] flex flex-col gap-[10px] min-h-0 bg-white">
                 {/* Welcome Title */}
                 <h2 className="text-[32px] leading-[38px] font-heading font-bold text-black pt-[2px] pb-[2px] text-center">
                   Ahoj, pomůžu najít nabídky, které ti sednou
@@ -202,16 +202,16 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                     className={`${msg.sender === 'user' ? 'flex justify-end' : 'flex flex-col gap-[8px]'}`}
                   >
                     {msg.sender === 'user' ? (
-                      <div className="bg-[#f0f0f3] rounded-[14px] rounded-br-[4px] px-[12px] py-[6px] max-w-[85%]">
-                        <p className="text-[14px] leading-[22px] text-black">{msg.text}</p>
+                      <div className="bg-[#E5F0F7] rounded-[16px] rounded-br-[4px] px-[14px] py-[8px] max-w-[85%]">
+                        <p className="text-[14px] leading-[22px] text-[#1a1a1a]">{msg.text}</p>
                       </div>
                     ) : (
-                      <>
-                        {msg.image && <img src={msg.image} alt="" className="w-[32px] h-[32px]" />}
+                      <div className="bg-white border border-[#e5e7eb] rounded-[16px] rounded-bl-[4px] px-[14px] py-[10px] max-w-[95%]">
+                        {msg.image && <img src={msg.image} alt="" className="w-[32px] h-[32px] mb-[4px]" />}
                         <p className="text-[14px] leading-[22px] text-[#1a1a1a] whitespace-pre-line" dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.+?)\*\*/g, '<strong class="underline">$1</strong>') }} />
                         {msg.deals && <DealCarousel deals={msg.deals} compact onFeedback={chat.handleFeedback} />}
                         {msg.activities && <ActivityCarousel activities={msg.activities} compact />}
-                      </>
+                      </div>
                     )}
                   </motion.div>
                 ))}
@@ -242,11 +242,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                     <button
                       key={tag.value}
                       onClick={() => tag.value !== '__fakedoor__' && chat.sendMessageWithText(tag.value)}
-                      className={`border rounded-[16px] px-[12px] py-[5px] text-[13px] font-medium transition-colors ${
-                        tag.value === '__fakedoor__'
-                          ? 'bg-[#E5F0F7] border-[#006eb9]/20 text-[#006eb9] cursor-pointer hover:bg-[#d6e8f3]'
-                          : 'bg-[#E5F0F7] border-[#006eb9]/20 text-[#006eb9] cursor-pointer hover:bg-[#d6e8f3]'
-                      }`}
+                      className="bg-white border border-[#CBCCCE] rounded-[20px] px-[14px] py-[6px] text-[13px] text-[#333] font-normal cursor-pointer hover:bg-[#f5f5f5] transition-colors"
                     >
                       {tag.label}
                     </button>
@@ -271,13 +267,13 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                     className="w-full bg-transparent px-[12px] pt-[8px] pb-[32px] text-[16px] leading-[20px] text-black placeholder-[#8e8e93] outline-none border-none resize-none"
                   />
                   {/* Buttons inside input – bottom right */}
-                  <div className="absolute bottom-[6px] right-[8px] flex items-center gap-[6px]">
-                    <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 cursor-pointer" />
+                  <div className="absolute bottom-[8px] right-[8px] flex items-center gap-[8px]">
+                    <Mic className="w-[18px] h-[18px] text-[#8e8e93] flex-shrink-0 cursor-pointer" />
                     <button
                       onClick={chat.sendMessage}
-                      className="w-[28px] h-[28px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-colors cursor-pointer"
+                      className="w-[32px] h-[32px] bg-[#006eb9] rounded-[8px] flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-colors cursor-pointer"
                     >
-                      <Send className="w-[12px] h-[12px] text-white" />
+                      <Send className="w-[14px] h-[14px] text-white" />
                     </button>
                   </div>
                 </div>
