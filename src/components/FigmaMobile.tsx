@@ -73,7 +73,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           <img src={`${import.meta.env.BASE_URL}assets/header.jpg`} alt="Header" className="w-full h-auto block" />
 
           {/* Hero Section */}
-          <div className="relative bg-white px-[12px] pt-[16px] pb-[16px]">
+          <div className="relative bg-[#FCFBFA] px-[12px] pt-[16px] pb-[16px]">
             {/* Container: input + separator + tags */}
             <div className="rounded-[12px] border border-[#CBCCCE] bg-white overflow-hidden">
               {/* Textarea with avatar on the right */}
