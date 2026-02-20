@@ -79,7 +79,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               {/* Textarea with avatar on the right */}
               <div className="relative">
                 {/* Avatar – right side */}
-                <div className="absolute top-[10px] right-[10px] w-[44px] h-[44px] flex-shrink-0">
+                <div className="absolute top-[10px] right-[-10px] w-[66px] h-[66px] flex-shrink-0">
                   <motion.img 
                     src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
                     alt="Mrkatko" 
@@ -95,16 +95,16 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
                   placeholder="Pomůžu vám najít nabídky, které vám sednou: např. víkendový pobyt na horách se psem, wellness pro dva tento víkend ..."
                   rows={4}
-                  className="w-full bg-transparent pl-[12px] pr-[62px] pt-[12px] pb-[40px] text-[14px] leading-[20px] text-[#1a1a1a] font-semibold placeholder-[#1a1a1a] placeholder:font-semibold outline-none border-none resize-none"
+                  className="w-full bg-transparent pl-[12px] pr-[84px] pt-[12px] pb-[40px] text-[14px] leading-[20px] text-[#1a1a1a] font-semibold placeholder-[#1a1a1a] placeholder:font-semibold outline-none border-none resize-none"
                 />
                 {/* Buttons inside textarea – bottom right */}
                 <div className="absolute bottom-[8px] right-[8px] flex items-center gap-[8px]">
-                  <Mic className="w-[18px] h-[18px] text-[#8e8e93] flex-shrink-0 cursor-pointer" />
+                  <Mic className="w-[22px] h-[22px] text-[#8e8e93] flex-shrink-0 cursor-pointer" />
                   <button
                     onMouseDown={(e) => { e.preventDefault(); handleHeroSend() }}
-                    className="w-[32px] h-[32px] bg-[#006eb9] rounded-[8px] flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-all cursor-pointer"
+                    className="w-[36px] h-[36px] bg-[#006eb9] rounded-[8px] flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-all cursor-pointer"
                   >
-                    <Send className="w-[14px] h-[14px] text-white" />
+                    <Send className="w-[16px] h-[16px] text-white" />
                   </button>
                 </div>
               </div>
