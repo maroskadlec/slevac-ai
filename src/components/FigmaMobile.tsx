@@ -76,10 +76,10 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           <div className="relative bg-white px-[14px] pt-[16px] pb-[16px]">
             {/* Container: input + separator + tags */}
             <div className="rounded-[12px] border border-[#CBCCCE] bg-white overflow-hidden">
-              {/* Textarea with avatar */}
+              {/* Textarea with avatar on the right */}
               <div className="relative">
-                {/* Avatar inside textarea area */}
-                <div className="absolute top-[10px] left-[10px] w-[44px] h-[44px] flex-shrink-0">
+                {/* Avatar – right side */}
+                <div className="absolute top-[10px] right-[10px] w-[44px] h-[44px] flex-shrink-0">
                   <motion.img 
                     src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
                     alt="Mrkatko" 
@@ -95,7 +95,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
                   placeholder="Pomůžu vám najít nabídky, které vám sednou: např. víkendový pobyt na horách se psem, wellness pro dva tento víkend ..."
                   rows={4}
-                  className="w-full bg-transparent pl-[62px] pr-[12px] pt-[12px] pb-[40px] text-[14px] leading-[20px] text-[#333] placeholder-[#999] outline-none border-none resize-none"
+                  className="w-full bg-transparent pl-[12px] pr-[62px] pt-[12px] pb-[40px] text-[14px] leading-[20px] text-[#1a1a1a] font-semibold placeholder-[#1a1a1a] placeholder:font-semibold outline-none border-none resize-none"
                 />
                 {/* Buttons inside textarea – bottom right */}
                 <div className="absolute bottom-[8px] right-[8px] flex items-center gap-[8px]">
@@ -118,7 +118,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   <button
                     key={tag}
                     onClick={() => { setHeroInput(tag) }}
-                    className="bg-white border border-[#CBCCCE] rounded-[16px] px-[10px] py-[4px] text-[14px] text-[#333] font-bold cursor-pointer hover:bg-[#f5f5f5] transition-colors"
+                    className="bg-white border border-[#CBCCCE] rounded-[16px] px-[10px] py-[4px] text-[13px] text-[#333] font-normal cursor-pointer hover:bg-[#f5f5f5] transition-colors"
                   >
                     {tag}
                   </button>
