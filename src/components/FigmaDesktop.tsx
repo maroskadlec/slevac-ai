@@ -81,7 +81,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               className="absolute right-[10px] bottom-[10px] w-[380px] h-[480px] bg-white rounded-[8px] border border-[#e3e4e6] shadow-2xl z-20 flex flex-col"
             >
               {/* Header Bar – text left, close button right */}
-              <div className="flex items-center justify-between px-[20px] pt-[14px] pb-[8px] flex-shrink-0">
+              <div className="flex items-center justify-between px-[20px] pt-[14px] pb-[8px] flex-shrink-0 border-b border-[#e5e7eb] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                 <p className="text-[12px] leading-[16px] text-[#8e8e93]">
                   S reklamací nebo refundací pomůže{' '}
                   <a href="#" onClick={(e) => e.preventDefault()} className="text-[#006eb9] hover:underline">kolega Slávek</a>.
@@ -154,9 +154,11 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                 <div ref={chat.messagesEndRef} />
               </div>
 
+              {/* Footer area: quick tags + input bar */}
+              <div className="flex-shrink-0 border-t border-[#e5e7eb]">
               {/* Quick Tags (contextual shortcuts) */}
               {chat.quickTags.length > 0 && (
-                <div className="px-[18px] pt-[4px] pb-[2px] flex-shrink-0 flex flex-wrap gap-[6px]">
+                <div className="px-[18px] pt-[6px] pb-[2px] flex flex-wrap gap-[6px]">
                   {chat.quickTags.map((tag) => (
                     <button
                       key={tag.value}
@@ -170,7 +172,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               )}
 
               {/* Input Bar – textarea with buttons inside */}
-              <div className="px-[18px] pb-[16px] pt-[6px] flex-shrink-0">
+              <div className="px-[18px] pb-[16px] pt-[4px]">
                 <div className="relative bg-white rounded-[12px] border border-[#d1d5db] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
                   <textarea
                     value={chat.inputValue}
@@ -204,6 +206,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                   <p className="text-[12px] leading-[16px] text-[#8e8e93]">Jsem tu chvilku a učím se. Občas můžu udělat chybku.</p>
                 </button>
               </div>
+              </div>{/* end footer area */}
             </motion.div>
           )}
         </AnimatePresence>

@@ -174,7 +174,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-40 flex flex-col h-[85dvh]"
             >
               {/* Header Bar – text left, close button right */}
-              <div className="flex items-center justify-between px-[18px] pt-[14px] pb-[6px] flex-shrink-0">
+              <div className="flex items-center justify-between px-[18px] pt-[14px] pb-[6px] flex-shrink-0 border-b border-[#e5e7eb] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                 <p className="text-[12px] leading-[16px] text-[#8e8e93]">
                   S reklamací nebo refundací pomůže{' '}
                   <a href="#" onClick={(e) => e.preventDefault()} className="text-[#006eb9] hover:underline">kolega Slávek</a>.
@@ -247,9 +247,11 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 <div ref={chat.messagesEndRef} />
               </div>
 
+              {/* Footer area: quick tags + input bar */}
+              <div className="flex-shrink-0 border-t border-[#e5e7eb]">
               {/* Quick Tags (contextual shortcuts) */}
               {chat.quickTags.length > 0 && (
-                <div className="px-[16px] pt-[4px] pb-[2px] flex-shrink-0 flex flex-wrap gap-[6px]">
+                <div className="px-[16px] pt-[6px] pb-[2px] flex flex-wrap gap-[6px]">
                   {chat.quickTags.map((tag) => (
                     <button
                       key={tag.value}
@@ -263,7 +265,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               )}
 
               {/* Input Bar – textarea with buttons inside */}
-              <div className="px-[16px] pb-[14px] pt-[4px] flex-shrink-0">
+              <div className="px-[16px] pb-[14px] pt-[4px]">
                 <div className="relative bg-white rounded-[12px] border border-[#d1d5db] focus-within:ring-2 focus-within:ring-[#006eb9]/20 focus-within:border-[#006eb9]/30">
                   <textarea
                     value={chat.inputValue}
@@ -297,6 +299,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                   <p className="text-[12px] leading-[16px] text-[#8e8e93]">Jsem tu chvilku a učím se. Občas můžu udělat chybku.</p>
                 </button>
               </div>
+              </div>{/* end footer area */}
             </motion.div>
           )}
         </AnimatePresence>
