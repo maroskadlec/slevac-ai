@@ -73,53 +73,57 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
           <img src={`${import.meta.env.BASE_URL}assets/header.jpg`} alt="Header" className="w-full h-auto block" />
 
           {/* Hero Section */}
-          <div className="relative bg-[#E5F0F7] px-[14px] pt-[16px] pb-[20px] overflow-hidden">
-            {/* Mrkatko avatar - absolute positioned */}
-            <div className="absolute top-[10px] right-[10px] w-[110px] h-[110px]">
-              <motion.img 
-                src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
-                alt="Mrkatko" 
-                className="w-full h-full object-contain"
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.1, ease: "easeIn" }}
-              />
-            </div>
-            
-            <h2 className="text-[#1a1a1a] font-bold text-[20px] leading-[24px] pr-[110px]">
-              Pomůžu ti najít nabídky, které ti sednou
-            </h2>
+          <div className="relative bg-white px-[14px] pt-[16px] pb-[16px]">
+            {/* Container: input + separator + tags */}
+            <div className="rounded-[12px] border border-[#CBCCCE] bg-white overflow-hidden">
+              {/* Textarea with avatar */}
+              <div className="relative">
+                {/* Avatar inside textarea area */}
+                <div className="absolute top-[10px] left-[10px] w-[44px] h-[44px] flex-shrink-0">
+                  <motion.img 
+                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                    alt="Mrkatko" 
+                    className="w-full h-full object-contain rounded-full"
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.1, ease: "easeIn" }}
+                  />
+                </div>
+                <textarea
+                  value={heroInput}
+                  onChange={(e) => setHeroInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
+                  placeholder="Pomůžu vám najít nabídky, které vám sednou: např. víkendový pobyt na horách se psem, wellness pro dva tento víkend ..."
+                  rows={4}
+                  className="w-full bg-transparent pl-[62px] pr-[12px] pt-[12px] pb-[40px] text-[14px] leading-[20px] text-[#333] placeholder-[#999] outline-none border-none resize-none"
+                />
+                {/* Buttons inside textarea – bottom right */}
+                <div className="absolute bottom-[8px] right-[8px] flex items-center gap-[8px]">
+                  <Mic className="w-[18px] h-[18px] text-[#8e8e93] flex-shrink-0 cursor-pointer" />
+                  <button
+                    onMouseDown={(e) => { e.preventDefault(); handleHeroSend() }}
+                    className="w-[32px] h-[32px] bg-[#006eb9] rounded-[8px] flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-all cursor-pointer"
+                  >
+                    <Send className="w-[14px] h-[14px] text-white" />
+                  </button>
+                </div>
+              </div>
 
-            {/* Search Input */}
-            <div className="mt-[12px] bg-white rounded-[12px] px-[12px] py-[8px] flex items-center border border-solid border-[#CBCCCE]">
-              <input
-                type="text"
-                value={heroInput}
-                onChange={(e) => setHeroInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleHeroSend() }}
-                placeholder="Popiš mi, co chceš zažít ..."
-                className="flex-1 bg-transparent text-[16px] text-[#333] placeholder-[#999] outline-none border-none"
-              />
-              <Mic className="w-[16px] h-[16px] text-[#333] flex-shrink-0 ml-[8px]" />
-              <button
-                onMouseDown={(e) => { e.preventDefault(); handleHeroSend() }}
-                className={`w-[28px] h-[28px] bg-[#006eb9] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#005a9a] transition-all cursor-pointer ml-[6px] ${heroInput.trim().length > 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
-              >
-                <Send className="w-[12px] h-[12px] text-white" />
-              </button>
-            </div>
+              {/* Separator */}
+              <div className="h-[1px] bg-[#CBCCCE]" />
 
-            {/* Tags */}
-            <div className="mt-[10px] flex flex-wrap gap-[6px]">
-              {['🧖 Chci zažít wellness a odpočinout si', '👨‍👩‍👧‍👦 S dětmi na týdenní prázdniny', '💑 Kam vzít holku na rande'].map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => { setHeroInput(tag) }}
-                  className="bg-white/70 border border-[#CBCCCE] rounded-[16px] px-[10px] py-[4px] text-[14px] text-[#333] font-bold cursor-pointer hover:bg-white transition-colors"
-                >
-                  {tag}
-                </button>
-              ))}
+              {/* Tags */}
+              <div className="px-[10px] py-[8px] flex flex-wrap gap-[6px]">
+                {['🧖 Chci zažít wellness a odpočinout si', '👨‍👩‍👧‍👦 S dětmi na týdenní prázdniny', '💑 Kam vzít holku na rande'].map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => { setHeroInput(tag) }}
+                    className="bg-white border border-[#CBCCCE] rounded-[16px] px-[10px] py-[4px] text-[14px] text-[#333] font-bold cursor-pointer hover:bg-[#f5f5f5] transition-colors"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
