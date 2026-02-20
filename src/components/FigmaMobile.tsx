@@ -89,13 +89,19 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                     transition={{ duration: 0.1, ease: "easeIn" }}
                   />
                 </div>
+                {/* Custom placeholder with mixed font-weights */}
+                {!heroInput && (
+                  <div className="absolute top-[12px] left-[12px] right-[84px] pointer-events-none text-[14px] leading-[20px] text-[#1a1a1a]">
+                    <span className="font-normal">Pomůžu vám najít nabídky, které vám sednou: </span>
+                    <span className="font-semibold">např. víkendový pobyt na horách se psem, wellness pro dva tento víkend ...</span>
+                  </div>
+                )}
                 <textarea
                   value={heroInput}
                   onChange={(e) => setHeroInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
-                  placeholder="Pomůžu vám najít nabídky, které vám sednou: např. víkendový pobyt na horách se psem, wellness pro dva tento víkend ..."
                   rows={4}
-                  className="w-full bg-transparent pl-[12px] pr-[84px] pt-[12px] pb-[40px] text-[14px] leading-[20px] text-[#1a1a1a] font-semibold placeholder-[#1a1a1a] placeholder:font-semibold outline-none border-none resize-none"
+                  className="w-full bg-transparent pl-[12px] pr-[84px] pt-[12px] pb-[40px] text-[14px] leading-[20px] text-[#1a1a1a] font-semibold outline-none border-none resize-none"
                 />
                 {/* Buttons inside textarea – bottom right */}
                 <div className="absolute bottom-[8px] right-[8px] flex items-center gap-[8px]">
