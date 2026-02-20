@@ -173,11 +173,15 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               }}
               className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[8px] rounded-tr-[8px] shadow-2xl z-40 flex flex-col h-[85dvh]"
             >
-              {/* Header Bar – only close button on the right */}
-              <div className="flex items-center justify-end px-[18px] pt-[14px] pb-[6px] flex-shrink-0">
+              {/* Header Bar – text left, close button right */}
+              <div className="flex items-center justify-between px-[18px] pt-[14px] pb-[6px] flex-shrink-0">
+                <p className="text-[12px] leading-[16px] text-[#8e8e93]">
+                  S reklamací nebo refundací pomůže{' '}
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-[#006eb9] hover:underline">kolega Slávek</a>.
+                </p>
                 <motion.button
                   onClick={onToggle}
-                  className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer"
+                  className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer flex-shrink-0 ml-[8px]"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >

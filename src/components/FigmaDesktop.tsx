@@ -80,11 +80,15 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               }}
               className="absolute right-[10px] bottom-[10px] w-[380px] h-[480px] bg-white rounded-[8px] border border-[#e3e4e6] shadow-2xl z-20 flex flex-col"
             >
-              {/* Header Bar – only close button on the right */}
-              <div className="flex items-center justify-end px-[20px] pt-[14px] pb-[8px] flex-shrink-0">
+              {/* Header Bar – text left, close button right */}
+              <div className="flex items-center justify-between px-[20px] pt-[14px] pb-[8px] flex-shrink-0">
+                <p className="text-[12px] leading-[16px] text-[#8e8e93]">
+                  S reklamací nebo refundací pomůže{' '}
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-[#006eb9] hover:underline">kolega Slávek</a>.
+                </p>
                 <motion.button
                   onClick={onToggle}
-                  className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer"
+                  className="w-[28px] h-[28px] flex items-center justify-center cursor-pointer flex-shrink-0 ml-[8px]"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
