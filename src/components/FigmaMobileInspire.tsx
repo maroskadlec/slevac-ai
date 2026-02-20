@@ -9,12 +9,21 @@ import ActivityCarousel from './ActivityCarousel'
 const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
 const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
 
-interface MobileProps {
+interface MobileInspireProps {
   isOpen: boolean
   onToggle: () => void
 }
 
-export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
+const occasionTags = [
+  { label: 'Víkend', bold: '20. 2. – 22. 2.' },
+  { label: 'Víkend', bold: '27. 2. – 1. 3.' },
+  { label: 'Jarní prázdniny', bold: null },
+  { label: 'Velikonoce', bold: null },
+  { label: 'Svátek', bold: '1. 5.', flag: true },
+  { label: 'Svátek', bold: '8. 5.', flag: true },
+]
+
+export default function FigmaMobileInspire({ isOpen, onToggle }: MobileInspireProps) {
   const navigate = useNavigate()
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
@@ -26,7 +35,6 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
     if (!text) return
     setHeroInput('')
     onToggle() // Open modal
-    // Small delay to let modal open, then send message
     setTimeout(() => {
       chat.sendMessageWithText(text)
     }, 400)
@@ -70,69 +78,97 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
         <div className="h-full overflow-y-auto z-0 bg-[#FCFBFA]">
           
           {/* Header */}
-          <Link to="/mobile/inspire">
-            <img src={`${import.meta.env.BASE_URL}assets/header.jpg`} alt="Header" className="w-full h-auto block" />
+          <Link to="/mobile">
+            <img src={`${import.meta.env.BASE_URL}assets/header-inspire.jpg`} alt="Header" className="w-full h-auto block" />
           </Link>
 
-          {/* Hero Section */}
+          {/* Hero Section – Inspire variant */}
           <div className="relative bg-[#FCFBFA] px-[12px] pt-[16px] pb-[16px]">
-            {/* Container: input + separator + tags */}
-            <div className="rounded-[12px] border border-[#CBCCCE] bg-white overflow-hidden">
-              {/* Textarea with avatar on the right */}
-              <div className="relative p-[16px]">
-                {/* Avatar – right side */}
-                <div className="absolute top-[10px] right-[-16px] w-[86px] h-[86px] flex-shrink-0">
-                  <motion.img 
-                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
-                    alt="Mrkatko" 
-                    className="w-full h-full object-contain rounded-full"
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.1, ease: "easeIn" }}
-                  />
-                </div>
-                {/* Custom placeholder with mixed font-weights */}
-                {!heroInput && (
-                  <div className="absolute top-[16px] left-[16px] right-[84px] pointer-events-none text-[16px] leading-[24px]">
-                    <span className="italic text-[#6b6b70]">Pomůžu vám najít nabídky, které vám sednou: </span>
-                    <span className="italic font-semibold text-black">např. víkendový pobyt na horách se psem, wellness pro dva tento víkend ...</span>
+            {/* Title */}
+            <h2 className="text-[24px] leading-[30px] font-bold text-black mb-[12px]">
+              Pobyty a cestování plné zážitků
+            </h2>
+
+            {/* Occasion Tags */}
+            <div className="flex flex-wrap gap-[6px] mb-[12px]">
+              {occasionTags.map((tag, i) => (
+                <button
+                  key={i}
+                  className="bg-white border border-[#CBCCCE] rounded-full px-[13px] py-[5px] text-[14px] leading-[20px] text-black cursor-pointer hover:bg-[#f5f5f5] transition-colors flex items-center gap-[4px]"
+                >
+                  {tag.flag && <span className="text-[14px]">🇨🇿</span>}
+                  <span>{tag.label}{' '}</span>
+                  {tag.bold && <span className="font-bold">{tag.bold}</span>}
+                </button>
+              ))}
+            </div>
+
+            {/* White card with shadow: input + separator + tags */}
+            <div className="rounded-[16px] bg-white shadow-[0px_2px_6px_0px_rgba(0,0,0,0.18)] overflow-hidden p-[8px]">
+              {/* Input area */}
+              <div className="rounded-[12px] border border-[#e3e4e6] overflow-hidden">
+                <div className="relative p-[16px]">
+                  {/* Avatar – right side */}
+                  <div className="absolute top-[10px] right-[-16px] w-[86px] h-[86px] flex-shrink-0">
+                    <motion.img 
+                      src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                      alt="Mrkatko" 
+                      className="w-full h-full object-contain rounded-full"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.1, ease: "easeIn" }}
+                    />
                   </div>
-                )}
-                <textarea
-                  value={heroInput}
-                  onChange={(e) => setHeroInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
-                  rows={4}
-                  className="w-full bg-transparent pr-[84px] text-[16px] leading-[24px] text-black font-semibold outline-none border-none resize-none"
-                />
-                {/* Buttons inside textarea – bottom right */}
-                <div className="flex items-center gap-[4px] justify-end mt-[8px]">
-                  <button className="w-[44px] h-[44px] border border-[#CBCCCE] rounded-[4px] flex items-center justify-center bg-white cursor-pointer hover:bg-[#f5f5f5] transition-colors">
-                    <Mic className="w-[20px] h-[20px] text-[#333]" />
-                  </button>
-                  <button
-                    onMouseDown={(e) => { e.preventDefault(); handleHeroSend() }}
-                    className="w-[44px] h-[44px] bg-[#006eb9] rounded-[4px] flex items-center justify-center cursor-pointer hover:bg-[#005a9a] transition-colors"
-                  >
-                    <Send className="w-[20px] h-[20px] text-white" />
-                  </button>
+                  {/* Custom placeholder */}
+                  {!heroInput && (
+                    <div className="absolute top-[16px] left-[16px] right-[84px] pointer-events-none text-[16px] leading-[24px]">
+                      <span className="italic text-[#6b6b70]">Pomůžu vám najít nabídky, které vám sednou: např. </span>
+                      <span className="italic font-semibold text-black">víkendový pobyt na horách se psem, wellness pro dva tento víkend ...</span>
+                    </div>
+                  )}
+                  <textarea
+                    value={heroInput}
+                    onChange={(e) => setHeroInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
+                    rows={3}
+                    className="w-full bg-transparent pr-[84px] text-[16px] leading-[24px] text-black font-semibold outline-none border-none resize-none"
+                  />
+                  {/* Buttons inside textarea – bottom right */}
+                  <div className="flex items-center gap-[4px] justify-end mt-[8px]">
+                    <button className="w-[44px] h-[44px] border border-[#CBCCCE] rounded-[4px] flex items-center justify-center bg-white cursor-pointer hover:bg-[#f5f5f5] transition-colors">
+                      <Mic className="w-[20px] h-[20px] text-[#333]" />
+                    </button>
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleHeroSend() }}
+                      className="w-[44px] h-[44px] bg-[#006eb9] rounded-[4px] flex items-center justify-center cursor-pointer hover:bg-[#005a9a] transition-colors"
+                    >
+                      <Send className="w-[20px] h-[20px] text-white" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Separator */}
+                <div className="h-[1px] bg-[#e3e4e6]" />
+
+                {/* Quick Tags */}
+                <div className="p-[8px] flex flex-wrap gap-[8px]">
+                  {['⛷️ Kam vyrazit s dětmi na jarní prázdniny?', '❤️ Kam vzít holku na rande?', '🎁 Tipy na zážitkový dárek pro tátu'].map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => { setHeroInput(tag) }}
+                      className="bg-white border border-[#CBCCCE] rounded-full px-[12px] py-[4px] text-[14px] leading-[20px] text-black font-normal cursor-pointer hover:bg-[#f5f5f5] transition-colors"
+                    >
+                      {tag}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Separator */}
-              <div className="h-[1px] bg-[#CBCCCE]" />
-
-              {/* Tags */}
-              <div className="p-[8px] flex flex-wrap gap-[8px]">
-                {['🧖 Chci zažít wellness a odpočinout si', '👨‍👩‍👧‍👦 S dětmi na týdenní prázdniny', '💑 Kam vzít holku na rande'].map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => { setHeroInput(tag) }}
-                    className="bg-white border border-[#CBCCCE] rounded-full px-[12px] py-[4px] text-[14px] leading-[20px] text-black font-normal cursor-pointer hover:bg-[#f5f5f5] transition-colors"
-                  >
-                    {tag}
-                  </button>
-                ))}
+              {/* Zobrazit vše link */}
+              <div className="pt-[4px] pb-[0px] pl-[4px]">
+                <a href="#" onClick={(e) => e.preventDefault()} className="text-[14px] font-semibold text-[#006eb9] hover:underline">
+                  Zobrazit vše
+                </a>
               </div>
             </div>
           </div>
