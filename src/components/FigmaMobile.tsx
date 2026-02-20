@@ -67,7 +67,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
     <div className="relative w-full max-w-[400px] h-[100dvh] bg-white overflow-hidden mx-auto">
         
         {/* ===== SLEVOMAT APP LAYOUT ===== */}
-        <div className="h-full overflow-y-auto z-0">
+        <div className="h-full overflow-y-auto z-0 bg-[#FCFBFA]">
           
           {/* Header */}
           <img src={`${import.meta.env.BASE_URL}assets/header.jpg`} alt="Header" className="w-full h-auto block" />
