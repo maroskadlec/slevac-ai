@@ -79,7 +79,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               {/* Textarea with avatar on the right */}
               <div className="relative">
                 {/* Avatar – right side */}
-                <div className="absolute top-[10px] right-[-18px] w-[86px] h-[86px] flex-shrink-0">
+                <div className="absolute top-[10px] right-[-16px] w-[86px] h-[86px] flex-shrink-0">
                   <motion.img 
                     src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
                     alt="Mrkatko" 
