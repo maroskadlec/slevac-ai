@@ -116,7 +116,15 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                       <div className="bg-white border border-[#e5e7eb] rounded-[16px] rounded-bl-[4px] px-[14px] py-[10px] max-w-[95%]">
                         {msg.image && <img src={msg.image} alt="" className="w-[32px] h-[32px] mb-[4px]" />}
                         <p className="text-[14px] leading-[22px] text-[#1a1a1a] whitespace-pre-line" dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.+?)\*\*/g, '<strong class="underline">$1</strong>') }} />
-                        {msg.deals && <DealCarousel deals={msg.deals} onFeedback={chat.handleFeedback} />}
+                        {msg.deals && (
+                          <>
+                            <p className="text-[13px] leading-[20px] text-[#1a1a1a] font-semibold mt-[8px] mb-[4px]">
+                              Tady je 5 z 30 nabídek, seřazených podle hodnocení ostatních.{' '}
+                              <a href="#" onClick={(e) => e.preventDefault()} className="text-[#006eb9] font-semibold hover:underline">Zobrazit všechny</a>
+                            </p>
+                            <DealCarousel deals={msg.deals} onFeedback={chat.handleFeedback} />
+                          </>
+                        )}
                         {msg.activities && <ActivityCarousel activities={msg.activities} />}
                       </div>
                     )}

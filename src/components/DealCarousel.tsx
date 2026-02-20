@@ -165,7 +165,7 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
 
       {/* Feedback Row */}
       {feedback === 'none' && (
-        <div className="flex items-center justify-between border border-[#e8e8ed] rounded-[10px] px-[10px] py-[8px]">
+        <div className="flex items-center justify-between border-t border-[#e8e8ed] pt-[8px]">
           <span className="text-[#1a1a1a] text-[14px] leading-[22px]">
             Vyhovují ti doporučení? Koukal jsem, co o nich říkají ostatní.
           </span>
