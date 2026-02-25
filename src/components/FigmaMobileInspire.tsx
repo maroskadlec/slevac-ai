@@ -235,7 +235,7 @@ export default function FigmaMobileInspire({ isOpen, onToggle }: MobileInspirePr
               </div>
 
               {/* Scrollable Chat Area */}
-              <div className="flex-1 overflow-y-auto px-[20px] pb-[6px] flex flex-col gap-[10px] min-h-0 bg-white">
+              <div ref={chat.scrollContainerRef} className="flex-1 overflow-y-auto px-[20px] pb-[6px] flex flex-col gap-[10px] min-h-0 bg-white">
                 {/* Welcome Title */}
                 <h2 className="text-[32px] leading-[38px] font-heading font-bold text-black pt-[26px] pb-[2px] text-center">
                   Ahoj, pomůžu najít nabídky, které ti sednou

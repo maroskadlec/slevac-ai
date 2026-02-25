@@ -913,6 +913,7 @@ function buildDealsResponse(state: ConversationState, prefix?: string): BotRespo
 export function useChatbot(isOpen?: boolean) {
   const { messages, setMessages, inputValue, setInputValue, isTyping, setIsTyping, typingText, setTypingText, nextIdRef } = useChatContext()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -925,10 +926,8 @@ export function useChatbot(isOpen?: boolean) {
   }, [messages, isTyping, scrollToBottom])
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'instant' })
-      }, 150)
+    if (isOpen && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
     }
   }, [isOpen])
 
@@ -1071,6 +1070,7 @@ export function useChatbot(isOpen?: boolean) {
     isTyping,
     typingText,
     messagesEndRef,
+    scrollContainerRef,
     sendMessage,
     sendMessageWithText,
     handleKeyDown,

@@ -97,7 +97,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               </div>
 
               {/* Scrollable Chat Area */}
-              <div className="flex-1 overflow-y-auto px-[24px] pb-[8px] flex flex-col gap-[12px] min-h-0 bg-white">
+              <div ref={chat.scrollContainerRef} className="flex-1 overflow-y-auto px-[24px] pb-[8px] flex flex-col gap-[12px] min-h-0 bg-white">
                 {/* Welcome Title */}
                 <h2 className="text-[32px] leading-[38px] font-heading font-bold text-black pt-[28px] pb-[4px] text-center">
                   Ahoj, pomůžu najít nabídky, které ti sednou
