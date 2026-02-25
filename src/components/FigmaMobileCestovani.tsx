@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mic, Send, SlidersHorizontal, Map, ArrowUpDown, ChevronRight } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
@@ -14,17 +14,6 @@ interface MobileCestovaniProps {
   isOpen: boolean
   onToggle: () => void
 }
-
-const navTabs = [
-  { label: 'Extra slevy', active: false },
-  { label: 'Cestování', active: true },
-  { label: 'Zážitky a zábava', active: false },
-  { label: 'Krása a relax', active: false },
-  { label: 'Restaurace a bary', active: false },
-  { label: 'Zboží', active: false },
-  { label: 'Fotodárky', active: false },
-  { label: 'Potraviny', active: false },
-]
 
 const categoryPills = [
   { name: 'S wellness', count: 1462, image: `${BASE}assets/pills/wellness.png` },
@@ -108,7 +97,6 @@ export default function FigmaMobileCestovani({ isOpen, onToggle }: MobileCestova
   const [isBlinking, setIsBlinking] = useState(false)
   const [heroInput, setHeroInput] = useState('')
   const chat = useChatbot(isOpen)
-  const activeTabRef = useRef<HTMLButtonElement>(null)
 
   const handleHeroSend = () => {
     const text = heroInput.trim()
@@ -119,12 +107,6 @@ export default function FigmaMobileCestovani({ isOpen, onToggle }: MobileCestova
       chat.sendMessageWithText(text)
     }, 400)
   }
-
-  useEffect(() => {
-    if (activeTabRef.current) {
-      activeTabRef.current.scrollIntoView({ inline: 'center', block: 'nearest' })
-    }
-  }, [])
 
   useEffect(() => {
     if (!isOpen) {
@@ -161,100 +143,73 @@ export default function FigmaMobileCestovani({ isOpen, onToggle }: MobileCestova
     <div className="relative w-full max-w-[400px] h-[100dvh] bg-white overflow-hidden mx-auto">
 
       {/* ===== PAGE CONTENT ===== */}
-      <div className="h-full overflow-y-auto z-0 bg-white">
+      <div className="h-full overflow-y-auto z-0 bg-[#FCFBFA]">
 
-        {/* Header image */}
-        <Link to="/mobile/inspire">
-          <img src={`${BASE}assets/header-inspire.jpg`} alt="Header" className="w-full h-auto block" />
+        {/* Top Header */}
+        <Link to="/mobile">
+          <img src={`${BASE}assets/top-header.jpg`} alt="Top Header" className="w-full h-auto block" />
         </Link>
 
-        {/* Horizontal Nav Tabs */}
-        <div className="border-b border-[#e5e7eb] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          <div className="flex items-stretch min-w-max">
-            {navTabs.map((tab) => (
-              <button
-                key={tab.label}
-                ref={tab.active ? activeTabRef : undefined}
-                className={`px-[12px] py-[12px] text-[14px] leading-[22px] whitespace-nowrap transition-colors ${
-                  tab.active
-                    ? 'text-[#006eb9] font-bold border-b-[2px] border-[#006eb9]'
-                    : 'text-[#333] font-normal'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+        {/* Header image */}
+        <img src={`${BASE}assets/header-inspire.jpg`} alt="Header" className="w-full h-auto block" />
+
+        {/* Hero Section with light blue background */}
+        <div className="bg-[#E6F7FC]">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-[4px] px-[8px] py-[12px] text-[14px] leading-[24px]">
+            <Link to="/mobile/inspire" className="text-[#006eb9] cursor-pointer hover:underline">Inspirace</Link>
+            <ChevronRight className="w-[10px] h-[10px] text-[#999]" />
+            <span className="text-[#006eb9] font-bold cursor-pointer hover:underline">Všechny nabídky</span>
           </div>
-        </div>
 
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-[4px] px-[8px] py-[12px] text-[14px] leading-[24px]">
-          <span className="text-[#006eb9] cursor-pointer hover:underline">Inspirace</span>
-          <ChevronRight className="w-[10px] h-[10px] text-[#999]" />
-          <span className="text-[#006eb9] font-bold cursor-pointer hover:underline">Všechny nabídky</span>
-        </div>
-
-        {/* Category Header */}
-        <div className="px-[8px]">
-          <h1 className="text-[24px] leading-[30px] font-bold text-black mb-[4px]">Cestování</h1>
-          <div className="text-[14px] leading-[20px] text-[#333] max-h-[40px] overflow-hidden relative mb-[2px]">
-            <p>
-              Objevujte svět se Slevomatem. Zamluvte si třeba{' '}
-              <span className="text-[#006eb9] underline">wellness pobyt</span>{' '}
-              a relaxujte od rána do večera.
-            </p>
+          {/* Category Header */}
+          <div className="px-[8px]">
+            <h1 className="text-[24px] leading-[30px] font-bold text-black mb-[4px]">Cestování</h1>
+            <div className="text-[14px] leading-[20px] text-[#333] max-h-[40px] overflow-hidden relative mb-[2px]">
+              <p>
+                Objevujte svět se Slevomatem. Zamluvte si třeba{' '}
+                <span className="text-[#006eb9] underline">wellness pobyt</span>{' '}
+                a relaxujte od rána do večera.
+              </p>
+            </div>
+            <button className="text-[14px] leading-[21px] text-[#006eb9] font-medium mb-[8px]">
+              Více informací
+            </button>
           </div>
-          <button className="text-[14px] leading-[21px] text-[#006eb9] font-medium mb-[8px]">
-            Více informací
-          </button>
-        </div>
 
-        {/* Category Pills */}
-        <div className="relative">
-          <div className="overflow-x-auto pl-[8px] py-[8px]" style={{ scrollbarWidth: 'none' }}>
-            <div className="flex gap-[8px] pr-[24px]">
-              {categoryPills.map((pill) => (
-                <button
-                  key={pill.name}
-                  className="flex-shrink-0 flex items-center gap-[6px] bg-white border border-[#cbccce] rounded-full pl-[5px] pr-[13px] py-[5px] cursor-pointer hover:bg-[#f5f5f5] transition-colors"
-                >
-                  <img src={pill.image} alt={pill.name} className="w-[44px] h-[44px] rounded-full object-cover" />
-                  <span className="text-[14px] font-bold text-black leading-[18px] whitespace-nowrap">{pill.name}</span>
-                  <span className="bg-[#006eb9] text-white text-[12px] font-bold leading-[18px] rounded-full px-[8px] py-[1px] min-w-[20px] text-center">
-                    {pill.count}
-                  </span>
-                </button>
-              ))}
+          {/* Category Pills */}
+          <div className="relative">
+            <div className="overflow-x-auto pl-[8px] py-[8px]" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex gap-[8px] pr-[24px]">
+                {categoryPills.map((pill) => (
+                  <button
+                    key={pill.name}
+                    className="flex-shrink-0 flex items-center gap-[6px] bg-white border border-[#cbccce] rounded-full pl-[5px] pr-[13px] py-[5px] cursor-pointer hover:bg-[#f5f5f5] transition-colors"
+                  >
+                    <img src={pill.image} alt={pill.name} className="w-[44px] h-[44px] rounded-full object-cover" />
+                    <span className="text-[14px] font-bold text-black leading-[18px] whitespace-nowrap">{pill.name}</span>
+                    <span className="bg-[#006eb9] text-white text-[12px] font-bold leading-[18px] rounded-full px-[8px] py-[1px] min-w-[20px] text-center">
+                      {pill.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="absolute top-0 right-0 bottom-0 w-[60px] bg-gradient-to-l from-white to-transparent pointer-events-none" />
-        </div>
-
-        {/* Search Banner */}
-        <div className="px-[8px] py-[16px]">
-          <div className="flex items-center gap-[12px] bg-[#f1f3f5] rounded-[12px] p-[12px] cursor-pointer hover:bg-[#e9ecef] transition-colors">
-            <div className="w-[42px] h-[42px] rounded-full overflow-hidden flex-shrink-0 bg-white">
-              <img src={mrkatkoImg} alt="" className="w-full h-full object-contain" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[14px] font-bold text-black leading-[20px]">Pokračovat v posledním hledání</p>
-              <p className="text-[14px] text-[#6b6b70] leading-[20px]">S wellness</p>
-            </div>
-            <X className="w-[18px] h-[18px] text-[#999] flex-shrink-0" />
+            <div className="absolute top-0 right-0 bottom-0 w-[60px] bg-gradient-to-l from-[#E6F7FC] to-transparent pointer-events-none" />
           </div>
         </div>
 
         {/* Filter Bar */}
-        <div className="flex items-center gap-[0px] px-[8px] pb-[8px] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          <button className="flex items-center gap-[6px] px-[12px] py-[9px] text-[14px] leading-[22px] text-[#333] whitespace-nowrap">
+        <div className="flex items-center gap-[12px] px-[8px] pt-[12px] pb-[8px]">
+          <button className="flex-1 flex items-center justify-center gap-[6px] py-[9px] text-[14px] leading-[22px] text-[#333] border border-[#cbccce] rounded-[8px] cursor-pointer hover:bg-[#f5f5f5] transition-colors">
             <ArrowUpDown className="w-[16px] h-[16px] text-[#333]" />
             Řazení
           </button>
-          <button className="flex items-center gap-[6px] px-[12px] py-[9px] text-[14px] leading-[22px] text-[#333] whitespace-nowrap">
+          <button className="flex-1 flex items-center justify-center gap-[6px] py-[9px] text-[14px] leading-[22px] text-[#333] border border-[#cbccce] rounded-[8px] cursor-pointer hover:bg-[#f5f5f5] transition-colors">
             <SlidersHorizontal className="w-[16px] h-[16px] text-[#333]" />
             Filtry
           </button>
-          <button className="flex items-center gap-[6px] px-[12px] py-[9px] text-[14px] leading-[22px] text-[#333] whitespace-nowrap">
+          <button className="flex-1 flex items-center justify-center gap-[6px] py-[9px] text-[14px] leading-[22px] text-[#333] border border-[#cbccce] rounded-[8px] cursor-pointer hover:bg-[#f5f5f5] transition-colors">
             <Map className="w-[16px] h-[16px] text-[#333]" />
             Mapa
           </button>
@@ -262,49 +217,47 @@ export default function FigmaMobileCestovani({ isOpen, onToggle }: MobileCestova
 
         {/* AI Input Section */}
         <div className="px-[8px] pb-[16px]">
-          <div className="bg-white border border-[#cbccce] rounded-[12px] p-[16px]">
-            <div className="flex flex-col gap-[8px]">
-              <div className="flex items-center gap-[8px]">
-                <p className="flex-1 text-[16px] leading-[24px] font-bold text-black">
-                  Najdu i podle hodnocení ostatních
-                </p>
-                <div className="w-[48px] h-[48px] flex-shrink-0">
-                  <motion.img
-                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
-                    alt="Mrkatko"
-                    className="w-full h-full object-contain"
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.1, ease: 'easeIn' }}
-                  />
-                </div>
-              </div>
-              {/* Input area */}
-              <div className="relative">
-                {!heroInput && (
-                  <div className="absolute top-0 left-0 right-[80px] pointer-events-none text-[16px] leading-[24px]">
-                    <span className="italic text-[#6b6b70]">např. </span>
-                    <span className="italic font-semibold text-black">hotel s klidným prostředím, čistým wellness, skvělou snídaní a pohodlnými postelemi ...</span>
-                  </div>
-                )}
-                <textarea
-                  value={heroInput}
-                  onChange={(e) => setHeroInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
-                  rows={3}
-                  className="w-full bg-transparent pr-[80px] text-[16px] leading-[24px] text-black font-semibold outline-none border-none resize-none"
+          <div className="bg-white border border-[#cbccce] rounded-[12px] overflow-hidden">
+            <div className="relative p-[16px]">
+              {/* Avatar – right side */}
+              <div className="absolute top-[10px] right-[-16px] w-[86px] h-[86px] flex-shrink-0">
+                <motion.img
+                  src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                  alt="Mrkatko"
+                  className="w-full h-full object-contain rounded-full"
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.1, ease: 'easeIn' }}
                 />
               </div>
-              {/* Buttons */}
-              <div className="flex items-center gap-[6px] justify-end">
-                <button className="w-[34px] h-[34px] border border-[#cbccce] rounded-[4px] flex items-center justify-center bg-white cursor-pointer hover:bg-[#f5f5f5] transition-colors">
-                  <Mic className="w-[18px] h-[18px] text-[#333]" />
+              {/* Title */}
+              <p className="text-[16px] leading-[24px] font-bold text-black mb-[8px] pr-[60px]">
+                Najdu i podle hodnocení ostatních
+              </p>
+              {/* Custom placeholder */}
+              {!heroInput && (
+                <div className="absolute left-[16px] right-[84px] pointer-events-none text-[16px] leading-[24px]" style={{ top: '52px' }}>
+                  <span className="italic text-[#6b6b70]">např. </span>
+                  <span className="italic font-semibold text-black">hotel s klidným prostředím, čistým wellness, skvělou snídaní a pohodlnými postelemi ...</span>
+                </div>
+              )}
+              <textarea
+                value={heroInput}
+                onChange={(e) => setHeroInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
+                rows={3}
+                className="w-full bg-transparent pr-[84px] text-[16px] leading-[24px] text-black font-semibold outline-none border-none resize-none"
+              />
+              {/* Buttons inside – bottom right */}
+              <div className="flex items-center gap-[4px] justify-end mt-[8px]">
+                <button className="w-[44px] h-[44px] border border-[#CBCCCE] rounded-[4px] flex items-center justify-center bg-white cursor-pointer hover:bg-[#f5f5f5] transition-colors">
+                  <Mic className="w-[20px] h-[20px] text-[#333]" />
                 </button>
                 <button
                   onMouseDown={(e) => { e.preventDefault(); handleHeroSend() }}
-                  className="w-[34px] h-[34px] bg-[#006eb9] rounded-[4px] flex items-center justify-center cursor-pointer hover:bg-[#005a9a] transition-colors"
+                  className="w-[44px] h-[44px] bg-[#006eb9] rounded-[4px] flex items-center justify-center cursor-pointer hover:bg-[#005a9a] transition-colors"
                 >
-                  <Send className="w-[18px] h-[18px] text-white" />
+                  <Send className="w-[20px] h-[20px] text-white" />
                 </button>
               </div>
             </div>

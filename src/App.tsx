@@ -5,6 +5,7 @@ import FigmaMCP from './pages/FigmaMCP'
 import DesktopPage from './pages/DesktopPage'
 import InspirePage from './pages/InspirePage'
 import CestovaniPage from './pages/CestovaniPage'
+import DealDetailPage from './pages/DealDetailPage'
 
 function App() {
   const basename = import.meta.env.PROD ? '/slevac-ai' : ''
@@ -17,6 +18,7 @@ function App() {
         <Route path="/mobile" element={<FigmaMCP />} />
         <Route path="/mobile/inspire" element={<InspirePage />} />
         <Route path="/mobile/cestovani" element={<CestovaniPage />} />
+        <Route path="/mobile/cestovani/detail" element={<DealDetailPage />} />
         <Route path="/desktop" element={<DesktopPage />} />
       </Routes>
     </BrowserRouter>

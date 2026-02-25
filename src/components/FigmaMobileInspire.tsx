@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mic, Send, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
 import ActivityCarousel from './ActivityCarousel'
@@ -24,7 +24,6 @@ const occasionTags = [
 ]
 
 export default function FigmaMobileInspire({ isOpen, onToggle }: MobileInspireProps) {
-  const navigate = useNavigate()
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
   const [heroInput, setHeroInput] = useState('')
@@ -78,12 +77,16 @@ export default function FigmaMobileInspire({ isOpen, onToggle }: MobileInspirePr
         <div className="h-full overflow-y-auto z-0 bg-[#FCFBFA]">
           
           {/* Header */}
+          {/* Top Header */}
           <Link to="/mobile">
-            <img src={`${import.meta.env.BASE_URL}assets/header-inspire.jpg`} alt="Header" className="w-full h-auto block" />
+            <img src={`${import.meta.env.BASE_URL}assets/top-header.jpg`} alt="Top Header" className="w-full h-auto block" />
           </Link>
 
+          {/* Header */}
+          <img src={`${import.meta.env.BASE_URL}assets/header-inspire.jpg`} alt="Header" className="w-full h-auto block" />
+
           {/* Hero Section – Inspire variant */}
-          <div className="relative bg-[#FCFBFA] px-[12px] pt-[16px] pb-[16px]">
+          <div className="relative px-[12px] pt-[16px] pb-[16px] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}assets/background.jpg)` }}>
             {/* Title */}
             <h2 className="text-[24px] leading-[30px] font-bold text-black mb-[12px]">
               Pobyty a cestování plné zážitků
@@ -168,7 +171,7 @@ export default function FigmaMobileInspire({ isOpen, onToggle }: MobileInspirePr
               <div className="pt-[8px] pb-[4px] px-[4px]">
                 <Link
                   to="/mobile/cestovani"
-                  className="inline-flex items-center gap-[4px] border border-[#CBCCCE] rounded-full px-[14px] py-[6px] text-[14px] leading-[20px] text-black font-medium hover:bg-[#f5f5f5] transition-colors"
+                  className="inline-flex items-center gap-[4px] border border-[#CBCCCE] rounded-[8px] px-[14px] py-[6px] text-[14px] leading-[20px] text-black font-medium hover:bg-[#f5f5f5] transition-colors"
                 >
                   Zobrazit vše
                   <ChevronRight className="w-[14px] h-[14px] text-[#666]" />
@@ -177,21 +180,9 @@ export default function FigmaMobileInspire({ isOpen, onToggle }: MobileInspirePr
             </div>
           </div>
 
-          {/* Promo Banner */}
-          <div className="mx-[10px] mt-[10px] rounded-[10px] overflow-hidden">
-            <img src={`${import.meta.env.BASE_URL}assets/banner.jpg`} alt="Promo banner" className="w-full h-auto block" />
-          </div>
-
-          {/* Location */}
-          <div className="px-[10px] py-[10px] flex items-center justify-center gap-[4px] text-[11px]">
-            <span className="text-[#333]">Praha a okolí</span>
-            <span className="text-[#333]">·</span>
-            <span className="text-[#00a84f] font-medium cursor-pointer hover:underline" onClick={() => navigate('/')}>Změnit lokalitu</span>
-          </div>
-
           {/* Category Cards Grid + Nedávno prohlížené */}
-          <div className="px-[10px]">
-            <img src={`${import.meta.env.BASE_URL}assets/grid.jpg`} alt="Kategorie a nedávno prohlížené" className="w-full h-auto block" />
+          <div className="px-[10px] pt-[24px]">
+            <img src={`${import.meta.env.BASE_URL}assets/grid2.jpg`} alt="Kategorie a nedávno prohlížené" className="w-full h-auto block" />
           </div>
 
           {/* Bottom spacer for floating button */}
