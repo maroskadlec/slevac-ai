@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mic, Send, SlidersHorizontal, Map, ArrowUpDown, ChevronRight } from 'lucide-react'
+import BottomNavBar from './BottomNavBar'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useChatbot } from '../hooks/useChatbot'
@@ -479,6 +480,9 @@ export default function FigmaMobileCestovani({ isOpen, onToggle }: MobileCestova
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Bottom Nav Bar */}
+      {!isOpen && <BottomNavBar />}
 
       {/* Floating Button */}
       <motion.button

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mic, Send } from 'lucide-react'
+import BottomNavBar from './BottomNavBar'
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useChatbot } from '../hooks/useChatbot'
@@ -317,6 +318,9 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Bottom Nav Bar */}
+        {!isOpen && <BottomNavBar />}
 
         {/* Floating Button - HIGH Z-INDEX */}
         <motion.button
