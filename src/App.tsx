@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ChatProvider } from './contexts/ChatContext'
 import HomePage from './pages/HomePage'
 import CursorIdeas from './pages/CursorIdeas'
 import FigmaMCP from './pages/FigmaMCP'
@@ -12,15 +13,17 @@ function App() {
   
   return (
     <BrowserRouter basename={basename}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/cursor-ideas" element={<CursorIdeas />} />
-        <Route path="/mobile" element={<FigmaMCP />} />
-        <Route path="/mobile/inspire" element={<InspirePage />} />
-        <Route path="/mobile/cestovani" element={<CestovaniPage />} />
-        <Route path="/mobile/cestovani/detail" element={<DealDetailPage />} />
-        <Route path="/desktop" element={<DesktopPage />} />
-      </Routes>
+      <ChatProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/cursor-ideas" element={<CursorIdeas />} />
+          <Route path="/mobile" element={<FigmaMCP />} />
+          <Route path="/mobile/inspire" element={<InspirePage />} />
+          <Route path="/mobile/cestovani" element={<CestovaniPage />} />
+          <Route path="/mobile/cestovani/detail" element={<DealDetailPage />} />
+          <Route path="/desktop" element={<DesktopPage />} />
+        </Routes>
+      </ChatProvider>
     </BrowserRouter>
   )
 }

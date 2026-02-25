@@ -1,12 +1,12 @@
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { useChatContext } from '../contexts/ChatContext'
 import FigmaDesktop from '../components/FigmaDesktop'
 
 function DesktopPage() {
   const navigate = useNavigate()
-  const [isDesktopOpen, setIsDesktopOpen] = useState(false)
+  const { isModalOpen: isDesktopOpen, setIsModalOpen: setIsDesktopOpen } = useChatContext()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex flex-col">

@@ -3,6 +3,7 @@ import { X, Mic, Send, ChevronRight, ChevronLeft, Shield, RefreshCw, Star, Heart
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useChatbot } from '../hooks/useChatbot'
+import { useChatContext } from '../contexts/ChatContext'
 import DealCarousel from './DealCarousel'
 import ActivityCarousel from './ActivityCarousel'
 import { allDeals } from '../data/mockDeals'
@@ -15,8 +16,6 @@ interface DealDetailProps {
   isOpen: boolean
   onToggle: () => void
 }
-
-const variantTabs = ['3 dny', '4 dny', '5 dní', '6 dní', '7 dní']
 
 interface Variant {
   title: string
@@ -46,6 +45,7 @@ function getVariants(deal: DealCard): Variant[] {
 
 export default function FigmaMobileDealDetail({ isOpen, onToggle }: DealDetailProps) {
   const navigate = useNavigate()
+  const { setIsModalOpen } = useChatContext()
   const [searchParams] = useSearchParams()
   const dealId = searchParams.get('id') || 'd1'
 
@@ -54,7 +54,6 @@ export default function FigmaMobileDealDetail({ isOpen, onToggle }: DealDetailPr
 
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
-  const [activeTab, setActiveTab] = useState(0)
   const chat = useChatbot(isOpen)
 
   const formatPrice = (n: number) => n.toLocaleString('cs-CZ')
@@ -96,12 +95,18 @@ export default function FigmaMobileDealDetail({ isOpen, onToggle }: DealDetailPr
           <img src={`${import.meta.env.BASE_URL}assets/top-header.jpg`} alt="Top Header" className="w-full h-auto block" />
         </Link>
 
+        {/* Header image */}
+        <img src={`${import.meta.env.BASE_URL}assets/header-inspire.jpg`} alt="Header" className="w-full h-auto block" />
+
         {/* Hero Image */}
         <div className="relative">
           <img src={deal.image} alt={deal.title} className="w-full h-[220px] object-cover" />
           {/* Back button */}
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              navigate(-1)
+              setTimeout(() => setIsModalOpen(true), 100)
+            }}
             className="absolute top-[12px] left-[8px] w-[36px] h-[36px] bg-white/90 rounded-full flex items-center justify-center shadow-sm cursor-pointer"
           >
             <ChevronLeft className="w-[20px] h-[20px] text-[#333]" />
@@ -170,23 +175,6 @@ export default function FigmaMobileDealDetail({ isOpen, onToggle }: DealDetailPr
         <div className="px-[8px] pt-[16px] pb-[8px]">
           <h2 className="text-[18px] leading-[24px] font-bold text-black mb-[12px]">Varianty podle vaší volby</h2>
 
-          {/* Day tabs */}
-          <div className="flex gap-[6px] overflow-x-auto pb-[12px]" style={{ scrollbarWidth: 'none' }}>
-            {variantTabs.map((tab, i) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(i)}
-                className={`flex-shrink-0 px-[14px] py-[6px] rounded-full text-[14px] font-medium border transition-colors cursor-pointer ${
-                  i === activeTab
-                    ? 'bg-[#006eb9] text-white border-[#006eb9]'
-                    : 'bg-white text-[#333] border-[#cbccce] hover:bg-[#f5f5f5]'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
           {/* Variant cards */}
           <div className="flex flex-col gap-[8px]">
             {variants.map((v, i) => (
@@ -206,6 +194,33 @@ export default function FigmaMobileDealDetail({ isOpen, onToggle }: DealDetailPr
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* AI Comparison Card */}
+        <div className="px-[8px] pb-[12px]">
+          <div className="bg-white rounded-[16px] shadow-[0px_2px_6px_0px_rgba(0,0,0,0.18)] p-[16px] flex items-start gap-[12px]">
+            <div className="flex-1">
+              <p className="text-[16px] leading-[22px] font-bold text-black mb-[12px]">
+                Porovnám s podobnými nabídkami nebo se chcete na něco optat?
+              </p>
+              <button
+                onClick={onToggle}
+                className="bg-[#006eb9] text-white font-bold text-[14px] px-[20px] py-[10px] rounded-[8px] cursor-pointer hover:bg-[#005a9a] transition-colors"
+              >
+                Pustit se do toho
+              </button>
+            </div>
+            <div className="w-[76px] h-[76px] flex-shrink-0 -mr-[20px]">
+              <motion.img
+                src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                alt="Mrkatko"
+                className="w-full h-full object-contain"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.1, ease: 'easeIn' }}
+              />
+            </div>
           </div>
         </div>
 

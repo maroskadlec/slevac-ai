@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { useChatContext } from '../contexts/ChatContext'
 import FigmaMobileCestovani from '../components/FigmaMobileCestovani'
 
 function CestovaniPage() {
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const { isModalOpen, setIsModalOpen } = useChatContext()
 
   return (
     <div className="bg-white">
       <FigmaMobileCestovani 
-        isOpen={isMobileOpen} 
-        onToggle={() => setIsMobileOpen(!isMobileOpen)} 
+        isOpen={isModalOpen} 
+        onToggle={() => setIsModalOpen(!isModalOpen)} 
       />
     </div>
   )

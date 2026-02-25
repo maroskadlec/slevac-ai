@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
+import { useChatContext } from '../contexts/ChatContext'
 import type { DealCard } from '../data/mockDeals'
 import { pickRandomDeals } from '../data/mockDeals'
 import type { ActivityCard } from '../data/mockActivities'
@@ -909,13 +910,9 @@ function buildDealsResponse(state: ConversationState, prefix?: string): BotRespo
 
 // ─── Hook ──────────────────────────────────────────────────────────
 
-export function useChatbot(_isOpen?: boolean) {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [inputValue, setInputValue] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const [typingText, setTypingText] = useState('')
+export function useChatbot(isOpen?: boolean) {
+  const { messages, setMessages, inputValue, setInputValue, isTyping, setIsTyping, typingText, setTypingText, nextIdRef } = useChatContext()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const nextIdRef = useRef(1)
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -926,6 +923,14 @@ export function useChatbot(_isOpen?: boolean) {
   useEffect(() => {
     scrollToBottom()
   }, [messages, isTyping, scrollToBottom])
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'instant' })
+      }, 150)
+    }
+  }, [isOpen])
 
   const sendMessageInternal = useCallback((text: string) => {
     if (!text || isTyping) return
@@ -957,7 +962,7 @@ export function useChatbot(_isOpen?: boolean) {
       setIsTyping(false)
       setTypingText('')
     }, delay)
-  }, [isTyping, messages])
+  }, [isTyping, messages, setMessages, setInputValue, setIsTyping, setTypingText, nextIdRef])
 
   const sendMessage = useCallback(() => {
     const text = inputValue.trim()
@@ -991,7 +996,7 @@ export function useChatbot(_isOpen?: boolean) {
       setIsTyping(false)
       setTypingText('')
     }, delay)
-  }, [isTyping])
+  }, [isTyping, setIsTyping, setTypingText, setMessages, nextIdRef])
 
   const handleFeedback = useCallback((type: 'up' | 'down') => {
     setIsTyping(true)
@@ -1011,20 +1016,18 @@ export function useChatbot(_isOpen?: boolean) {
       setIsTyping(false)
       setTypingText('')
     }, delay)
-  }, [])
+  }, [setIsTyping, setTypingText, setMessages, nextIdRef])
 
   // ─── Quick Tags (contextual shortcuts above input) ──────────────
   const quickTags: { label: string; value: string }[] = (() => {
     if (isTyping) return []
     if (messages.length === 0) return []
 
-    // Tags only show when last message is from bot (not after user sends)
     const lastMsg = messages[messages.length - 1]
     if (!lastMsg || lastMsg.sender !== 'bot') return []
 
     const lastBotText = norm(lastMsg.text)
 
-    // 1) After dislike feedback → dislike reason tags
     if (lastBotText.includes('pomoz mi pochopit') || lastBotText.includes('udelal chybku')) {
       return [
         { label: '💰 Příliš drahé', value: 'Příliš drahé' },
@@ -1033,14 +1036,12 @@ export function useChatbot(_isOpen?: boolean) {
       ]
     }
 
-    // 2) After dislike explanation → "Ano" to try again
     if (lastBotText.includes('beru si to k srdci') || lastBotText.includes('zkusil znovu')) {
       return [
         { label: '👍 Ano', value: 'Ano' },
       ]
     }
 
-    // 3) Bot asking for parameters → "Je mi to jedno"
     if (
       lastBotText.includes('kolik vas') || lastBotText.includes('kolik') ||
       lastBotText.includes('kdy chces') || lastBotText.includes('termin') ||
@@ -1053,7 +1054,6 @@ export function useChatbot(_isOpen?: boolean) {
       ]
     }
 
-    // 4) Deals were shown → activity tag + fakedoor "Více nabídek"
     if (dealsWereShown(messages)) {
       return [
         { label: '🗺️ Chci výlety v okolí', value: 'Chci výlety v okolí' },

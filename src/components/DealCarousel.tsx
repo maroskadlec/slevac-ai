@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Heart, Star, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { useChatContext } from '../contexts/ChatContext'
 import type { DealCard } from '../data/mockDeals'
 
 // 20 badge labels for "Líbilo se: XX"
@@ -46,6 +47,7 @@ interface DealCarouselProps {
 
 export default function DealCarousel({ deals, compact = false, onFeedback }: DealCarouselProps) {
   const navigate = useNavigate()
+  const { setIsModalOpen } = useChatContext()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [feedback, setFeedback] = useState<'none' | 'up' | 'down'>('none')
@@ -85,7 +87,7 @@ export default function DealCarousel({ deals, compact = false, onFeedback }: Dea
         {deals.map((deal) => (
           <div
             key={deal.id}
-            onClick={() => navigate(`/mobile/cestovani/detail?id=${deal.id}`)}
+            onClick={() => { setIsModalOpen(false); navigate(`/mobile/cestovani/detail?id=${deal.id}`) }}
             className="snap-start flex-shrink-0 rounded-[10px] overflow-hidden bg-white cursor-pointer"
             style={{ width: `${cardWidth}px` }}
           >
