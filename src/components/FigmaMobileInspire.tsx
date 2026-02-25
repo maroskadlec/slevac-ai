@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Mic, Send } from 'lucide-react'
+import { X, Mic, Send, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useChatbot } from '../hooks/useChatbot'
@@ -164,11 +164,15 @@ export default function FigmaMobileInspire({ isOpen, onToggle }: MobileInspirePr
                 </div>
               </div>
 
-              {/* Zobrazit vše link */}
-              <div className="pt-[4px] pb-[0px] pl-[4px]">
-                <a href="#" onClick={(e) => e.preventDefault()} className="text-[14px] font-semibold text-[#006eb9] hover:underline">
+              {/* Zobrazit vše button */}
+              <div className="pt-[8px] pb-[4px] px-[4px]">
+                <Link
+                  to="/mobile/cestovani"
+                  className="inline-flex items-center gap-[4px] border border-[#CBCCCE] rounded-full px-[14px] py-[6px] text-[14px] leading-[20px] text-black font-medium hover:bg-[#f5f5f5] transition-colors"
+                >
                   Zobrazit vše
-                </a>
+                  <ChevronRight className="w-[14px] h-[14px] text-[#666]" />
+                </Link>
               </div>
             </div>
           </div>

@@ -4,6 +4,7 @@ import CursorIdeas from './pages/CursorIdeas'
 import FigmaMCP from './pages/FigmaMCP'
 import DesktopPage from './pages/DesktopPage'
 import InspirePage from './pages/InspirePage'
+import CestovaniPage from './pages/CestovaniPage'
 
 function App() {
   const basename = import.meta.env.PROD ? '/slevac-ai' : ''
@@ -15,6 +16,7 @@ function App() {
         <Route path="/cursor-ideas" element={<CursorIdeas />} />
         <Route path="/mobile" element={<FigmaMCP />} />
         <Route path="/mobile/inspire" element={<InspirePage />} />
+        <Route path="/mobile/cestovani" element={<CestovaniPage />} />
         <Route path="/desktop" element={<DesktopPage />} />
       </Routes>
     </BrowserRouter>
