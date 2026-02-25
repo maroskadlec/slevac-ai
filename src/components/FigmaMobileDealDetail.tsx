@@ -203,7 +203,7 @@ export default function FigmaMobileDealDetail({ isOpen, onToggle }: DealDetailPr
           <div className="bg-white rounded-[16px] shadow-[0px_2px_6px_0px_rgba(0,0,0,0.18)] p-[16px] flex items-start gap-[12px]">
             <div className="flex-1">
               <p className="text-[16px] leading-[22px] font-bold text-black mb-[12px]">
-                Porovnám s podobnými nabídkami nebo se chcete na něco optat?
+                Chcete se na něco k nabídce optat?
               </p>
               <button
                 onClick={onToggle}
