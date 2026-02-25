@@ -903,7 +903,7 @@ function buildDealsResponse(state: ConversationState, prefix?: string): BotRespo
   const intro = prefix || 'Paráda, mám vše!'
 
   return {
-    text: `${intro}\n\n${summary}\n\nNašel jsem pár zajímavých pobytů, kde si užiješ, co hledáš. Který se ti líbí nejvíc?`,
+    text: `${intro}\n\n${summary}\n\nNašel jsem podle toho, co ti nejvíc sedne.`,
     deals: pickRandomDeals(5),
   }
 }
