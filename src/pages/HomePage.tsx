@@ -57,18 +57,6 @@ function HomePage() {
           >
             Jdeme na to
           </motion.button>
-
-          {/* Secondary Button → Figma prototype */}
-          <motion.a
-            href="https://www.figma.com/proto/zvc9bqZGmvrfW1vhS9BGzN/Slevomat-Mobil?page-id=19028%3A78613&node-id=19645-78206&viewport=1225%2C451%2C0.19&t=lbxh0cfGJpKg8H8o-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=19741%3A78519"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full max-w-sm bg-white hover:bg-gray-50 text-gray-700 font-semibold text-lg rounded-2xl px-8 py-4 border-2 border-gray-300 hover:border-gray-400 transition-all cursor-pointer text-center"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            A k tomuhle se vrátíme později
-          </motion.a>
         </motion.div>
 
         {/* Hidden desktop link */}
