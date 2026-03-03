@@ -1009,8 +1009,8 @@ export function useChatbot(isOpen?: boolean) {
         ? 'Děkuju, to je milé.'
         : 'To mne mrzí. Pomoz mi pochopit, kde jsem udělal chybku. Školím se a ty mi pomůžeš být příště lepším.'
       const image = type === 'up'
-        ? `${import.meta.env.BASE_URL}assets/like.png`
-        : `${import.meta.env.BASE_URL}assets/dislike.png`
+        ? `${import.meta.env.BASE_URL}assets/like.svg`
+        : `${import.meta.env.BASE_URL}assets/dislike.svg`
       setMessages(prev => [...prev, { id: botMsgId, text, sender: 'bot', image }])
       setIsTyping(false)
       setTypingText('')

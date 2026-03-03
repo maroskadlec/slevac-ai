@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Heart, Star } from 'lucide-react'
 import type { ActivityCard } from '../data/mockActivities'
 
-const dislikeImg = `${import.meta.env.BASE_URL}assets/dislike.png`
+const dislikeImg = `${import.meta.env.BASE_URL}assets/dislike.svg`
 
 interface ActivityCarouselProps {
   activities: ActivityCard[]

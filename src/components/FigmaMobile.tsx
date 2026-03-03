@@ -7,8 +7,10 @@ import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
 import ActivityCarousel from './ActivityCarousel'
 
-const mrkatkoImg = `${import.meta.env.BASE_URL}assets/fc1601850dd2f7e663f5b1530e6a54e3bfc3e857.png`
-const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/76cb4db62fdf61674840e9abfdf6700b478b2a68.png`
+const mrkatkoImg = `${import.meta.env.BASE_URL}assets/nemrknutej.svg`
+const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/mrknutej.svg`
+const fillingImg = `${import.meta.env.BASE_URL}assets/filling-default.svg`
+const fillingImgBlink = `${import.meta.env.BASE_URL}assets/filling-mrknutej.svg`
 
 interface MobileProps {
   isOpen: boolean
@@ -20,6 +22,7 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
   const [heroInput, setHeroInput] = useState('')
+  const [heroInputFocused, setHeroInputFocused] = useState(false)
   const chat = useChatbot(isOpen)
 
   const handleHeroSend = () => {
@@ -82,9 +85,9 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               {/* Textarea with avatar on the right */}
               <div className="relative p-[16px]">
                 {/* Avatar – right side */}
-                <div className="absolute top-[10px] right-[-16px] w-[86px] h-[86px] flex-shrink-0">
+                <div className="absolute top-[10px] right-[8px] w-[40px] h-[40px] flex-shrink-0">
                   <motion.img 
-                    src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                    src={heroInputFocused ? (isBlinking ? fillingImgBlink : fillingImg) : (isBlinking ? mrkatkoImgBlink : mrkatkoImg)}
                     alt="Mrkatko" 
                     className="w-full h-full object-contain rounded-full"
                     initial={{ opacity: 1 }}
@@ -102,6 +105,8 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
                 <textarea
                   value={heroInput}
                   onChange={(e) => setHeroInput(e.target.value)}
+                  onFocus={() => setHeroInputFocused(true)}
+                  onBlur={() => setHeroInputFocused(false)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleHeroSend() } }}
                   rows={4}
                   className="w-full bg-transparent pr-[84px] text-[16px] leading-[24px] text-black font-semibold outline-none border-none resize-none"
@@ -369,15 +374,15 @@ export default function FigmaMobile({ isOpen, onToggle }: MobileProps) {
               damping: 120
             }}
           >
-            <div className="bg-[#006eb9] border-2 border-white flex flex-col items-center justify-center rounded-[38px] w-[48px] h-[48px] overflow-hidden">
-              <div className="w-[40px] h-[40px] relative">
-                <div className="absolute left-1/2 top-[calc(50%-0.25px)] -translate-x-1/2 -translate-y-1/2 w-[39.375px] h-[37.5px]">
+            <div className="bg-white border-2 border-[#006eb9] flex flex-col items-center justify-center rounded-[38px] w-[48px] h-[48px] overflow-hidden">
+              <div className="w-[32px] h-[32px] relative">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[32px] h-[32px]">
                   <div className="absolute inset-[0_1.56%_0_-1.56%]">
                     <div className="absolute inset-0 overflow-visible">
                       <motion.img 
                         src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
                         alt="Mrkatko" 
-                        className="absolute left-[-22.38%] top-[-6.15%] w-[167.25%] h-[174.82%] max-w-none"
+                        className="w-full h-full object-contain"
                         initial={{ opacity: 1 }}
                         animate={{ opacity: 1 }}
                         transition={{
