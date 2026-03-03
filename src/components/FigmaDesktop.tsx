@@ -1,12 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { X, Mic, Send } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { X, Mic, Send, ArrowLeft } from 'lucide-react'
 import { useChatbot } from '../hooks/useChatbot'
 import DealCarousel from './DealCarousel'
 import ActivityCarousel from './ActivityCarousel'
 
 const mrkatkoImg = `${import.meta.env.BASE_URL}assets/nemrknutej.svg`
 const mrkatkoImgBlink = `${import.meta.env.BASE_URL}assets/mrknutej.svg`
+const mrkatkoImgUp = `${import.meta.env.BASE_URL}assets/default-up.svg`
+const mrkatkoImgUpBlink = `${import.meta.env.BASE_URL}assets/mrknutej-up.svg`
 
 interface DesktopProps {
   isOpen: boolean
@@ -14,8 +17,10 @@ interface DesktopProps {
 }
 
 export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
+  const navigate = useNavigate()
   const [buttonState, setButtonState] = useState<'default' | 'state3' | 'state4' | 'state5'>('default')
   const [isBlinking, setIsBlinking] = useState(false)
+  const [modalInputFocused, setModalInputFocused] = useState(false)
   const chat = useChatbot(isOpen)
 
   useEffect(() => {
@@ -50,9 +55,18 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
   }, [])
 
   return (
-    <div className="relative w-full h-full overflow-visible flex items-center justify-center">
-      <div className="relative w-[1000px] h-[800px] bg-white rounded-lg border-4 border-black overflow-hidden">
-        
+    <div className="relative w-full h-full min-h-[100dvh] bg-white overflow-hidden">
+        {/* Back button */}
+        <motion.button
+          onClick={() => navigate('/')}
+          className="absolute top-[12px] left-[12px] z-50 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          whileHover={{ x: -4 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Zpět</span>
+        </motion.button>
+
         {/* Backdrop */}
         <AnimatePresence>
           {isOpen && (
@@ -60,13 +74,13 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/20 z-10"
+              className="absolute inset-0 bg-black/20 z-30"
               onClick={onToggle}
             />
           )}
         </AnimatePresence>
 
-        {/* Modal */}
+        {/* Modal – above floating button, stretched upward */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -78,7 +92,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                 stiffness: 280,
                 damping: 30
               }}
-              className="absolute right-[10px] bottom-[10px] w-[380px] h-[480px] bg-white rounded-[8px] border border-[#e3e4e6] shadow-2xl z-20 flex flex-col"
+              className="absolute right-[10px] bottom-[80px] top-[10px] w-[540px] bg-white rounded-[8px] border border-[#e3e4e6] shadow-2xl z-40 flex flex-col"
             >
               {/* Header Bar – text left, close button right */}
               <div className="flex items-center justify-between px-[20px] pt-[14px] pb-[8px] flex-shrink-0 border-b border-[#e5e7eb] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
@@ -177,6 +191,8 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                   <textarea
                     value={chat.inputValue}
                     onChange={(e) => chat.setInputValue(e.target.value)}
+                    onFocus={() => setModalInputFocused(true)}
+                    onBlur={() => setModalInputFocused(false)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault()
@@ -211,33 +227,25 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
           )}
         </AnimatePresence>
 
-        {/* Floating Button */}
+        {/* Floating Button – zůstává viditelný i při otevřeném modálu */}
         <motion.button
           onClick={onToggle}
-          className="absolute right-[10px] bottom-[10px] flex items-center p-[6px] rounded-[58px] cursor-pointer z-30"
-          animate={
-            isOpen 
-              ? { scale: 0, opacity: 0, backgroundColor: 'transparent' }
-              : { 
-                  scale: 1, 
-                  opacity: 1,
-                  backgroundColor: buttonState === 'default' 
-                    ? 'rgba(0,110,185,0.07)' 
-                    : 'rgba(0,110,185,0)'
-                }
-          }
-          transition={
-            isOpen 
-              ? { duration: 0.2 }
-              : {
-                  type: "spring",
-                  mass: 1,
-                  stiffness: 6400,
-                  damping: 120,
-                  scale: { duration: 0.2 },
-                  opacity: { duration: 0.2 }
-                }
-          }
+          className="absolute right-[10px] bottom-[10px] flex items-center p-[6px] rounded-[58px] cursor-pointer z-50"
+          animate={{ 
+            scale: 1, 
+            opacity: 1,
+            backgroundColor: buttonState === 'default' 
+              ? 'rgba(0,110,185,0.07)' 
+              : 'rgba(0,110,185,0)'
+          }}
+          transition={{
+            type: "spring",
+            mass: 1,
+            stiffness: 6400,
+            damping: 120,
+            scale: { duration: 0.2 },
+            opacity: { duration: 0.2 }
+          }}
           whileHover={{
             scale: 1.05,
             backgroundColor: 'rgba(0,110,185,0.12)'
@@ -264,7 +272,7 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
                   <div className="absolute inset-[0_1.56%_0_-1.56%]">
                     <div className="absolute inset-0 overflow-visible">
                       <motion.img 
-                        src={isBlinking ? mrkatkoImgBlink : mrkatkoImg}
+                        src={isOpen && modalInputFocused ? (isBlinking ? mrkatkoImgUpBlink : mrkatkoImgUp) : (isBlinking ? mrkatkoImgBlink : mrkatkoImg)}
                         alt="Mrkatko" 
                         className="w-full h-full object-contain"
                         initial={{ opacity: 1 }}
@@ -281,7 +289,6 @@ export default function FigmaDesktop({ isOpen, onToggle }: DesktopProps) {
             </div>
           </motion.div>
         </motion.button>
-      </div>
     </div>
   )
 }
